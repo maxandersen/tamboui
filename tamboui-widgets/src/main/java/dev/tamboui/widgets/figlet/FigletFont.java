@@ -8,7 +8,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +62,34 @@ public final class FigletFont {
                 throw new IllegalStateException("Failed to load FIGlet font from resource: " + path, e);
             }
         });
+    }
+
+    /**
+     * Loads a FIGlet font from a filesystem path.
+     *
+     * <p>Unlike {@link #fromResource(String)}, this does not cache by default.</p>
+     */
+    public static FigletFont fromPath(Path path) {
+        Objects.requireNonNull(path, "path");
+        try (InputStream in = Files.newInputStream(path)) {
+            return parse(in);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to load FIGlet font from path: " + path, e);
+        }
+    }
+
+    /**
+     * Loads a FIGlet font from an input stream.
+     *
+     * <p>The stream will be fully consumed but not closed.</p>
+     */
+    public static FigletFont fromInputStream(InputStream in) {
+        Objects.requireNonNull(in, "in");
+        try {
+            return parse(in);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to load FIGlet font from input stream", e);
+        }
     }
 
     public int height() {
