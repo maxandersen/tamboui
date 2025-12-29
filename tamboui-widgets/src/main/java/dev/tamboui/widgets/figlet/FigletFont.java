@@ -125,6 +125,22 @@ public final class FigletFont {
                     continue;
                 }
 
+                // Overlay the overlapped prefix onto the current rows.
+                int currentWidth = maxWidth(rows);
+                padRight(rows, currentWidth);
+                for (int r = 0; r < height; r++) {
+                    StringBuilder cur = rows.get(r);
+                    String next = glyph[r];
+                    for (int k = 0; k < shift; k++) {
+                        int dest = currentWidth - shift + k;
+                        char a = charAtOrSpace(cur, dest);
+                        char b = charAtOrSpace(next, k);
+                        if (a == ' ' && b != ' ') {
+                            cur.setCharAt(dest, b);
+                        }
+                    }
+                }
+
                 // Append glyph excluding the overlapped prefix.
                 for (int r = 0; r < height; r++) {
                     String line = glyph[r];
@@ -250,12 +266,13 @@ public final class FigletFont {
         char hardBlank = header.charAt(5);
 
         String[] parts = header.substring(6).trim().split("\\s+");
-        if (parts.length < 6) {
+        if (parts.length < 5) {
             throw new IllegalArgumentException("Invalid FIGlet font header parameters");
         }
 
         int height = Integer.parseInt(parts[0]);
-        int commentLines = Integer.parseInt(parts[5]);
+        // Header params: height, baseline, maxLen, oldLayout, commentLines, ...
+        int commentLines = Integer.parseInt(parts[4]);
 
         for (int i = 0; i < commentLines; i++) {
             // discard
