@@ -4,36 +4,38 @@
  */
 package dev.tamboui.demo;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.software.os.OSProcess;
+import oshi.software.os.OperatingSystem;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
- * Reads system metrics from /proc on Linux.
+ * Reads system metrics using OSHI (cross-platform).
  * Separates system monitoring logic from UI rendering.
  */
 final class SystemMetrics {
 
     private static final int HISTORY_SIZE = 60;
-    private static final Path PROC_STAT = Path.of("/proc/stat");
-    private static final Path PROC_MEMINFO = Path.of("/proc/meminfo");
-    private static final Path PROC_UPTIME = Path.of("/proc/uptime");
-    private static final Path PROC_LOADAVG = Path.of("/proc/loadavg");
-    private static final Path PROC = Path.of("/proc");
-    private static final Pattern STAT_PATTERN = Pattern.compile("^(\\d+) \\((.*)\\) (\\S).*");
+
+    private final SystemInfo systemInfo = new SystemInfo();
+    private final GlobalMemory memory = systemInfo.getHardware().getMemory();
+    private final CentralProcessor processor = systemInfo.getHardware().getProcessor();
+    private final OperatingSystem operatingSystem = systemInfo.getOperatingSystem();
 
     // CPU tracking
     private final int numCpus;
     private final double[] coreUsage;
-    private final long[] lastCoreTotal;
-    private final long[] lastCoreIdle;
     private final List<Deque<Long>> coreHistory;
+    private long[][] lastCpuTicks;
 
     // Memory tracking
     private final Deque<Long> memoryHistory = new ArrayDeque<>(HISTORY_SIZE);
@@ -51,6 +53,7 @@ final class SystemMetrics {
 
     // Process list
     private List<ProcessInfo> processes = new ArrayList<>();
+    private final Map<Integer, OSProcess> lastProcessesByPid = new HashMap<>();
 
     /**
      * Information about a running process.
@@ -72,10 +75,8 @@ final class SystemMetrics {
     }
 
     SystemMetrics() {
-        numCpus = Runtime.getRuntime().availableProcessors();
+        numCpus = processor.getLogicalProcessorCount();
         coreUsage = new double[numCpus];
-        lastCoreTotal = new long[numCpus];
-        lastCoreIdle = new long[numCpus];
         coreHistory = new ArrayList<>(numCpus);
 
         for (var i = 0; i < numCpus; i++) {
@@ -178,65 +179,38 @@ final class SystemMetrics {
     // ==================== Update Methods ====================
 
     private void updateCpuUsage() {
-        try {
-            var lines = Files.readAllLines(PROC_STAT);
-            for (var line : lines) {
-                if (line.startsWith("cpu") && !line.startsWith("cpu ")) {
-                    var parts = line.split("\\s+");
-                    var coreId = Integer.parseInt(parts[0].substring(3));
-                    if (coreId >= numCpus) {
-                        continue;
-                    }
+        if (lastCpuTicks == null) {
+            lastCpuTicks = processor.getProcessorCpuLoadTicks();
+            return;
+        }
 
-                    var user = Long.parseLong(parts[1]);
-                    var nice = Long.parseLong(parts[2]);
-                    var system = Long.parseLong(parts[3]);
-                    var idle = Long.parseLong(parts[4]);
-                    var iowait = Long.parseLong(parts[5]);
-                    var irq = Long.parseLong(parts[6]);
-                    var softirq = Long.parseLong(parts[7]);
+        var load = processor.getProcessorCpuLoadBetweenTicks(lastCpuTicks); // 0..1 per logical CPU
+        lastCpuTicks = processor.getProcessorCpuLoadTicks();
 
-                    var total = user + nice + system + idle + iowait + irq + softirq;
-                    var totalDelta = total - lastCoreTotal[coreId];
-                    var idleDelta = idle - lastCoreIdle[coreId];
-
-                    if (lastCoreTotal[coreId] > 0 && totalDelta > 0) {
-                        coreUsage[coreId] = 100.0 * (totalDelta - idleDelta) / totalDelta;
-                    }
-
-                    lastCoreTotal[coreId] = total;
-                    lastCoreIdle[coreId] = idle;
-
-                    var history = coreHistory.get(coreId);
-                    if (history.size() >= HISTORY_SIZE) {
-                        history.removeFirst();
-                    }
-                    history.addLast((long) coreUsage[coreId]);
-                }
+        for (var coreId = 0; coreId < Math.min(numCpus, load.length); coreId++) {
+            var usage = 100.0 * load[coreId];
+            if (Double.isNaN(usage) || Double.isInfinite(usage)) {
+                usage = 0;
             }
-        } catch (IOException e) {
-            // Ignore - will show 0
+            coreUsage[coreId] = Math.max(0, Math.min(100, usage));
+
+            var history = coreHistory.get(coreId);
+            if (history.size() >= HISTORY_SIZE) {
+                history.removeFirst();
+            }
+            history.addLast((long) coreUsage[coreId]);
         }
     }
 
     private void updateMemoryInfo() {
-        try {
-            var lines = Files.readAllLines(PROC_MEMINFO);
-            for (var line : lines) {
-                if (line.startsWith("MemTotal:")) {
-                    memTotal = parseMemValue(line);
-                } else if (line.startsWith("MemAvailable:")) {
-                    memAvailable = parseMemValue(line);
-                } else if (line.startsWith("SwapTotal:")) {
-                    swapTotal = parseMemValue(line);
-                } else if (line.startsWith("SwapFree:")) {
-                    swapFree = parseMemValue(line);
-                }
-            }
-            memUsed = memTotal - memAvailable;
-        } catch (IOException e) {
-            // Ignore
-        }
+        memTotal = memory.getTotal() / 1024;
+        memAvailable = memory.getAvailable() / 1024;
+        memUsed = Math.max(0, memTotal - memAvailable);
+
+        var vm = memory.getVirtualMemory();
+        swapTotal = vm.getSwapTotal() / 1024;
+        var swapUsed = vm.getSwapUsed() / 1024;
+        swapFree = Math.max(0, swapTotal - swapUsed);
 
         var memPercent = memTotal > 0 ? (memUsed * 100) / memTotal : 0;
         if (memoryHistory.size() >= HISTORY_SIZE) {
@@ -245,54 +219,69 @@ final class SystemMetrics {
         memoryHistory.addLast(memPercent);
     }
 
-    private long parseMemValue(String line) {
-        var parts = line.split("\\s+");
-        if (parts.length >= 2) {
-            return Long.parseLong(parts[1]);
-        }
-        return 0;
-    }
-
     private void updateSystemInfo() {
-        try {
-            var uptimeLine = Files.readString(PROC_UPTIME).trim();
-            var parts = uptimeLine.split("\\s+");
-            uptime = Double.parseDouble(parts[0]);
-        } catch (IOException | NumberFormatException e) {
-            // Ignore
-        }
+        uptime = operatingSystem.getSystemUptime();
 
-        try {
-            var loadavg = Files.readString(PROC_LOADAVG).trim();
-            var parts = loadavg.split("\\s+");
-            loadAvg1 = Double.parseDouble(parts[0]);
-            loadAvg5 = Double.parseDouble(parts[1]);
-            loadAvg15 = Double.parseDouble(parts[2]);
-        } catch (IOException | NumberFormatException e) {
-            // Ignore
+        var la = processor.getSystemLoadAverage(3);
+        if (la != null && la.length >= 3) {
+            loadAvg1 = la[0] < 0 ? 0 : la[0];
+            loadAvg5 = la[1] < 0 ? 0 : la[1];
+            loadAvg15 = la[2] < 0 ? 0 : la[2];
+        } else {
+            loadAvg1 = 0;
+            loadAvg5 = 0;
+            loadAvg15 = 0;
         }
     }
 
     private void updateProcessList(SortMode sortMode) {
         var newProcesses = new ArrayList<ProcessInfo>();
 
-        try (var stream = Files.list(PROC)) {
-            stream.filter(p -> {
-                    var name = p.getFileName().toString();
-                    return name.chars().allMatch(Character::isDigit);
-                })
-                .forEach(pidPath -> {
-                    try {
-                        var info = readProcessInfo(pidPath);
-                        if (info != null) {
-                            newProcesses.add(info);
-                        }
-                    } catch (Exception e) {
-                        // Process may have exited
-                    }
-                });
-        } catch (IOException e) {
-            // Ignore
+        // Grab a snapshot of processes (limit later in rendering).
+        // Sorting will be applied after we compute CPU between ticks.
+        var snapshot = operatingSystem.getProcesses();
+        var newByPid = new HashMap<Integer, OSProcess>(snapshot.size());
+
+        for (var p : snapshot) {
+            var pid = p.getProcessID();
+            var prev = lastProcessesByPid.get(pid);
+
+            var cpuPercent = 0.0;
+            try {
+                if (prev != null) {
+                    cpuPercent = 100.0 * p.getProcessCpuLoadBetweenTicks(prev);
+                }
+            } catch (Exception ignored) {
+                // Some platforms/permissions may fail per-process CPU query.
+            }
+            if (Double.isNaN(cpuPercent) || Double.isInfinite(cpuPercent)) {
+                cpuPercent = 0;
+            }
+
+            var memoryKb = p.getResidentSetSize() / 1024;
+            var user = p.getUser();
+            if (user == null || user.isBlank()) {
+                user = "?";
+            }
+
+            var name = p.getCommandLine();
+            if (name == null || name.isBlank()) {
+                name = p.getName();
+            }
+            if (name == null || name.isBlank()) {
+                name = "?";
+            }
+
+            newProcesses.add(new ProcessInfo(
+                pid,
+                name,
+                mapState(p.getState()),
+                Math.max(0, cpuPercent),
+                Math.max(0, memoryKb),
+                user
+            ));
+
+            newByPid.put(pid, p);
         }
 
         var comparator = switch (sortMode) {
@@ -303,51 +292,21 @@ final class SystemMetrics {
         newProcesses.sort(comparator);
 
         this.processes = newProcesses;
+        lastProcessesByPid.clear();
+        lastProcessesByPid.putAll(newByPid);
     }
 
-    private ProcessInfo readProcessInfo(Path pidPath) {
-        try {
-            var pid = Integer.parseInt(pidPath.getFileName().toString());
-
-            var statLine = Files.readString(pidPath.resolve("stat")).trim();
-            var matcher = STAT_PATTERN.matcher(statLine);
-            if (!matcher.find()) {
-                return null;
-            }
-
-            var name = matcher.group(2);
-            var state = matcher.group(3).charAt(0);
-
-            var statmLine = Files.readString(pidPath.resolve("statm")).trim();
-            var statmParts = statmLine.split("\\s+");
-            var memPages = Long.parseLong(statmParts[1]);
-            var memoryKb = memPages * 4;
-
-            var statParts = statLine.substring(statLine.lastIndexOf(')') + 2).split("\\s+");
-            double cpuPercent = 0;
-            if (statParts.length > 12) {
-                var utime = Long.parseLong(statParts[11]);
-                var stime = Long.parseLong(statParts[12]);
-                cpuPercent = (utime + stime) / 100.0;
-            }
-
-            var user = "?";
-            try {
-                var statusLines = Files.readAllLines(pidPath.resolve("status"));
-                for (var line : statusLines) {
-                    if (line.startsWith("Uid:")) {
-                        var uid = line.split("\\s+")[1];
-                        user = uid;
-                        break;
-                    }
-                }
-            } catch (IOException e) {
-                // Ignore
-            }
-
-            return new ProcessInfo(pid, name, state, cpuPercent, memoryKb, user);
-        } catch (IOException | NumberFormatException e) {
-            return null;
+    private static char mapState(OSProcess.State state) {
+        if (state == null) {
+            return '?';
         }
+        return switch (state) {
+            case RUNNING -> 'R';
+            case SLEEPING -> 'S';
+            case WAITING -> 'D';
+            case STOPPED -> 'T';
+            case ZOMBIE -> 'Z';
+            default -> '?';
+        };
     }
 }
