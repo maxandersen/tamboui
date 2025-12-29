@@ -42,8 +42,10 @@ public class JLineBackend implements Backend {
     public JLineBackend() throws IOException {
         this.terminal = TerminalBuilder.builder()
             .system(true)
-            .jansi(true)
+            // Let JLine auto-detect the best available provider
+            // It will try: ffm (if available), jna, jni, or fallback to system
             .build();
+        
         this.writer = terminal.writer();
         this.reader = terminal.reader();
         this.inAlternateScreen = false;
