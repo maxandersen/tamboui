@@ -5,7 +5,6 @@
 package dev.tamboui.terminal;
 
 import dev.tamboui.buffer.Buffer;
-import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widgets.StatefulWidget;
@@ -85,23 +84,7 @@ public final class Frame {
      * @param area the area to render within
      */
     public void renderWidget(Widget widget, Rect area) {
-        if (area.isEmpty()) {
-            return;
-        }
-
-        // Render to a clipped buffer so widgets cannot paint outside `area`.
-        // To preserve layering semantics, start by copying the current content
-        // for the area from the main buffer into the clipped buffer.
-        Buffer clipped = Buffer.empty(area);
-        for (int y = area.top(); y < area.bottom(); y++) {
-            for (int x = area.left(); x < area.right(); x++) {
-                Cell cell = buffer.get(x, y);
-                clipped.set(x, y, cell);
-            }
-        }
-
-        widget.render(area, clipped);
-        buffer.merge(clipped, area.x(), area.y());
+        widget.render(area, buffer);
     }
 
     /**
@@ -113,20 +96,7 @@ public final class Frame {
      * @param state the widget state
      */
     public <S> void renderStatefulWidget(StatefulWidget<S> widget, Rect area, S state) {
-        if (area.isEmpty()) {
-            return;
-        }
-
-        Buffer clipped = Buffer.empty(area);
-        for (int y = area.top(); y < area.bottom(); y++) {
-            for (int x = area.left(); x < area.right(); x++) {
-                Cell cell = buffer.get(x, y);
-                clipped.set(x, y, cell);
-            }
-        }
-
-        widget.render(area, clipped, state);
-        buffer.merge(clipped, area.x(), area.y());
+        widget.render(area, buffer, state);
     }
 
     /**
