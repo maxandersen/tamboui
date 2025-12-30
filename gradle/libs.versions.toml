@@ -5,6 +5,7 @@ assertj = "3.27.6"
 native-build-tools = "0.11.1"
 picocli = "4.7.6"
 nexus = "2.0.0"
+oshi = "6.6.5"
 
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }
@@ -16,6 +17,7 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 graalvm-native = { module = "org.graalvm.buildtools:native-gradle-plugin", version.ref = "native-build-tools" }
 nexus-publishing-plugin = { module = "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin", version.ref = "nexus" }
+oshi-core = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
 
 [bundles]
 testing = ["junit-jupiter", "junit-platform-launcher", "assertj-core"]
