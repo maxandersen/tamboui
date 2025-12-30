@@ -81,17 +81,17 @@ public final class TiofDemo extends ToolkitApp {
                 text(" the Term Is On Fire ").bold().yellow(),
                 spacer(),
                 text(" [h] Help ").dim(),
-                text(" [↑/↓] Strength ").dim(),
+                text(" [↑/↓] Force ").dim(),
                 text(" [Esc/Enter/Space] Quit ").dim()
             )).rounded().length(3),
             fire,
             panel(() -> row(
                 text(" CPU ").dim(),
                 text(String.format("%5.1f%%", fire.cpuLoadPercent())).bold().cyan(),
-                text("  Strength ").dim(),
-                text(String.valueOf(fire.effectiveStrength())).bold().yellow(),
-                text("  Override ").dim(),
-                text(String.format("%+d", fire.manualStrengthOffset())).bold().magenta()
+                text("  Target ").dim(),
+                text(String.format("%.2f", fire.cpuTargetForce())).bold().yellow(),
+                text("  Force ").dim(),
+                text(String.format("%.2f", fire.force())).bold().magenta()
             )).rounded().length(3)
         );
     }

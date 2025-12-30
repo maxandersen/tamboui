@@ -38,10 +38,10 @@ import java.util.Random;
  */
 final class TiofFire implements Element {
 
-    private static final int PALETTE_SIZE = 37;
-    private static final int BASE_STRENGTH = 10;
-    private static final int MAX_STRENGTH = PALETTE_SIZE - 1;
-    private static final int STRENGTH_STEP = 2;
+    private static final double DEFAULT_FORCE = 3.0;
+    private static final double CPU_FORCE_MIN = 1.0;
+    private static final double CPU_FORCE_MAX = 6.0;
+    private static final double FORCE_SMOOTHING = 0.9; // like (force*9 + cpu)/10
     private static final Duration CPU_SAMPLE_EVERY = Duration.ofMillis(250);
 
     private static final Style HELP_STYLE = Style.EMPTY.fg(Color.WHITE).bg(Color.BLACK).bold();
@@ -59,15 +59,13 @@ final class TiofFire implements Element {
 
     // Fire simulation state
     private int simW = 0;
-    private int simH = 0;
-    private int[] fire;
-    private int[] next;
-
-    private final Style[] palette = buildPalette();
+    private int simHPlusOne = 0; // height + 1 (Rust keeps a seeded row at y=height)
+    private float[] fire;
 
     // UI state
     private boolean showHelp = false;
-    private int manualStrengthOffset = 0;
+    private double force = DEFAULT_FORCE;
+    private double cpuTargetForce = DEFAULT_FORCE;
 
     TiofFire(List<String> messageLines, Runnable quit) {
         this.messageLines = List.copyOf(messageLines);
@@ -82,12 +80,12 @@ final class TiofFire implements Element {
         return cpuLoad * 100.0;
     }
 
-    int manualStrengthOffset() {
-        return manualStrengthOffset;
+    double force() {
+        return force;
     }
 
-    int effectiveStrength() {
-        return computeStrength();
+    double cpuTargetForce() {
+        return cpuTargetForce;
     }
 
     @Override
@@ -103,7 +101,7 @@ final class TiofFire implements Element {
             Span.raw("·").dim(),
             Span.raw(String.format(" cpu %.1f%% ", cpuLoadPercent())).yellow(),
             Span.raw("·").dim(),
-            Span.raw(String.format(" strength %d ", effectiveStrength())).magenta(),
+            Span.raw(String.format(" force %.2f ", force)).magenta(),
             Span.raw("·").dim(),
             Span.raw(" [h] help ").dim()
         )).centered();
@@ -142,15 +140,15 @@ final class TiofFire implements Element {
         }
 
         if (Keys.isUp(event)) {
-            manualStrengthOffset = clamp(manualStrengthOffset + STRENGTH_STEP, -MAX_STRENGTH, MAX_STRENGTH);
+            force *= 1.1;
             return EventResult.HANDLED;
         }
         if (Keys.isDown(event)) {
-            manualStrengthOffset = clamp(manualStrengthOffset - STRENGTH_STEP, -MAX_STRENGTH, MAX_STRENGTH);
+            force /= 1.1;
             return EventResult.HANDLED;
         }
         if (Keys.isChar(event, 'r') || Keys.isChar(event, 'R')) {
-            manualStrengthOffset = 0;
+            force = DEFAULT_FORCE;
             return EventResult.HANDLED;
         }
         if (Keys.isChar(event, 'h') || Keys.isChar(event, 'H')) {
@@ -171,83 +169,80 @@ final class TiofFire implements Element {
                 cpuLoad = clamp01(load);
             }
 
+            cpuTargetForce = CPU_FORCE_MIN + (CPU_FORCE_MAX - CPU_FORCE_MIN) * cpuLoad;
+            // Smoothly blend like upstream: force = (force*9 + cpu)/10
+            force = force * FORCE_SMOOTHING + cpuTargetForce * (1.0 - FORCE_SMOOTHING);
+
             lastCpuSampleNanos = now;
         }
     }
 
-    private int computeStrength() {
-        // Make idle still burn a bit, and map to palette.
-        double baseline = 0.15;
-        double scaled = baseline + (1.0 - baseline) * cpuLoad;
-        int cpuStrength = (int) Math.round(scaled * MAX_STRENGTH);
-        int strength = cpuStrength + manualStrengthOffset;
-        strength = clamp(strength, 0, MAX_STRENGTH);
-        return Math.max(BASE_STRENGTH, strength);
-    }
-
     private void stepFire(int width, int height) {
         ensureSimulationSize(width, height);
-
-        int strength = computeStrength();
-
-        // Clear next
-        for (int i = 0; i < next.length; i++) {
-            next[i] = 0;
+        if (fire == null) {
+            return;
         }
 
-        // Seed bottom row
-        int bottomY = simH - 1;
+        // Seed the row at y=height (Rust: *entry = (*entry*2 + rand)/3)
+        int seedY = simHPlusOne - 1;
         for (int x = 0; x < simW; x++) {
-            next[bottomY * simW + x] = random.nextInt(strength + 1);
+            int idx = seedY * simW + x;
+            float prev = fire[idx];
+            float r = random.nextFloat();
+            fire[idx] = (prev * 2.0f + r) / 3.0f;
         }
 
-        // Propagate upwards
-        for (int y = 0; y < simH - 1; y++) {
+        // Propagate upwards (Rust averages (x,y) with (x,y+1) and diagonals)
+        float heatDamp = (float) (0.9 + 0.05 * ((double) (simHPlusOne - 1) / 80.0));
+        for (int y = (simHPlusOne - 2); y >= 0; y--) {
             int row = y * simW;
             int below = (y + 1) * simW;
             for (int x = 0; x < simW; x++) {
-                int belowIntensity = fire[below + x];
-                int decay = random.nextInt(3); // 0..2
-                int newIntensity = Math.max(0, belowIntensity - decay);
-                int shift = random.nextInt(3) - 1; // -1..+1
-                int dstX = clamp(x + shift, 0, simW - 1);
-                next[row + dstX] = Math.max(next[row + dstX], newIntensity);
+                int n = 2;
+                float v = fire[row + x];
+                if (x > 0) {
+                    v += fire[below + (x - 1)];
+                    n++;
+                }
+                v += fire[below + x];
+                // Note: upstream uses x < width - 2 (not - 1)
+                if (x < simW - 2) {
+                    v += fire[below + (x + 1)];
+                    n++;
+                }
+                v /= (float) n;
+                v *= heatDamp;
+                fire[row + x] = v;
             }
         }
-
-        // Swap
-        int[] tmp = fire;
-        fire = next;
-        next = tmp;
     }
 
     private void ensureSimulationSize(int width, int height) {
         if (width <= 0 || height <= 0) {
             simW = 0;
-            simH = 0;
+            simHPlusOne = 0;
             fire = null;
-            next = null;
             return;
         }
 
-        if (width == simW && height == simH && fire != null && next != null) {
+        if (width == simW && (height + 1) == simHPlusOne && fire != null) {
             return;
         }
 
         simW = width;
-        simH = height;
-        fire = new int[simW * simH];
-        next = new int[simW * simH];
+        simHPlusOne = height + 1;
+        fire = new float[simW * simHPlusOne];
     }
 
     private void renderFire(Buffer buffer, Rect area) {
-        for (int y = 0; y < simH; y++) {
+        int height = area.height();
+        for (int y = 0; y < height; y++) {
             int srcRow = y * simW;
             int dstY = area.y() + y;
             for (int x = 0; x < simW; x++) {
-                int intensity = fire[srcRow + x];
-                Style style = palette[clamp(intensity, 0, MAX_STRENGTH)];
-                buffer.set(area.x() + x, dstY, new Cell(" ", style));
+                float v = fire[srcRow + x];
+                Color bg = valToColor(v * (float) force);
+                buffer.set(area.x() + x, dstY, new Cell(" ", Style.EMPTY.bg(bg)));
             }
         }
     }
@@ -284,8 +279,8 @@ final class TiofFire implements Element {
         lines.add("");
         lines.add("Esc / Enter / Space : quit");
         lines.add("h                   : toggle help");
-        lines.add("Up / Down           : strength override");
-        lines.add("r                   : reset override");
+        lines.add("Up / Down           : increase / decrease force");
+        lines.add("r                   : reset force");
         lines.add("");
         lines.add("fire strength tracks CPU load via OSHI");
 
@@ -321,54 +316,27 @@ final class TiofFire implements Element {
         }
     }
 
-    private static Style[] buildPalette() {
-        // A warm gradient: black -> deep red -> orange -> yellow -> white.
-        Style[] out = new Style[PALETTE_SIZE];
-        out[0] = Style.EMPTY.bg(Color.BLACK);
-
-        // Hand-tuned RGB ramp (PALETTE_SIZE-1 entries).
-        for (int i = 1; i < PALETTE_SIZE; i++) {
-            double t = (i - 1) / (double) (PALETTE_SIZE - 2); // 0..1
-
-            int r;
-            int g;
-            int b;
-            if (t < 0.33) {
-                // black -> red
-                double u = t / 0.33;
-                r = lerp(0, 200, u);
-                g = 0;
-                b = 0;
-            } else if (t < 0.75) {
-                // red -> orange/yellow
-                double u = (t - 0.33) / (0.75 - 0.33);
-                r = lerp(200, 255, u);
-                g = lerp(0, 180, u);
-                b = 0;
-            } else {
-                // yellow -> white
-                double u = (t - 0.75) / (1.0 - 0.75);
-                r = 255;
-                g = lerp(180, 255, u);
-                b = lerp(0, 255, u);
-            }
-
-            out[i] = Style.EMPTY.bg(Color.rgb(r, g, b));
-        }
-
-        return out;
-    }
-
-    private static int lerp(int a, int b, double t) {
-        return (int) Math.round(a + (b - a) * clamp01(t));
-    }
-
     private static int clamp(int v, int min, int max) {
         return Math.max(min, Math.min(max, v));
     }
 
     private static double clamp01(double v) {
         return Math.max(0.0, Math.min(1.0, v));
+    }
+
+    // Match upstream tiof's piecewise RGB mapping (background color)
+    private static Color valToColor(float val) {
+        float v = Math.min(1.0f, Math.max(0.0f, val));
+        if (v > 0.75f) {
+            int b = (int) (255.0f * 4.0f * (v - 0.75f));
+            return Color.rgb(255, 255, clamp(b, 0, 255));
+        }
+        if (v > 0.5f) {
+            int g = (int) (255.0f * 4.0f * (v - 0.5f));
+            return Color.rgb(255, clamp(g, 0, 255), 0);
+        }
+        int r = (int) (255.0f * 2.0f * v);
+        return Color.rgb(clamp(r, 0, 255), 0, 0);
     }
 }
 
