@@ -44,6 +44,9 @@
     },
     "toolkit-demo": {
       "script-ref": "demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
+    },
+    "newyear-countdown-demo": {
+      "script-ref": "demos/newyear-countdown-demo/src/main/java/dev/tamboui/demo/NewYearCountdownDemo.java"
     }
   }
 }

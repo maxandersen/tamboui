@@ -1,3 +1,7 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+//DEPS dev.tamboui:tamboui-toolkit:LATEST
+//DEPS dev.tamboui:tamboui-jline:LATEST
+
 /*
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
@@ -16,18 +20,25 @@ import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.shapes.Points;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -36,26 +47,27 @@ import static dev.tamboui.toolkit.Toolkit.*;
  *
  * - Big digital countdown clock to local New Year (Jan 1st 00:00 local time)
  * - Firework rockets + particle explosions (triggered at midnight or Space)
- *
- * Notes on sound:
- * - This demo emits a terminal bell (BEL, \\u0007) for the "boom" at explosion.
- *   Whether you hear it depends on your terminal settings.
+ * - 3D perspective projection with camera movement
+ * - Procedural stereo audio system
+ * - 60 FPS rendering
  */
 public final class NewYearCountdownDemo extends ToolkitApp {
 
-    private static final Duration TICK = Duration.ofMillis(50); // ~20 fps
+    private static final Duration TICK = Duration.ofMillis(16); // ~60 fps
     private static final Duration MANUAL_SHOW_DURATION = Duration.ofSeconds(6);
     private static final Duration MIDNIGHT_SHOW_DURATION = Duration.ofSeconds(18);
 
     private final ZoneId zone = ZoneId.systemDefault();
     private final Random random = new Random();
     private final FireworksShow fireworks = new FireworksShow(random);
+    private final SoundManager soundManager = new SoundManager();
 
     private ZonedDateTime target;
     private boolean midnightTriggered = false;
 
     private long lastUpdateNanos = 0L;
-    private boolean pendingBell = false;
+    private double cameraZ = 0.0;
+    private static final double CAMERA_SPEED = 15.0; // pixels/second through Z-space
 
     public static void main(String[] args) throws Exception {
         new NewYearCountdownDemo().run();
@@ -95,7 +107,6 @@ public final class NewYearCountdownDemo extends ToolkitApp {
             if (!midnightTriggered) {
                 midnightTriggered = true;
                 fireworks.startShow(MIDNIGHT_SHOW_DURATION);
-                pendingBell = true; // a little "midnight!" punctuation
             }
             remaining = Duration.ZERO;
         }
@@ -104,7 +115,11 @@ public final class NewYearCountdownDemo extends ToolkitApp {
         long nowNanos = System.nanoTime();
         double dt = Math.max(0.0, Math.min(0.2, (nowNanos - lastUpdateNanos) / 1_000_000_000.0));
         lastUpdateNanos = nowNanos;
-        fireworks.update(dt, innerW, innerH, () -> pendingBell = true);
+        
+        // Animate camera moving forward through Z-space
+        cameraZ += CAMERA_SPEED * dt;
+        
+        fireworks.update(dt, innerW, innerH, cameraZ, soundManager);
 
         String bottomHelp = " [Space] Fireworks   [q] Quit ";
         final ZonedDateTime nowFinal = now;
@@ -116,18 +131,11 @@ public final class NewYearCountdownDemo extends ToolkitApp {
             canvas(0, innerWFinal, 0, innerHFinal)
                 .marker(Marker.BRAILLE)
                 .paint(ctx -> {
-                    // Background fireworks (points/lines)
-                    fireworks.render(ctx);
+                    // Background fireworks (points/lines) with 3D perspective
+                    fireworks.render(ctx, cameraZ, innerWFinal, innerHFinal);
 
                     // Foreground clock + labels (rendered above points)
                     renderOverlay(ctx, innerWFinal, innerHFinal, nowFinal, remainingFinal);
-
-                    // One-frame terminal bell for "boom".
-                    if (pendingBell) {
-                        // Clamp puts it on-screen; BEL is non-printing for most terminals.
-                        ctx.print(0, 0, "\u0007");
-                        pendingBell = false;
-                    }
                 })
                 .fill()
         )
@@ -139,7 +147,8 @@ public final class NewYearCountdownDemo extends ToolkitApp {
             .bottomTitle(bottomHelp)
             .onKeyEvent(e -> {
                 if (e != null && e.isChar(' ')) {
-                    fireworks.startShow(MANUAL_SHOW_DURATION);
+                    // Launch a single firework on space press
+                    fireworks.launchSingleFirework(innerWFinal, innerHFinal, cameraZ);
                     return EventResult.HANDLED;
                 }
                 return EventResult.UNHANDLED;
@@ -156,43 +165,154 @@ public final class NewYearCountdownDemo extends ToolkitApp {
 
         String clock = String.format("%02d:%02d:%02d", hours, minutes, seconds);
         SevenSegFont font = SevenSegFont.DEFAULT;
-        List<String> lines = font.render(clock);
 
-        // Centered big clock.
-        int clockHeight = lines.size();
-        int clockWidth = 0;
-        for (String line : lines) {
-            clockWidth = Math.max(clockWidth, line.length());
+        // Match Python's rendering approach exactly
+        // Calculate total width including 3 pixels spacing between digits
+        List<Integer> charWidths = new ArrayList<>();
+        int totalWidth = 0;
+        for (int idx = 0; idx < clock.length(); idx++) {
+            char ch = clock.charAt(idx);
+            if (font.glyphs.containsKey(ch)) {
+                String[] pattern = font.glyphs.get(ch);
+                int width = pattern[0].length();
+                charWidths.add(width);
+                totalWidth += width;
+                // Add 3 pixels spacing between digits (but not after colon or at end)
+                if (idx < clock.length() - 1 && ch != ':') {
+                    totalWidth += 3;
+                }
+            } else {
+                charWidths.add(0);
+            }
         }
 
-        int startX = Math.max(0, (w - clockWidth) / 2);
-        int topY = Math.max(0, (int) Math.round(h * 0.72));
+        if (totalWidth == 0) {
+            return;
+        }
+
+        // Use integer scaling for uniform rendering (no sub-pixel coordinates)
+        // Scale factor: 2 = 50% size (render every 2nd pixel), 3 = 33% size, etc.
+        int scaleDivisor = 2; // Makes digits 50% size
+        
+        // Calculate scaled dimensions using integer division
+        int digitHeight = 22;
+        int scaledHeight = digitHeight / scaleDivisor;
+        int scaledWidth = totalWidth / scaleDivisor;
+        
+        // Calculate starting position to center the text
+        // Use canvas coordinates directly - the canvas will map them to grid positions
+        double startX = (w - scaledWidth) / 2.0;
+        double startY = (h - scaledHeight) / 2.0;
+        
+        // Calculate topY for text labels (canvas is bottom-origin, so top is startY + scaledHeight - 1)
+        // For ctx.print(), we need to convert to top-origin coordinates
+        // Canvas height h, bottom-origin: y=0 is bottom, y=h-1 is top
+        // Text coordinates: y=0 is top, y=h-1 is bottom
+        // So: textY = h - 1 - canvasY
+        double clockTopCanvasY = startY + scaledHeight - 1;
+        int topY = (int) Math.round(h - 1 - clockTopCanvasY);
 
         Color clockColor = fireworks.isShowActive() ? Color.YELLOW : Color.CYAN;
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            // Canvas y is bottom-origin; decreasing y moves down visually.
-            double y = topY - i;
-            ctx.print(startX, y, Line.from(Span.raw(line).fg(clockColor).bold()));
+        
+        // Render each character directly from pattern
+        // Each pattern character = tightly packed pixels to create dense Braille characters (like ⠶)
+        // Pixels are packed so multiple fall into the same Braille cell (2x4 dots per cell)
+        List<double[]> clockPoints = new ArrayList<>();
+        int currentX = 0;
+        
+        for (int idx = 0; idx < clock.length(); idx++) {
+            char ch = clock.charAt(idx);
+            if (font.glyphs.containsKey(ch)) {
+                String[] pattern = font.glyphs.get(ch);
+                int width = charWidths.get(idx);
+                
+                // Render this character's pattern, scaled to integer coordinates
+                // Each pattern character = 1 Braille cell (2x4 pixels) aligned to cell boundaries
+                for (int row = 0; row < pattern.length; row++) {
+                    // Only render every Nth row for vertical scaling
+                    if (row % scaleDivisor != 0) {
+                        continue;
+                    }
+                    String patternLine = pattern[row];
+                    // Canvas y is bottom-origin, Python is top-origin
+                    // Invert and scale: startY + (digitHeight - 1 - row) / scaleDivisor
+                    int scaledRow = (digitHeight - 1 - row) / scaleDivisor;
+                    // Calculate Y position in canvas coordinates
+                    // Canvas maps to grid: gridY = (h - y) / h * (h*4 - 1) ≈ (h - y) * 4
+                    // To pack pixels in same Braille cell, use small spacing
+                    double y = startY + scaledRow * 0.25; // Small spacing for compact rows
+                    
+                    for (int col = 0; col < patternLine.length(); col++) {
+                        // Only render every Nth column for horizontal scaling
+                        if (col % scaleDivisor != 0) {
+                            continue;
+                        }
+                        char pixel = patternLine.charAt(col);
+                        if (pixel != ' ') {
+                            // Calculate X position in canvas coordinates
+                            // Canvas maps to grid: gridX = x / w * (w*2 - 1) ≈ x * 2
+                            // To pack pixels in same Braille cell, use small spacing
+                            int scaledCol = col / scaleDivisor;
+                            double x = startX + (currentX + scaledCol) * 0.5; // Small spacing for compact columns
+                            
+                            // Render 2x4 pixel block to fill one Braille cell (like Python)
+                            // Render 8 pixels very close together so they pack into same Braille cell
+                            // Python: plots at integer (x,y), then char_x = x>>1, char_y = y>>2
+                            // We render with small offsets so canvas maps them to adjacent grid positions
+                            for (int dy = 0; dy < 4; dy++) {
+                                for (int dx = 0; dx < 2; dx++) {
+                                    // Small offsets: 0.0, 0.5 horizontally and 0.0, 0.25, 0.5, 0.75 vertically
+                                    // These map to grid positions in the same Braille cell
+                                    double px = x + dx * 0.5;
+                                    double py = y + dy * 0.25;
+                                    clockPoints.add(new double[] {px, py});
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Move to next character position (scaled width + scaled spacing with kerning)
+                // currentX tracks position in scaled pixel units
+                int scaledCharWidth = width / scaleDivisor;
+                currentX += scaledCharWidth;
+                if (idx < clock.length() - 1 && ch != ':') {
+                    // Add kerning spacing between digits (3 pixels scaled)
+                    int scaledSpacing = 3 / scaleDivisor;
+                    currentX += scaledSpacing;
+                }
+            }
+        }
+        
+        if (!clockPoints.isEmpty()) {
+            double[][] coords = new double[clockPoints.size()][2];
+            for (int i = 0; i < clockPoints.size(); i++) {
+                coords[i] = clockPoints.get(i);
+            }
+            ctx.draw(Points.of(coords, clockColor));
         }
 
-        // Days label (normal size)
+        // Days label (normal size) - positioned below clock, adapts to terminal size
         if (days > 0) {
             String daysLine = String.format("%d day%s", days, days == 1 ? "" : "s");
             int dx = Math.max(0, (w - daysLine.length()) / 2);
-            ctx.print(dx, topY + 2, Line.from(Span.raw(daysLine).magenta().bold()));
+            int daysY = Math.min(h - 1, topY + digitHeight + 2);
+            ctx.print(dx, daysY, Line.from(Span.raw(daysLine).magenta().bold()));
         }
 
-        // Title / subtext
+        // Title / subtext - positioned below days, adapts to terminal size
         String title = "Counting down to " + nextYear + " (local time)";
         int titleX = Math.max(0, (w - title.length()) / 2);
-        ctx.print(titleX, topY + 4, Line.from(Span.raw(title).gray()));
+        int titleY = Math.min(h - 1, topY + digitHeight + 4);
+        ctx.print(titleX, titleY, Line.from(Span.raw(title).gray()));
 
-        // At/after midnight: happy message
+        // At/after midnight: happy message - adapts to terminal size
         if (midnightTriggered || remaining.isZero()) {
             String msg = "HAPPY NEW YEAR " + nextYear + "!";
             int mx = Math.max(0, (w - msg.length()) / 2);
-            double my = Math.max(0, Math.round(h * 0.25));
+            // Convert from canvas coordinates (bottom-origin) to text coordinates (top-origin)
+            // Canvas y = h * 0.25 (near bottom) -> Text y = h - 1 - h*0.25 = h*0.75 - 1
+            int my = Math.max(0, Math.min(h - 1, (int) Math.round(h * 0.75 - 1)));
             ctx.print(mx, my, Line.from(Span.raw(msg).green().bold()));
         }
 
@@ -207,13 +327,288 @@ public final class NewYearCountdownDemo extends ToolkitApp {
         return ZonedDateTime.of(LocalDate.of(nextYear, 1, 1), LocalTime.MIDNIGHT, zone);
     }
 
+    @Override
+    protected void onStop() {
+        soundManager.stop();
+    }
+
+    /**
+     * Manages sound generation and playback for fireworks explosions.
+     * Generates procedural explosion sounds with stereo panning.
+     */
+    static final class SoundManager {
+        private static final int SAMPLE_RATE = 22050;
+        private static final double DURATION = 1.5; // seconds
+        private static final int MAX_CONCURRENT_SOUNDS = 8;
+        private static final int PAN_POSITIONS = 17; // -1.0 to 1.0 in steps of 0.125
+
+        private final ConcurrentLinkedQueue<SoundClip> activeSounds = new ConcurrentLinkedQueue<>();
+        private final AtomicBoolean running = new AtomicBoolean(false);
+        private final byte[][] stereoCache = new byte[PAN_POSITIONS][];
+        private final byte[] monoExplosionSound;
+        private Thread audioThread;
+        private SourceDataLine audioLine;
+
+        SoundManager() {
+            // Generate mono explosion sound
+            monoExplosionSound = generateExplosionSound();
+            
+            // Pre-generate stereo variations at different pan positions
+            generateStereoCache();
+            
+            // Start audio thread
+            startAudioThread();
+        }
+
+        private byte[] generateExplosionSound() {
+            int samples = (int) (SAMPLE_RATE * DURATION);
+            float[] wave = new float[samples];
+            Random rng = new Random();
+            
+            // Generate time array
+            for (int i = 0; i < samples; i++) {
+                double t = (double) i / SAMPLE_RATE;
+                
+                // White noise
+                double noise = (rng.nextGaussian() * 0.5);
+                
+                // Low-frequency rumble
+                double rumbleFreq = 60.0;
+                double rumble = Math.sin(2 * Math.PI * rumbleFreq * t);
+                rumble += 0.5 * Math.sin(2 * Math.PI * rumbleFreq * 2 * t);
+                
+                // Combine noise and rumble
+                wave[i] = (float) (0.7 * noise + 0.3 * rumble);
+                
+                // Apply exponential decay envelope
+                double envelope = Math.exp(-3 * t / DURATION);
+                wave[i] *= (float) envelope;
+                
+                // Add crackle (short bursts)
+                if (rng.nextDouble() < 0.05) {
+                    wave[i] += (float) (rng.nextGaussian() * 0.5 * envelope);
+                }
+            }
+            
+            // Apply simple low-pass filter (moving average)
+            int windowSize = 15;
+            float[] filtered = new float[samples];
+            for (int i = 0; i < samples; i++) {
+                double sum = 0;
+                int count = 0;
+                for (int j = Math.max(0, i - windowSize / 2); j < Math.min(samples, i + windowSize / 2 + 1); j++) {
+                    sum += wave[j];
+                    count++;
+                }
+                filtered[i] = (float) (sum / count);
+            }
+            
+            // Normalize and convert to bytes (16-bit PCM)
+            byte[] result = new byte[samples * 2];
+            float max = 0;
+            for (float f : filtered) {
+                max = Math.max(max, Math.abs(f));
+            }
+            if (max > 0) {
+                float scale = 0.5f / max; // Reduce volume to 50%
+                for (int i = 0; i < samples; i++) {
+                    short sample = (short) (filtered[i] * scale * Short.MAX_VALUE);
+                    result[i * 2] = (byte) (sample & 0xFF);
+                    result[i * 2 + 1] = (byte) ((sample >> 8) & 0xFF);
+                }
+            }
+            
+            return result;
+        }
+
+        private void generateStereoCache() {
+            if (monoExplosionSound == null) {
+                return;
+            }
+            
+            int samples = monoExplosionSound.length / 2; // 16-bit samples
+            
+            for (int i = 0; i < PAN_POSITIONS; i++) {
+                double pan = -1.0 + (i * 0.125); // -1.0 to 1.0
+                
+                // Constant power panning
+                double panAngle = (pan + 1) * (Math.PI / 4); // Map -1..1 to 0..pi/2
+                double leftGain = Math.cos(panAngle);
+                double rightGain = Math.sin(panAngle);
+                
+                // Create stereo audio
+                byte[] stereo = new byte[samples * 4]; // 2 channels * 2 bytes per sample
+                for (int j = 0; j < samples; j++) {
+                    int monoIdx = j * 2;
+                    short monoSample = (short) ((monoExplosionSound[monoIdx] & 0xFF) | 
+                                                ((monoExplosionSound[monoIdx + 1] & 0xFF) << 8));
+                    
+                    short leftSample = (short) (monoSample * leftGain);
+                    short rightSample = (short) (monoSample * rightGain);
+                    
+                    int stereoIdx = j * 4;
+                    stereo[stereoIdx] = (byte) (leftSample & 0xFF);
+                    stereo[stereoIdx + 1] = (byte) ((leftSample >> 8) & 0xFF);
+                    stereo[stereoIdx + 2] = (byte) (rightSample & 0xFF);
+                    stereo[stereoIdx + 3] = (byte) ((rightSample >> 8) & 0xFF);
+                }
+                
+                stereoCache[i] = stereo;
+            }
+        }
+
+        private void startAudioThread() {
+            try {
+                AudioFormat format = new AudioFormat(SAMPLE_RATE, 16, 2, true, false);
+                DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+                
+                if (!AudioSystem.isLineSupported(info)) {
+                    return; // Audio not supported, silently fail
+                }
+                
+                audioLine = (SourceDataLine) AudioSystem.getLine(info);
+                audioLine.open(format);
+                audioLine.start();
+                
+                running.set(true);
+                audioThread = new Thread(this::audioPlaybackLoop, "FireworksAudio");
+                audioThread.setDaemon(true);
+                audioThread.start();
+            } catch (LineUnavailableException e) {
+                // Silently fail if audio is unavailable
+            }
+        }
+
+        private void audioPlaybackLoop() {
+            byte[] buffer = new byte[4096];
+            
+            while (running.get() && audioLine != null && audioLine.isOpen()) {
+                try {
+                    // Mix all active sounds
+                    int bytesToWrite = Math.min(buffer.length, audioLine.available());
+                    if (bytesToWrite > 0) {
+                        // Zero buffer (16-bit stereo: 4 bytes per sample = 2 channels * 2 bytes)
+                        for (int i = 0; i < bytesToWrite; i++) {
+                            buffer[i] = 0;
+                        }
+                        
+                        // Mix sounds (16-bit stereo: L, R, L, R...)
+                        Iterator<SoundClip> it = activeSounds.iterator();
+                        while (it.hasNext()) {
+                            SoundClip clip = it.next();
+                            if (clip.position >= clip.data.length) {
+                                it.remove();
+                                continue;
+                            }
+                            
+                            int remaining = clip.data.length - clip.position;
+                            int toMix = Math.min(remaining, bytesToWrite);
+                            
+                            // Mix 16-bit stereo samples (4 bytes per sample)
+                            for (int i = 0; i < toMix; i += 4) {
+                                if (clip.position + i + 3 >= clip.data.length) {
+                                    break;
+                                }
+                                
+                                // Left channel
+                                short clipLeft = (short) ((clip.data[clip.position + i] & 0xFF) | 
+                                                           ((clip.data[clip.position + i + 1] & 0xFF) << 8));
+                                short bufferLeft = (short) ((buffer[i] & 0xFF) | 
+                                                             ((buffer[i + 1] & 0xFF) << 8));
+                                int mixedLeft = bufferLeft + clipLeft;
+                                mixedLeft = Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, mixedLeft));
+                                buffer[i] = (byte) (mixedLeft & 0xFF);
+                                buffer[i + 1] = (byte) ((mixedLeft >> 8) & 0xFF);
+                                
+                                // Right channel
+                                short clipRight = (short) ((clip.data[clip.position + i + 2] & 0xFF) | 
+                                                            ((clip.data[clip.position + i + 3] & 0xFF) << 8));
+                                short bufferRight = (short) ((buffer[i + 2] & 0xFF) | 
+                                                              ((buffer[i + 3] & 0xFF) << 8));
+                                int mixedRight = bufferRight + clipRight;
+                                mixedRight = Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, mixedRight));
+                                buffer[i + 2] = (byte) (mixedRight & 0xFF);
+                                buffer[i + 3] = (byte) ((mixedRight >> 8) & 0xFF);
+                            }
+                            
+                            clip.position += toMix;
+                            if (clip.position >= clip.data.length) {
+                                it.remove();
+                            }
+                        }
+                        
+                        // Write to audio line
+                        audioLine.write(buffer, 0, bytesToWrite);
+                    } else {
+                        Thread.sleep(1);
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    // Silently handle errors
+                    break;
+                }
+            }
+        }
+
+        void playExplosion(double x, double screenWidth) {
+            if (monoExplosionSound == null || stereoCache[0] == null) {
+                return;
+            }
+            
+            if (activeSounds.size() >= MAX_CONCURRENT_SOUNDS) {
+                return; // Too many sounds playing
+            }
+            
+            // Calculate pan position: -1 (left) to 1 (right)
+            double pan = (x / screenWidth) * 2.0 - 1.0;
+            pan = Math.max(-1.0, Math.min(1.0, pan));
+            
+            // Quantize to nearest cached position
+            int panIndex = (int) Math.round((pan + 1.0) / 0.125);
+            panIndex = Math.max(0, Math.min(PAN_POSITIONS - 1, panIndex));
+            
+            byte[] stereoData = stereoCache[panIndex];
+            if (stereoData != null) {
+                activeSounds.offer(new SoundClip(stereoData));
+            }
+        }
+
+        void stop() {
+            running.set(false);
+            if (audioThread != null) {
+                audioThread.interrupt();
+                try {
+                    audioThread.join(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            if (audioLine != null && audioLine.isOpen()) {
+                audioLine.stop();
+                audioLine.close();
+            }
+        }
+
+        private static final class SoundClip {
+            final byte[] data;
+            int position;
+
+            SoundClip(byte[] data) {
+                this.data = data;
+                this.position = 0;
+            }
+        }
+    }
+
     /**
      * Simple fireworks show: rockets fly up, then explode into particles which fall and fade.
-     * Coordinates are in "cell space" (x: 0..width, y: 0..height) and rendered onto a braille canvas.
+     * Coordinates are in 3D space with perspective projection.
      */
     static final class FireworksShow {
-        private static final double GRAVITY = -28.0; // units / s^2
-        private static final double DRAG = 0.995;
+        private static final double GRAVITY = -100.0; // units / s^2 (negative = downward, since y increases upward)
+        private static final double DRAG = 0.97; // Air resistance (matching Python)
 
         private final Random rng;
         private final List<Rocket> rockets = new ArrayList<>();
@@ -236,7 +631,12 @@ public final class NewYearCountdownDemo extends ToolkitApp {
             rocketSpawnCooldown = 0.0;
         }
 
-        void update(double dt, int width, int height, Runnable onBoom) {
+        void launchSingleFirework(int width, int height, double cameraZ) {
+            // Launch just one firework immediately
+            spawnRocket(width, height, cameraZ);
+        }
+
+        void update(double dt, int width, int height, double cameraZ, SoundManager soundManager) {
             if (dt <= 0) {
                 return;
             }
@@ -246,9 +646,9 @@ public final class NewYearCountdownDemo extends ToolkitApp {
                 showTimeLeft = Math.max(0.0, showTimeLeft - dt);
                 rocketSpawnCooldown -= dt;
                 if (rocketSpawnCooldown <= 0.0) {
-                    spawnRocket(width, height);
+                    spawnRocket(width, height, cameraZ);
                     // Random cadence (denser near the start).
-                    rocketSpawnCooldown = 0.25 + rng.nextDouble() * 0.55;
+                    rocketSpawnCooldown = 0.2 + rng.nextDouble() * 0.6;
                 }
             }
 
@@ -257,57 +657,83 @@ public final class NewYearCountdownDemo extends ToolkitApp {
                 Rocket r = it.next();
                 r.update(dt, width, height, GRAVITY);
 
-                // "Hiss" trail: small short-lived sparks while ascending.
-                if (r.age > 0.05 && r.vy > 4.0) {
-                    int n = 1 + rng.nextInt(3);
-                    for (int i = 0; i < n; i++) {
-                        double sx = r.x + (rng.nextDouble() - 0.5) * 0.6;
-                        double sy = r.y + (rng.nextDouble() - 0.5) * 0.6;
-                        double svx = (rng.nextDouble() - 0.5) * 1.5;
-                        double svy = -2.0 - rng.nextDouble() * 3.0;
-                        double life = 0.18 + rng.nextDouble() * 0.18;
-                        particles.add(new Particle(sx, sy, svx, svy, life, FxColor.GRAY));
-                    }
+                // Store trail position for launch phase
+                r.trail.add(new double[] {r.x, r.y, r.z});
+                if (r.trail.size() > 15) {
+                    r.trail.remove(0);
                 }
 
                 if (r.shouldExplode()) {
-                    explode(r, onBoom);
+                    explode(r, width, soundManager);
                     it.remove();
-                } else if (r.isOutOfBounds(width, height)) {
+                } else if (r.isOutOfBounds(width, height, cameraZ)) {
                     it.remove();
                 }
             }
 
-            // Update particles.
+            // Update particles with lighter gravity for explosion (matching Python)
+            double particleGravity = -50.0; // Lighter than rocket gravity
             for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
                 Particle p = it.next();
-                p.update(dt, GRAVITY, DRAG);
-                if (p.life <= 0.0 || p.y < -2) {
+                p.update(dt, particleGravity, DRAG);
+                // Remove if dead or fallen below bottom
+                if (p.life <= 0.0 || p.y < 0) {
                     it.remove();
                 }
             }
         }
 
-        void render(Context ctx) {
-            // Draw rocket trails as short lines + a head point.
-            for (Rocket r : rockets) {
-                ctx.draw(dev.tamboui.widgets.canvas.shapes.Line.of(r.prevX, r.prevY, r.x, r.y, Color.GRAY));
-                ctx.draw(Points.of(new double[][] {{r.x, r.y}}, Color.WHITE));
-            }
+        void render(Context ctx, double cameraZ, int width, int height) {
+            double centerX = width / 2.0;
+            double centerY = height / 2.0;
+            double cameraDistance = 200.0;
 
-            // Group particles by color for efficient Points rendering.
-            Map<FxColor, List<double[]>> buckets = new EnumMap<>(FxColor.class);
-            for (FxColor fc : FxColor.values()) {
-                buckets.put(fc, new ArrayList<>());
-            }
-            for (Particle p : particles) {
-                FxColor fc = p.color;
-                List<double[]> list = buckets.get(fc);
-                if (list != null) {
-                    list.add(new double[] {p.x, p.y});
+            // Draw rocket trails with perspective as continuous lines
+            for (Rocket r : rockets) {
+                if (r.trail.size() > 1) {
+                    // Convert trail points to screen coordinates
+                    List<double[]> screenPoints = new ArrayList<>();
+                    for (double[] point : r.trail) {
+                        double zRel = point[2] - cameraZ;
+                        double zOffset = zRel + cameraDistance;
+                        if (zOffset > 0) {
+                            double scale = cameraDistance / zOffset;
+                            double sx = centerX + (point[0] - centerX) * scale;
+                            double sy = centerY + (point[1] - centerY) * scale;
+                            if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+                                screenPoints.add(new double[] {sx, sy});
+                            }
+                        }
+                    }
+                    // Draw continuous line segments for the trail
+                    if (screenPoints.size() > 1) {
+                        for (int i = 0; i < screenPoints.size() - 1; i++) {
+                            double[] p1 = screenPoints.get(i);
+                            double[] p2 = screenPoints.get(i + 1);
+                            ctx.draw(dev.tamboui.widgets.canvas.shapes.Line.of(p1[0], p1[1], p2[0], p2[1], r.fireworkColor));
+                        }
+                    }
                 }
             }
-            for (Map.Entry<FxColor, List<double[]>> e : buckets.entrySet()) {
+
+            // Group particles by color for efficient Points rendering with perspective.
+            Map<Color, List<double[]>> buckets = new java.util.HashMap<>();
+            for (Particle p : particles) {
+                double zRel = p.z - cameraZ;
+                double zOffset = zRel + cameraDistance;
+                if (zOffset <= 0) {
+                    continue; // Behind camera
+                }
+                double scale = cameraDistance / zOffset;
+                double sx = centerX + (p.x - centerX) * scale;
+                double sy = centerY + (p.y - centerY) * scale;
+                if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+                    Color color = p.color;
+                    List<double[]> list = buckets.computeIfAbsent(color, k -> new ArrayList<>());
+                    list.add(new double[] {sx, sy});
+                }
+            }
+            for (Map.Entry<Color, List<double[]>> e : buckets.entrySet()) {
                 List<double[]> pts = e.getValue();
                 if (pts == null || pts.isEmpty()) {
                     continue;
@@ -316,49 +742,97 @@ public final class NewYearCountdownDemo extends ToolkitApp {
                 for (int i = 0; i < pts.size(); i++) {
                     coords[i] = pts.get(i);
                 }
-                ctx.draw(Points.of(coords, e.getKey().toColor()));
+                ctx.draw(Points.of(coords, e.getKey()));
             }
         }
 
-        private void spawnRocket(int width, int height) {
+        private void spawnRocket(int width, int height, double cameraZ) {
             if (width <= 0 || height <= 0) {
                 return;
             }
-            double x = 2 + rng.nextDouble() * Math.max(1, width - 4);
-            double y = 1.0;
-            double vx = (rng.nextDouble() - 0.5) * 6.0;
-            double vy = 26 + rng.nextDouble() * 10.0;
+            // Canvas: y=0 is bottom, y increases upward
+            // Start at very bottom (y=0 or slightly above)
+            double x = width * 0.2 + rng.nextDouble() * (width * 0.6);
+            double y = 0.0; // Start at absolute bottom
+            double z = cameraZ + 50.0 + rng.nextDouble() * 250.0; // Spawn ahead of camera
+            
+            // Calculate target explosion height - should peak well above clock level
+            // Clock is at ~72% from bottom, so target 80-98% from bottom (well above clock)
+            double targetY = height * 0.80 + rng.nextDouble() * (height * 0.18);
+            
+            // Calculate required launch velocity to reach target height
+            // Using kinematic equation: v² = u² + 2as
+            // At apex: v = 0, so u² = -2as
+            // distanceToTarget is positive (going up)
+            double distanceToTarget = targetY - y; // Positive (going up) - larger range now
+            // GRAVITY is negative, so -2 * GRAVITY is positive
+            // Keep original velocity calculation (no reduction) to reach the higher peak
+            double requiredVelocity = Math.sqrt(-2 * GRAVITY * distanceToTarget);
+            
+            double vx = (rng.nextDouble() - 0.5) * 40.0;
+            double vy = requiredVelocity; // Positive because upward (y increases upward)
+            double vz = 0.0;
             double fuse = 0.9 + rng.nextDouble() * 0.8;
-            rockets.add(new Rocket(x, y, vx, vy, fuse));
+            
+            // Generate random firework color matching Python palette
+            Color fireworkColor = randomFireworkColor(rng);
+            rockets.add(new Rocket(x, y, z, vx, vy, vz, fuse, fireworkColor));
+        }
+        
+        private Color randomFireworkColor(Random rng) {
+            // Python firework colors - realistic pyrotechnic colors
+            int[][] colors = {
+                {255, 50, 50},      // Red (Strontium)
+                {255, 140, 0},       // Orange (Calcium)
+                {255, 215, 0},       // Gold/Yellow (Sodium, Iron)
+                {240, 240, 240},     // White/Silver (Aluminum, Magnesium)
+                {50, 255, 50},       // Green (Barium)
+                {100, 150, 255},     // Blue (Copper)
+                {200, 100, 255},     // Purple (Strontium + Copper)
+                {255, 192, 203},     // Pink (Strontium + Titanium)
+                {0, 255, 255},       // Cyan/Turquoise (Copper compounds)
+                {220, 20, 60},       // Deep Red/Crimson (Lithium)
+                {200, 255, 0},       // Lime Green (Barium with additives)
+                {80, 200, 255},      // Electric Blue (Copper chloride)
+                {180, 140, 255},     // Lavender (Potassium/Rubidium)
+                {255, 180, 120},     // Peach (Calcium + Strontium)
+                {255, 191, 0},       // Amber (Iron + Charcoal)
+                {255, 250, 200},     // Golden White (Titanium sparkles)
+                {255, 0, 255},       // Magenta (Strontium + Copper)
+                {150, 255, 200},     // Mint Green (Barium + Copper)
+            };
+            int[] rgb = colors[rng.nextInt(colors.length)];
+            return Color.rgb(rgb[0], rgb[1], rgb[2]);
         }
 
-        private void explode(Rocket r, Runnable onBoom) {
-            // "Boom" (terminal bell).
-            if (onBoom != null) {
-                onBoom.run();
+        private void explode(Rocket r, int width, SoundManager soundManager) {
+            // Play explosion sound with stereo positioning
+            if (soundManager != null) {
+                soundManager.playExplosion(r.x, width);
             }
 
-            FxColor base = FxColor.random(rng);
-            int count = 110 + rng.nextInt(120);
+            Color baseColor = r.fireworkColor;
+            // Increased particle count: 450-750 for denser explosion
+            int count = 450 + rng.nextInt(301);
+            // Smaller, more contained explosion - half the speed for tighter circle
+            double speed = 50.0 + rng.nextDouble() * 25.0; // 50-75 (half of previous)
+            
             for (int i = 0; i < count; i++) {
-                double angle = rng.nextDouble() * Math.PI * 2.0;
-                double speed = 8 + rng.nextDouble() * 18.0;
-                double vx = Math.cos(angle) * speed;
-                double vy = Math.sin(angle) * speed;
-                double life = 0.9 + rng.nextDouble() * 1.2;
-                FxColor color = rng.nextDouble() < 0.20 ? FxColor.WHITE : base;
-                particles.add(new Particle(r.x, r.y, vx, vy, life, color));
-            }
-
-            // Falling "tail" sparks.
-            int tail = 40 + rng.nextInt(45);
-            for (int i = 0; i < tail; i++) {
-                double angle = (rng.nextDouble() * Math.PI) - (Math.PI / 2.0); // mostly downward
-                double speed = 2 + rng.nextDouble() * 8.0;
-                double vx = Math.cos(angle) * speed * 0.6;
-                double vy = Math.sin(angle) * speed - 6.0;
-                double life = 1.4 + rng.nextDouble() * 1.2;
-                particles.add(new Particle(r.x, r.y, vx, vy, life, FxColor.YELLOW));
+                // Random direction on a sphere for circular explosion
+                double theta = rng.nextDouble() * Math.PI * 2.0; // Azimuthal angle (full circle)
+                double phi = rng.nextDouble() * Math.PI; // Polar angle (half sphere)
+                
+                // Convert to Cartesian coordinates
+                // This creates a spherical explosion pattern
+                double vx = speed * Math.sin(phi) * Math.cos(theta);
+                double vy = speed * Math.cos(phi); // Vertical component
+                double vz = speed * Math.sin(phi) * Math.sin(theta);
+                
+                // Random lifetime: 1.8-2.5 seconds (matching Python)
+                double life = 1.8 + rng.nextDouble() * 0.7;
+                // 20% white sparkles, 80% base color
+                Color color = rng.nextDouble() < 0.20 ? Color.WHITE : baseColor;
+                particles.add(new Particle(r.x, r.y, r.z, vx, vy, vz, life, color));
             }
         }
     }
@@ -366,254 +840,431 @@ public final class NewYearCountdownDemo extends ToolkitApp {
     static final class Rocket {
         double x;
         double y;
-        double prevX;
-        double prevY;
+        double z;
         double vx;
         double vy;
+        double vz;
         double fuse;
         double age;
+        boolean apexReached = false;
+        double timeSinceApex = 0.0;
+        final List<double[]> trail = new ArrayList<>(); // [x, y, z] points
+        final Color fireworkColor; // Color for this firework (used for trail and explosion)
 
-        Rocket(double x, double y, double vx, double vy, double fuse) {
+        Rocket(double x, double y, double z, double vx, double vy, double vz, double fuse, Color fireworkColor) {
             this.x = x;
             this.y = y;
-            this.prevX = x;
-            this.prevY = y;
+            this.z = z;
             this.vx = vx;
             this.vy = vy;
+            this.vz = vz;
             this.fuse = fuse;
             this.age = 0.0;
+            this.fireworkColor = fireworkColor;
         }
 
         void update(double dt, int width, int height, double gravity) {
             age += dt;
-            prevX = x;
-            prevY = y;
 
             // Integrate
             x += vx * dt;
             y += vy * dt;
-            vy += gravity * dt;
+            z += vz * dt;
+            vy += gravity * dt; // gravity is negative, so this decreases vy
 
-            // Gentle screen-bounds influence to keep it visible.
-            if (x < 1) x = 1;
-            if (x > width - 2) x = width - 2;
-            if (y < 0) y = 0;
-            if (y > height) y = height;
+            // Check if apex reached (velocity becomes negative/downward)
+            // In this coordinate system, vy positive = upward, vy negative = downward
+            if (vy < 0 && !apexReached) {
+                apexReached = true;
+            }
+
+            // If apex reached, wait about 1 second before exploding
+            if (apexReached) {
+                timeSinceApex += dt;
+            }
         }
 
         boolean shouldExplode() {
-            // Explode after fuse or at apex.
-            return age >= fuse || vy < 2.0;
+            // Explode after fuse or 1.5 seconds after apex (longer peak/fall time)
+            return age >= fuse || (apexReached && timeSinceApex >= 1.5);
         }
 
-        boolean isOutOfBounds(int width, int height) {
-            return y <= 0 && age > 1.0;
+        boolean isOutOfBounds(int width, int height, double cameraZ) {
+            // Remove if behind camera or too old (fallen below bottom)
+            return (z - cameraZ < -50.0) || (y < 0 && age > 1.0);
         }
     }
 
     static final class Particle {
         double x;
         double y;
+        double z;
         double vx;
         double vy;
+        double vz;
         double life;
-        final FxColor color;
+        final Color color;
 
-        Particle(double x, double y, double vx, double vy, double life, FxColor color) {
+        Particle(double x, double y, double z, double vx, double vy, double vz, double life, Color color) {
             this.x = x;
             this.y = y;
+            this.z = z;
             this.vx = vx;
             this.vy = vy;
+            this.vz = vz;
             this.life = life;
-            this.color = color != null ? color : FxColor.WHITE;
+            this.color = color != null ? color : Color.WHITE;
         }
 
         void update(double dt, double gravity, double drag) {
             life -= dt;
             x += vx * dt;
             y += vy * dt;
-            vx *= Math.pow(drag, dt * 60.0);
-            vy *= Math.pow(drag, dt * 60.0);
+            z += vz * dt;
+            // Apply air resistance (per-frame damping)
+            vx *= drag;
+            vy *= drag;
+            vz *= drag;
+            // Apply gravity (negative = downward in this coordinate system)
             vy += gravity * dt;
         }
     }
 
-    enum FxColor {
-        GRAY(Color.GRAY),
-        RED(Color.RED),
-        GREEN(Color.GREEN),
-        YELLOW(Color.YELLOW),
-        BLUE(Color.BLUE),
-        MAGENTA(Color.MAGENTA),
-        CYAN(Color.CYAN),
-        WHITE(Color.WHITE);
-
-        private final Color color;
-
-        FxColor(Color color) {
-            this.color = color;
-        }
-
-        Color toColor() {
-            return color;
-        }
-
-        static FxColor random(Random rng) {
-            FxColor[] values = values();
-            // avoid GRAY/WHITE most of the time for variety
-            int idx = 1 + rng.nextInt(values.length - 2);
-            return values[idx];
-        }
-    }
 
     /**
-     * Tiny 7-seg-ish font for "HH:MM:SS" (height 7).
+     * 7-segment font matching Python version exactly (height 22).
      */
     static final class SevenSegFont {
         static final SevenSegFont DEFAULT = new SevenSegFont();
 
-        private final Map<Character, String[]> glyphs = Map.ofEntries(
+        final Map<Character, String[]> glyphs = Map.ofEntries(
             Map.entry('0', new String[] {
-                " ███ ",
-                "█   █",
-                "█  ██",
-                "█ █ █",
-                "██  █",
-                "█   █",
-                " ███ "
+                "███████████",
+                "███████████",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "███████████",
+                "███████████"
             }),
             Map.entry('1', new String[] {
-                "  █  ",
-                " ██  ",
-                "  █  ",
-                "  █  ",
-                "  █  ",
-                "  █  ",
-                " ███ "
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██"
             }),
             Map.entry('2', new String[] {
-                " ███ ",
-                "█   █",
-                "    █",
-                "  ██ ",
-                " █   ",
-                "█    ",
-                "█████"
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "███████████",
+                "███████████",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "███████████",
+                "███████████"
             }),
             Map.entry('3', new String[] {
-                "████ ",
-                "    █",
-                "    █",
-                " ███ ",
-                "    █",
-                "    █",
-                "████ "
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "███████████",
+                "███████████"
             }),
             Map.entry('4', new String[] {
-                "█   █",
-                "█   █",
-                "█   █",
-                "█████",
-                "    █",
-                "    █",
-                "    █"
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██"
             }),
             Map.entry('5', new String[] {
-                "█████",
-                "█    ",
-                "█    ",
-                "████ ",
-                "    █",
-                "    █",
-                "████ "
+                "███████████",
+                "███████████",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "███████████",
+                "███████████"
             }),
             Map.entry('6', new String[] {
-                " ███ ",
-                "█    ",
-                "█    ",
-                "████ ",
-                "█   █",
-                "█   █",
-                " ███ "
+                "███████████",
+                "███████████",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "██         ",
+                "███████████",
+                "███████████",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "███████████",
+                "███████████"
             }),
             Map.entry('7', new String[] {
-                "█████",
-                "    █",
-                "   █ ",
-                "  █  ",
-                " █   ",
-                " █   ",
-                " █   "
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██"
             }),
             Map.entry('8', new String[] {
-                " ███ ",
-                "█   █",
-                "█   █",
-                " ███ ",
-                "█   █",
-                "█   █",
-                " ███ "
+                "███████████",
+                "███████████",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "███████████",
+                "███████████",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "███████████",
+                "███████████"
             }),
             Map.entry('9', new String[] {
-                " ███ ",
-                "█   █",
-                "█   █",
-                " ████",
-                "    █",
-                "    █",
-                " ███ "
+                "███████████",
+                "███████████",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "██       ██",
+                "███████████",
+                "███████████",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "         ██",
+                "███████████",
+                "███████████"
             }),
             Map.entry(':', new String[] {
-                "     ",
-                "  ░  ",
-                "  ░  ",
-                "     ",
-                "  ░  ",
-                "  ░  ",
-                "     "
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                " ██ ",
+                " ██ ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                " ██ ",
+                " ██ ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                "    ",
+                "    "
             })
         );
 
         List<String> render(String text) {
+            // Match Python's rendering approach exactly
             String s = text != null ? text : "";
-            int height = 7;
-            String[] out = new String[height];
-            for (int i = 0; i < height; i++) {
-                out[i] = "";
-            }
-
+            List<Integer> charWidths = new ArrayList<>();
+            int totalWidth = 0;
+            
+            // Calculate widths and total width (with 3 pixels spacing between digits)
             for (int idx = 0; idx < s.length(); idx++) {
                 char ch = s.charAt(idx);
-                String[] g = glyphs.getOrDefault(ch, blank(height));
-                for (int row = 0; row < height; row++) {
-                    out[row] += g[row];
-                    if (idx < s.length() - 1) {
-                        out[row] += " ";
+                if (glyphs.containsKey(ch)) {
+                    String[] pattern = glyphs.get(ch);
+                    int width = pattern[0].length();
+                    charWidths.add(width);
+                    totalWidth += width;
+                    // Add 3 pixels spacing between digits (but not after colon or at end)
+                    if (idx < s.length() - 1 && ch != ':') {
+                        totalWidth += 3;
+                    }
+                } else {
+                    charWidths.add(0);
+                }
+            }
+            
+            if (totalWidth == 0) {
+                return new ArrayList<>();
+            }
+            
+            // Render each character at proper position (matching Python)
+            int height = 22;
+            List<String> lines = new ArrayList<>();
+            for (int i = 0; i < height; i++) {
+                lines.add("");
+            }
+            
+            int currentX = 0;
+            for (int idx = 0; idx < s.length(); idx++) {
+                char ch = s.charAt(idx);
+                if (glyphs.containsKey(ch)) {
+                    String[] pattern = glyphs.get(ch);
+                    int width = charWidths.get(idx);
+                    
+                    // Render this character's pattern
+                    for (int row = 0; row < height && row < pattern.length; row++) {
+                        String line = lines.get(row);
+                        // Pad line to currentX if needed
+                        while (line.length() < currentX) {
+                            line += " ";
+                        }
+                        line += pattern[row];
+                        lines.set(row, line);
+                    }
+                    
+                    // Move to next character position (width + 3 pixels spacing)
+                    currentX += width;
+                    if (idx < s.length() - 1 && ch != ':') {
+                        currentX += 3; // 3 pixels spacing between digits
                     }
                 }
             }
-
-            List<String> lines = new ArrayList<>(height);
-            for (int i = 0; i < height; i++) {
-                lines.add(rtrim(out[i]));
-            }
+            
             return lines;
-        }
-
-        private static String[] blank(int h) {
-            String[] b = new String[h];
-            for (int i = 0; i < h; i++) {
-                b[i] = "     ";
-            }
-            return b;
-        }
-
-        private static String rtrim(String s) {
-            int i = s.length() - 1;
-            while (i >= 0 && s.charAt(i) == ' ') {
-                i--;
-            }
-            return s.substring(0, i + 1);
         }
     }
 }
