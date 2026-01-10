@@ -23,7 +23,7 @@ public class FileManagerController {
 
     public enum Side { LEFT, RIGHT }
 
-    public enum DialogType { NONE, COPY_CONFIRM, MOVE_CONFIRM, DELETE_CONFIRM, MKDIR_INPUT, GOTO_INPUT, ERROR }
+    public enum DialogType { NONE, COPY_CONFIRM, MOVE_CONFIRM, DELETE_CONFIRM, MKDIR_INPUT, GOTO_INPUT, ERROR, VIEW_FILE }
 
     private final DirectoryBrowserController leftBrowser;
     private final DirectoryBrowserController rightBrowser;
@@ -32,6 +32,8 @@ public class FileManagerController {
     private DialogType currentDialog = DialogType.NONE;
     private String dialogMessage = "";
     private final TextInputState inputState = new TextInputState();
+    private Path viewingFile;
+    private int textScrollPosition = 0;
 
     public FileManagerController(Path leftStart, Path rightStart) {
         this.leftBrowser = new DirectoryBrowserController(leftStart);
@@ -80,6 +82,38 @@ public class FileManagerController {
 
     public boolean isInputDialog() {
         return currentDialog == DialogType.MKDIR_INPUT || currentDialog == DialogType.GOTO_INPUT;
+    }
+
+    public boolean isViewerDialog() {
+        return currentDialog == DialogType.VIEW_FILE;
+    }
+
+    public Path viewingFile() {
+        return viewingFile;
+    }
+
+    public int textScrollPosition() {
+        return textScrollPosition;
+    }
+
+    public void setTextScrollPosition(int position) {
+        this.textScrollPosition = Math.max(0, position);
+    }
+
+    public void scrollTextUp() {
+        textScrollPosition = Math.max(0, textScrollPosition - 1);
+    }
+
+    public void scrollTextDown() {
+        textScrollPosition = Math.max(0, textScrollPosition + 1);
+    }
+
+    public void scrollTextPageUp(int pageSize) {
+        textScrollPosition = Math.max(0, textScrollPosition - pageSize);
+    }
+
+    public void scrollTextPageDown(int pageSize) {
+        textScrollPosition = Math.max(0, textScrollPosition + pageSize);
     }
 
     /**
@@ -162,6 +196,8 @@ public class FileManagerController {
         currentDialog = DialogType.NONE;
         dialogMessage = "";
         inputState.clear();
+        viewingFile = null;
+        textScrollPosition = 0;
     }
 
     public void promptMkdir() {
@@ -206,6 +242,16 @@ public class FileManagerController {
     public void showError(String message) {
         dialogMessage = message;
         currentDialog = DialogType.ERROR;
+    }
+
+    public void promptViewFile() {
+        var selected = activeBrowser().selectedPath();
+        if (selected == null || Files.isDirectory(selected)) {
+            return;
+        }
+        viewingFile = selected;
+        textScrollPosition = 0;
+        currentDialog = DialogType.VIEW_FILE;
     }
 
     // ═══════════════════════════════════════════════════════════════

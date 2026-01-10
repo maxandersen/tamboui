@@ -160,6 +160,12 @@ public class FileManagerKeyHandler {
             return EventResult.HANDLED;
         }
 
+        // View file
+        if (event.isCharIgnoreCase('v')) {
+            manager.promptViewFile();
+            return EventResult.HANDLED;
+        }
+
         return EventResult.UNHANDLED;
     }
 }

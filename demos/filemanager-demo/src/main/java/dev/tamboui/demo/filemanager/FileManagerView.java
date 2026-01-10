@@ -4,15 +4,28 @@
  */
 package dev.tamboui.demo.filemanager;
 
+import dev.tamboui.image.Image;
+import dev.tamboui.image.ImageData;
+import dev.tamboui.image.ImageScaling;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.elements.DialogElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.paragraph.Paragraph;
+import dev.tamboui.widgets.text.Overflow;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -63,6 +76,10 @@ public class FileManagerView implements Element {
         if (type == FileManagerController.DialogType.GOTO_INPUT) {
             currentDialog = createInputDialog("Go To Directory", message, manager::confirmGoto);
             currentDialog.render(frame, area, context);
+            return;
+        }
+        if (type == FileManagerController.DialogType.VIEW_FILE) {
+            renderViewerDialog(frame, area, context);
             return;
         }
 
@@ -124,6 +141,10 @@ public class FileManagerView implements Element {
         if (currentDialog != null && manager.isInputDialog()) {
             return currentDialog.handleKeyEvent(event, true);
         }
+        // Route to viewer dialog if one is present
+        if (manager.isViewerDialog()) {
+            return handleViewerKey(event);
+        }
         // For confirmation dialogs and browser, use the key handler
         return keyHandler.handle(event);
     }
@@ -139,6 +160,7 @@ public class FileManagerView implements Element {
                 text(" [F7] Mkdir ").dim(),
                 text(" [F8] Delete ").dim(),
                 text(" [o] Goto ").dim(),
+                text(" [v] View ").dim(),
                 text(" [q] Quit ").dim()
         ).length(1);
     }
@@ -249,8 +271,151 @@ public class FileManagerView implements Element {
 
         return row(
                 text(info).fill(),
-                text("[Enter] Open  [Backspace] Up  [+] Mark All  [-] Unmark").dim()
+                text("[Enter] Open  [v] View  [Backspace] Up  [+] Mark All  [-] Unmark").dim()
         ).length(1);
+    }
+
+    private void renderViewerDialog(Frame frame, Rect area, RenderContext context) {
+        Path file = manager.viewingFile();
+        if (file == null) {
+            return;
+        }
+
+        String fileName = file.getFileName().toString();
+        boolean isPng = fileName.toLowerCase().endsWith(".png");
+
+        // Calculate dialog size (use most of the screen)
+        int dialogWidth = Math.min(area.width() - 4, 120);
+        int dialogHeight = Math.min(area.height() - 4, 40);
+
+        // For PNG images, create the image widget first to get protocol name
+        String dialogTitle = fileName;
+        if (isPng) {
+            try {
+                ImageData imageData = ImageData.fromPath(file);
+                Image image = Image.builder()
+                        .data(imageData)
+                        .scaling(ImageScaling.FIT)
+                        .build();
+                String protocolName = image.protocol().name();
+                dialogTitle = fileName + " (" + protocolName + ")";
+            } catch (IOException e) {
+                // If we can't load the image, just use the filename
+            }
+        }
+
+        // Create a custom element for the viewer
+        Element viewerElement = new Element() {
+            @Override
+            public void render(Frame frame, Rect renderArea, RenderContext ctx) {
+                if (isPng) {
+                    renderImage(frame, renderArea, file);
+                } else {
+                    renderTextFile(frame, renderArea, file);
+                }
+            }
+
+            @Override
+            public Constraint constraint() {
+                return Constraint.fill();
+            }
+        };
+
+        // Create dialog with viewer content
+        currentDialog = dialog(dialogTitle,
+                viewerElement,
+                text(isPng 
+                        ? "[Esc] Close" 
+                        : "[Esc] Close  [↑↓] Scroll  [PgUp/PgDn] Page").dim()
+        ).rounded()
+                .borderColor(Color.CYAN)
+                .width(dialogWidth)
+                .height(dialogHeight)
+                .onCancel(manager::dismissDialog);
+
+        currentDialog.render(frame, area, context);
+    }
+
+    private void renderImage(Frame frame, Rect area, Path imagePath) {
+        try {
+            ImageData imageData = ImageData.fromPath(imagePath);
+            Image image = Image.builder()
+                    .data(imageData)
+                    .scaling(ImageScaling.FIT)
+                    .block(Block.builder()
+                            .borders(Borders.NONE)
+                            .build())
+                    .build();
+            frame.renderWidget(image, area);
+        } catch (IOException e) {
+            // Render error message
+            Paragraph error = Paragraph.builder()
+                    .text(Text.from("Error loading image: " + e.getMessage()))
+                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.RED))
+                    .build();
+            frame.renderWidget(error, area);
+        }
+    }
+
+    private void renderTextFile(Frame frame, Rect area, Path textPath) {
+        try {
+            String content = Files.readString(textPath, StandardCharsets.UTF_8);
+            int scrollPos = manager.textScrollPosition();
+            
+            Paragraph paragraph = Paragraph.builder()
+                    .text(Text.from(content))
+                    .overflow(Overflow.WRAP_WORD)
+                    .scroll(scrollPos)
+                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.WHITE))
+                    .build();
+            frame.renderWidget(paragraph, area);
+        } catch (IOException e) {
+            // Render error message
+            Paragraph error = Paragraph.builder()
+                    .text(Text.from("Error reading file: " + e.getMessage()))
+                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.RED))
+                    .build();
+            frame.renderWidget(error, area);
+        }
+    }
+
+    private EventResult handleViewerKey(KeyEvent event) {
+        // Close viewer
+        if (event.isCancel()) {
+            manager.dismissDialog();
+            return EventResult.HANDLED;
+        }
+
+        Path file = manager.viewingFile();
+        if (file == null) {
+            return EventResult.UNHANDLED;
+        }
+
+        String fileName = file.getFileName().toString();
+        boolean isPng = fileName.toLowerCase().endsWith(".png");
+
+        // Only handle scroll keys for text files
+        if (!isPng) {
+            if (event.isUp()) {
+                manager.scrollTextUp();
+                return EventResult.HANDLED;
+            }
+            if (event.isDown()) {
+                manager.scrollTextDown();
+                return EventResult.HANDLED;
+            }
+            if (event.isPageUp()) {
+                // Estimate page size based on available area
+                manager.scrollTextPageUp(20);
+                return EventResult.HANDLED;
+            }
+            if (event.isPageDown()) {
+                manager.scrollTextPageDown(20);
+                return EventResult.HANDLED;
+            }
+        }
+
+        return EventResult.UNHANDLED;
     }
 
     private static String formatSize(long size) {

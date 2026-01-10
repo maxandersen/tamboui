@@ -7,6 +7,9 @@
     "fakodex-demo": {
       "script-ref": "demos/fakodex-demo/src/main/java/dev/tamboui/demo/coding/CodingAssistantDemo.java"
     },
+    "filemanager-demo": {
+      "script-ref": "demos/filemanager-demo/src/main/java/dev/tamboui/demo/filemanager/FileManagerDemo.java"
+    },
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
@@ -27,9 +30,6 @@
     },
     "custom-component-demo": {
       "script-ref": "tamboui-toolkit/demos/custom-component-demo/src/main/java/dev/tamboui/demo/CustomComponentDemo.java"
-    },
-    "filemanager-demo": {
-      "script-ref": "tamboui-toolkit/demos/filemanager-demo/src/main/java/dev/tamboui/demo/filemanager/FileManagerDemo.java"
     },
     "jtop-demo": {
       "script-ref": "tamboui-toolkit/demos/jtop-demo/src/main/java/dev/tamboui/demo/JTopDemo.java"
