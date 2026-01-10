@@ -16,6 +16,9 @@
     "css-no-toolkit-demo": {
       "script-ref": "tamboui-css/demos/css-no-toolkit-demo/src/main/java/dev/tamboui/demo/CssNoToolkitDemo.java"
     },
+    "image-demo": {
+      "script-ref": "tamboui-image/demos/image-demo/src/main/java/dev/tamboui/demo/ImageDemo.java"
+    },
     "picocli-demo": {
       "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     },
@@ -71,7 +74,7 @@
       "script-ref": "tamboui-widgets/demos/collapsed-borders-demo/src/main/java/dev/tamboui/demo/CollapsedBordersDemo.java"
     },
     "colors-rgb-demo": {
-      "script-ref": "tamboui-widgets/demos/colors-rgb-demo/src/main/java/dev/tamboui/demo/ColorsRgbDemo.java"
+      "script-ref": "tamboui-widgets/demos/colors-rgb-demo/src/main/java/dev/tamboui/demo/ColorsRgbDemoPanama.java"
     },
     "gauge-demo": {
       "script-ref": "tamboui-widgets/demos/gauge-demo/src/main/java/dev/tamboui/demo/GaugeDemo.java"
