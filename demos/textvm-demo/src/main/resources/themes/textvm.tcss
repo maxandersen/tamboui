@@ -1,0 +1,126 @@
+/* TextVM Theme - Professional JVM Monitor Styling */
+
+$bg-primary: black;
+$bg-secondary: #1a1a1a;
+$fg-primary: white;
+$fg-dim: dark-gray;
+$accent: cyan;
+$accent-bright: light-cyan;
+$border-color: #333333;
+$focus-color: cyan;
+$highlight-bg: #2a4a4a;
+$section-header-color: light-cyan;
+$info-color: light-cyan;
+$success-color: light-green;
+$warning-color: light-yellow;
+$error-color: light-red;
+
+/* Base styles */
+* {
+    color: $fg-primary;
+    background: $bg-primary;
+}
+
+/* Panel styling */
+Panel {
+    background: $bg-primary;
+    border-color: $border-color;
+    border-type: rounded;
+}
+
+Panel:focus {
+    border-color: $focus-color;
+    border-type: double;
+}
+
+/* Status bar */
+.status {
+    background: $bg-secondary;
+    color: $fg-primary;
+    border-color: $border-color;
+}
+
+/* Header text */
+.header {
+    color: $accent-bright;
+    text-style: bold;
+}
+
+/* Dimmed text */
+.dim {
+    color: $fg-dim;
+    text-style: dim;
+}
+
+/* Section headers */
+.section-header {
+    color: $section-header-color;
+    text-style: bold;
+    text-decoration: underline;
+}
+
+/* Info text */
+.info {
+    color: $info-color;
+}
+
+/* Success text */
+.success {
+    color: $success-color;
+}
+
+/* Warning text */
+.warning {
+    color: $warning-color;
+}
+
+/* Error text */
+.error {
+    color: $error-color;
+    text-style: bold;
+}
+
+/* List styling */
+ListContainer {
+    background: $bg-primary;
+    border-color: $border-color;
+}
+
+ListContainer:focus {
+    border-color: $focus-color;
+}
+
+/* List item styles */
+ListContainer-item {
+    color: $fg-primary;
+}
+
+ListContainer-item:selected {
+    background: $highlight-bg;
+    color: $accent-bright;
+    text-style: bold;
+}
+
+/* Memory gauge */
+.memory-gauge {
+    background: $bg-secondary;
+}
+
+/* Process list specific styling */
+#process-list {
+    border-color: $border-color;
+}
+
+#process-list:focus {
+    border-color: $focus-color;
+}
+
+/* Details panel */
+#details-panel {
+    border-color: $border-color;
+}
+
+#details-panel:focus {
+    border-color: $focus-color;
+}
+

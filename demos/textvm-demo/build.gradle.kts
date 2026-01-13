@@ -5,8 +5,10 @@ plugins {
 description = "VisualVM-like Java process monitor demo"
 
 dependencies {
+    implementation(projects.tambouiToolkit)
     implementation(projects.tambouiWidgets)
     implementation(projects.tambouiJline)
+    implementation(projects.tambouiCss)
     // Attach API is in tools.jar, but for Java 9+ it's in jdk.attach module
     // We'll use reflection to access it
 }
