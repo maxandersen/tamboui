@@ -4,6 +4,13 @@
  */
 package dev.tamboui.widgets.table;
 
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
@@ -11,21 +18,17 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyKey;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
-import dev.tamboui.text.Text;
 import dev.tamboui.text.Span;
+import dev.tamboui.text.Text;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiFunction;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
 
 /**
  * A table widget for displaying data in rows and columns.
@@ -300,6 +303,93 @@ public final class Table implements StatefulWidget<TableState> {
 
         return y + rowHeight + row.bottomMargin();
     }
+
+    /**
+     * Renders a few example tables to stdout as strings.
+     * <p>
+     * This is intended for quick manual experimentation (similar to Rich's {@code table.py} examples):
+     * it renders into a {@link Buffer} and prints different string renderings (symbols-only and ANSI).
+     */
+    public static void main(String[] args) {
+        Rect area = new Rect(0, 0, 72, 12);
+
+        Row header = Row.from("Name", "Age", "City", "Notes")
+            .style(Style.EMPTY.bold().fg(Color.YELLOW));
+        Row footer = Row.from("Tip", "", "", "Use TableState.select(i) to highlight rows")
+            .style(Style.EMPTY.fg(Color.DARK_GRAY));
+
+        List<Row> rows = Arrays.asList(
+            Row.from("Alice", "30", "New York", "Loves long strings; truncation demo"),
+            Row.from("Bob", "25", "Los Angeles", "Multi-line:\nline 2"),
+            Row.from("Charlie", "35", "Chicago", "Emoji: ✓ and box ─"),
+            Row.from("Diana", "41", "London", "RGB colors + zebra stripes"),
+            Row.from("Eve", "29", "Paris", "Selection + highlight symbol")
+        );
+
+        TableState selectedState = new TableState();
+        selectedState.select(2);
+
+        Table base = Table.builder()
+            .block(Block.builder()
+                .borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED)
+                .title("Table (rounded)")
+                .build())
+            .header(header)
+            .footer(footer)
+            .rows(rows)
+            .widths(
+                Constraint.length(12),
+                Constraint.length(4),
+                Constraint.length(14),
+                Constraint.fill()
+            )
+            .columnSpacing(2)
+            .rowStyleResolver((index, total) -> {
+                if (index % 2 == 0) {
+                    return Style.EMPTY.bg(Color.rgb(20, 20, 20));
+                }
+                return Style.EMPTY.bg(Color.rgb(35, 35, 35));
+            })
+            .highlightStyle(Style.EMPTY.bg(Color.BLUE).fg(Color.BRIGHT_WHITE).bold())
+            .highlightSymbol("▶ ")
+            .highlightSpacing(HighlightSpacing.WHEN_SELECTED)
+            .build();
+
+        Table noSelectionSpacing = Table.builder()
+            .block(Block.builder()
+                .borders(Borders.ALL)
+                .borderType(BorderType.DOUBLE)
+                .title("Table (double, highlightSpacing=ALWAYS)")
+                .build())
+            .header(header)
+            .rows(rows)
+            .widths(
+                Constraint.length(12),
+                Constraint.length(4),
+                Constraint.length(14),
+                Constraint.fill()
+            )
+            .columnSpacing(1)
+            .highlightStyle(Style.EMPTY.bg(Color.MAGENTA).fg(Color.BRIGHT_WHITE))
+            .highlightSymbol(">> ")
+            .highlightSpacing(HighlightSpacing.ALWAYS)
+            .build();
+
+        TableState emptyState = new TableState();
+
+        printExample("1) Selected row + zebra striping", base, selectedState, area);
+        printExample("2) No selection (highlightSpacing=WHEN_SELECTED)", base, emptyState, area);
+        printExample("3) highlightSpacing=ALWAYS (symbol column always reserved)", noSelectionSpacing, emptyState, area);
+    }
+
+    private static void printExample(String title, Table table, TableState state, Rect area) {
+        Buffer buffer = Buffer.empty(area);
+        table.render(area, buffer, state);
+
+        System.out.println(buffer.toAnsiString());
+    }
+
 
     /**
      * Controls when space is allocated for the highlight symbol.
