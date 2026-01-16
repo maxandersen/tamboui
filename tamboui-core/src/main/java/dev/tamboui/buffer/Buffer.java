@@ -4,16 +4,18 @@
  */
 package dev.tamboui.buffer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Hyperlink;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A buffer that stores cells for a rectangular area.
@@ -365,6 +367,7 @@ public final class Buffer {
     public String toAnsiString() {
         StringBuilder result = new StringBuilder();
         Style lastStyle = null;
+        Hyperlink lastHyperlink = null;
 
         for (int y = area.top(); y < area.bottom(); y++) {
             if (y > area.top()) {
@@ -376,6 +379,16 @@ public final class Buffer {
 
                 // Apply style if changed
                 if (!cell.style().equals(lastStyle)) {
+                    Hyperlink currentHyperlink = cell.style().hyperlink().orElse(null);
+                    if (!Objects.equals(currentHyperlink, lastHyperlink)) {
+                        if (lastHyperlink != null) {
+                            result.append(AnsiStringBuilder.hyperlinkEnd());
+                        }
+                        if (currentHyperlink != null) {
+                            result.append(AnsiStringBuilder.hyperlinkStart(currentHyperlink));
+                        }
+                        lastHyperlink = currentHyperlink;
+                    }
                     result.append(AnsiStringBuilder.styleToAnsi(cell.style()));
                     lastStyle = cell.style();
                 }
@@ -384,6 +397,9 @@ public final class Buffer {
             }
         }
 
+        if (lastHyperlink != null) {
+            result.append(AnsiStringBuilder.hyperlinkEnd());
+        }
         // Reset at end
         result.append(AnsiStringBuilder.RESET);
         return result.toString();
@@ -399,6 +415,7 @@ public final class Buffer {
     public String toAnsiStringWithCursorPositioning() {
         StringBuilder result = new StringBuilder();
         Style lastStyle = null;
+        Hyperlink lastHyperlink = null;
 
         for (int y = area.top(); y < area.bottom(); y++) {
             // Position cursor at start of row (1-based coordinates)
@@ -409,6 +426,16 @@ public final class Buffer {
 
                 // Apply style if changed
                 if (!cell.style().equals(lastStyle)) {
+                    Hyperlink currentHyperlink = cell.style().hyperlink().orElse(null);
+                    if (!Objects.equals(currentHyperlink, lastHyperlink)) {
+                        if (lastHyperlink != null) {
+                            result.append(AnsiStringBuilder.hyperlinkEnd());
+                        }
+                        if (currentHyperlink != null) {
+                            result.append(AnsiStringBuilder.hyperlinkStart(currentHyperlink));
+                        }
+                        lastHyperlink = currentHyperlink;
+                    }
                     result.append(AnsiStringBuilder.styleToAnsi(cell.style()));
                     lastStyle = cell.style();
                 }
@@ -417,6 +444,9 @@ public final class Buffer {
             }
         }
 
+        if (lastHyperlink != null) {
+            result.append(AnsiStringBuilder.hyperlinkEnd());
+        }
         // Reset at end
         result.append(AnsiStringBuilder.RESET);
         return result.toString();
@@ -432,6 +462,7 @@ public final class Buffer {
     public String toAnsiStringTrimmed() {
         StringBuilder result = new StringBuilder();
         Style lastStyle = null;
+        Hyperlink lastHyperlink = null;
 
         for (int y = area.top(); y < area.bottom(); y++) {
             if (y > area.top()) {
@@ -454,6 +485,16 @@ public final class Buffer {
 
                 // Apply style if changed
                 if (!cell.style().equals(lastStyle)) {
+                    Hyperlink currentHyperlink = cell.style().hyperlink().orElse(null);
+                    if (!Objects.equals(currentHyperlink, lastHyperlink)) {
+                        if (lastHyperlink != null) {
+                            result.append(AnsiStringBuilder.hyperlinkEnd());
+                        }
+                        if (currentHyperlink != null) {
+                            result.append(AnsiStringBuilder.hyperlinkStart(currentHyperlink));
+                        }
+                        lastHyperlink = currentHyperlink;
+                    }
                     result.append(AnsiStringBuilder.styleToAnsi(cell.style()));
                     lastStyle = cell.style();
                 }
@@ -462,6 +503,9 @@ public final class Buffer {
             }
         }
 
+        if (lastHyperlink != null) {
+            result.append(AnsiStringBuilder.hyperlinkEnd());
+        }
         // Reset at end
         result.append(AnsiStringBuilder.RESET);
         return result.toString();

@@ -773,6 +773,34 @@ display.setLine(2, Text.from(Span.styled("No errors", Style.EMPTY.fg(Color.GREEN
 |Interactive full-screen apps
 |===
 
+== Markup and RichIO (CLI Output)
+
+TamboUI includes a small Rich / BBCode-inspired markup parser for producing styled `Text` without requiring widgets or a full-screen TUI:
+
+[source,java]
+----
+import dev.tamboui.text.Text;
+import dev.tamboui.text.markup.Markup;
+
+Text text = Markup.render("[bold red]Hello[/] World");
+----
+
+For direct terminal output, use `RichIO`, which can print markup strings, `Text`, and pretty formatted `Throwable`s:
+
+[source,java]
+----
+import dev.tamboui.console.RichIO;
+
+var console = RichIO.system();
+console.print("[link=https://example.com]Hello[/link]");
+
+try {
+    throw new RuntimeException("boom", new IllegalArgumentException("bad input"));
+} catch (RuntimeException e) {
+    console.print(e);
+}
+----
+
 == Choosing a Level
 
 **Start with the Toolkit DSL** for most applications.
