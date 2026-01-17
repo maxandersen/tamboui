@@ -33,18 +33,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A container element with borders and title.
-/// <p>
+///
 /// CSS properties {@code border-type} and {@code border-color} are automatically
 /// resolved through the underlying {@link Block} widget.
-/// <p>
+///
 /// Layout properties can be set via CSS or programmatically:
-/// <ul>
-///    <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
-///    <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
-///    <li>{@code margin} - Margin around the panel: single value or CSS-style shorthand</li>
-///    <li>{@code spacing} - Gap between children in cells</li>
-/// </ul>
-/// <p>
+///
+/// - {@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code margin} - Margin around the panel: single value or CSS-style shorthand
+/// - {@code spacing} - Gap between children in cells
+///
+///
 /// Programmatic values override CSS values when both are set.
 public final class Panel extends ContainerElement<Panel> {
 
@@ -128,7 +128,7 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /// Makes this panel borderless.
-    /// <p>
+    ///
     /// This sets the border type to {@link BorderType#NONE}, which renders
     /// no borders but still reserves space for them if borders are enabled.
     public Panel borderless() {
@@ -161,7 +161,7 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /// Sets the layout direction for children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code direction} property.
     ///
     /// @param direction the layout direction
@@ -188,7 +188,7 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /// Sets the flex layout mode for positioning children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code flex} property.
     ///
     /// @param flex the flex mode
@@ -199,7 +199,7 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /// Sets the margin around the panel.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code margin} property.
     ///
     /// @param margin the margin
@@ -219,7 +219,7 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /// Sets the spacing (gap) between children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code spacing} property.
     ///
     /// @param spacing the spacing in cells
@@ -230,15 +230,14 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /// Enables automatic height calculation to fit the panel's content.
-    /// <p>
+    ///
     /// When enabled, the constraint is computed dynamically based on:
-    /// <ul>
-    ///    <li>Border overhead: 2 rows (top and bottom borders)</li>
-    ///    <li>Padding overhead: vertical padding if set</li>
-    ///    <li>Children height: sum of child heights (1 row each by default,
-    ///        or the length from their constraint if specified)</li>
-    /// </ul>
-    /// <p>
+    ///
+    /// - Border overhead: 2 rows (top and bottom borders)
+    /// - Padding overhead: vertical padding if set
+    /// - Children height: sum of child heights (1 row each by default, or the length from their constraint if specified)
+    ///
+    ///
     /// The height is computed when {@link #constraint()} is called, so children
     /// can be added before or after calling this method.
     ///

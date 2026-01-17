@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.Random;
 
 /// Demo TUI application showcasing the Sparkline widget.
-/// <p>
+///
 /// Demonstrates sparklines with different styles, bar sets,
 /// and animated data updates.
 public class SparklineDemo {

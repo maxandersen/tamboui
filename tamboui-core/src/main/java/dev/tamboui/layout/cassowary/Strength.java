@@ -8,20 +8,23 @@ import dev.tamboui.layout.Fraction;
 
 /// Constraint strength representing priority in the constraint hierarchy.
 ///
-/// <p>Cassowary uses a hierarchical constraint system where higher-strength
+///
+/// Cassowary uses a hierarchical constraint system where higher-strength
 /// constraints take absolute precedence over lower-strength ones. The strength
 /// is computed using three weight levels that are combined into a single value.
 ///
-/// <p>This implementation uses {@link Fraction} for exact arithmetic,
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
 /// avoiding the cumulative rounding errors that occur with floating-point.
 ///
-/// <p>Predefined strengths in decreasing order of priority:
-/// <ul>
-///    <li>{@link #REQUIRED} - Must be satisfied; failure throws an exception</li>
-///    <li>{@link #STRONG} - High priority preference</li>
-///    <li>{@link #MEDIUM} - Medium priority preference</li>
-///    <li>{@link #WEAK} - Low priority preference</li>
-/// </ul>
+///
+/// Predefined strengths in decreasing order of priority:
+///
+/// - {@link #REQUIRED} - Must be satisfied; failure throws an exception
+/// - {@link #STRONG} - High priority preference
+/// - {@link #MEDIUM} - Medium priority preference
+/// - {@link #WEAK} - Low priority preference
+///
 public final class Strength {
 
     private static final Fraction THOUSAND = Fraction.of(1000);
@@ -52,7 +55,8 @@ public final class Strength {
 
     /// Creates a custom strength with the given weights.
     ///
-    /// <p>The weights are combined using a polynomial scheme where the strong
+    ///
+    /// The weights are combined using a polynomial scheme where the strong
     /// weight has the highest significance, followed by medium, then weak.
     ///
     /// @param strong the strong weight (highest priority)
@@ -65,7 +69,8 @@ public final class Strength {
 
     /// Creates a custom strength with the given weights.
     ///
-    /// <p>The weights are combined using a polynomial scheme where the strong
+    ///
+    /// The weights are combined using a polynomial scheme where the strong
     /// weight has the highest significance, followed by medium, then weak.
     ///
     /// @param strong the strong weight (highest priority)
@@ -78,7 +83,8 @@ public final class Strength {
 
     /// Computes the numeric value of this strength for use in the simplex objective.
     ///
-    /// <p>Uses a polynomial scheme to ensure hierarchical ordering:
+    ///
+    /// Uses a polynomial scheme to ensure hierarchical ordering:
     /// strong weights dominate medium weights which dominate weak weights.
     ///
     /// @return the computed strength value

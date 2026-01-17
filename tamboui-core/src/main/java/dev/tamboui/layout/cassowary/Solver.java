@@ -11,18 +11,21 @@ import java.util.Map;
 
 /// Cassowary constraint solver using the dual simplex method.
 ///
-/// <p>The solver maintains a tableau of linear equations and supports:
-/// <ul>
-///    <li>Adding and removing constraints dynamically</li>
-///    <li>Suggesting values for edit variables</li>
-///    <li>Hierarchical constraint priorities</li>
-/// </ul>
 ///
-/// <p>This implementation uses {@link Fraction} for exact arithmetic,
+/// The solver maintains a tableau of linear equations and supports:
+///
+/// - Adding and removing constraints dynamically
+/// - Suggesting values for edit variables
+/// - Hierarchical constraint priorities
+///
+///
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
 /// avoiding the cumulative rounding errors that occur with floating-point.
 ///
-/// <p>Example usage:
-/// <pre>
+///
+/// Example usage:
+/// ```java
 /// Solver solver = new Solver();
 /// Variable left = new Variable("left");
 /// Variable width = new Variable("width");
@@ -41,7 +44,7 @@ import java.util.Map;
 ///
 /// solver.updateVariables();
 /// Fraction resolvedWidth = solver.valueOf(width);
-/// </pre>
+/// ```
 ///
 /// @see Variable
 /// @see CassowaryConstraint
@@ -211,7 +214,8 @@ public final class Solver {
 
     /// Suggests a new value for an edit variable.
     ///
-    /// <p>Call {@link #updateVariables()} after suggesting values.
+    ///
+    /// Call {@link #updateVariables()} after suggesting values.
     ///
     /// @param variable the edit variable
     /// @param value    the suggested value
@@ -254,7 +258,8 @@ public final class Solver {
 
     /// Updates all variable values after constraint changes.
     ///
-    /// <p>Must be called before reading variable values.
+    ///
+    /// Must be called before reading variable values.
     public void updateVariables() {
         for (Map.Entry<Variable, Symbol> entry : vars.entrySet()) {
             Variable variable = entry.getKey();

@@ -6,12 +6,13 @@ package dev.tamboui.layout.cassowary;
 
 /// The type of relationship in a constraint.
 ///
-/// <p>Cassowary supports three types of linear constraints:
-/// <ul>
-///    <li>Equality: expression == 0</li>
-///    <li>Less than or equal: expression &lt;= 0</li>
-///    <li>Greater than or equal: expression &gt;= 0</li>
-/// </ul>
+///
+/// Cassowary supports three types of linear constraints:
+///
+/// - Equality: expression == 0
+/// - Less than or equal: expression &lt;= 0
+/// - Greater than or equal: expression &gt;= 0
+///
 public enum Relation {
 
     /// Equality constraint: the expression must equal zero.

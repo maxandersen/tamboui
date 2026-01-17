@@ -7,7 +7,7 @@ package dev.tamboui.tui;
 import dev.tamboui.terminal.Frame;
 
 /// Functional interface for rendering the TUI.
-/// <p>
+///
 /// The renderer is called whenever the UI needs to be redrawn,
 /// typically after handling an event that returns {@code true}.
 ///

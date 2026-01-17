@@ -24,16 +24,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A DSL wrapper for the BarChart widget.
-/// <p>
+///
 /// Displays grouped bar charts.
-/// <pre>{@code
+/// ```java
 /// barChart()
 ///      .data(10, 20, 30, 40)
 ///      .barWidth(3)
 ///      .barColor(Color.CYAN)
 ///      .title("Sales")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class BarChartElement extends StyledElement<BarChartElement> {
 
     private final List<BarGroup> groups = new ArrayList<>();

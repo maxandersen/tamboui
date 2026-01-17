@@ -15,16 +15,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /// Renders images using the iTerm2 inline images protocol.
-/// <p>
+///
 /// The iTerm2 protocol uses OSC (Operating System Command) escape sequences
 /// with base64-encoded image data. It's simpler than Kitty but widely supported.
-/// <p>
+///
 /// Supported by: iTerm2, WezTerm, Ghostty, Konsole, mintty.
 ///
-/// <h2>Protocol Format</h2>
-/// <pre>
+/// ## Protocol Format
+/// ```java
 /// ESC ] 1337 ; File = [arguments] : base64-data BEL
-/// </pre>
+/// ```
 ///
 /// @see <a href="https://iterm2.com/documentation-images.html">iTerm2 Inline Images</a>
 public final class ITermProtocol implements ImageProtocol {

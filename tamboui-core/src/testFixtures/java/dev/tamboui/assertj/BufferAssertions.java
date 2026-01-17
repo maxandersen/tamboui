@@ -7,15 +7,16 @@ package dev.tamboui.assertj;
 import dev.tamboui.buffer.Buffer;
 
 /// Entry point for AssertJ custom assertions for {@link Buffer}.
-/// <p>
+///
 /// Example usage:
-/// <pre>{@code
+/// ```java
 /// import static dev.tamboui.assertj.BufferAssertions.assertThat;
 ///
 /// Buffer actual = Buffer.empty(new Rect(0, 0, 10, 5));
 /// Buffer expected = Buffer.filled(new Rect(0, 0, 10, 5), Cell.EMPTY);
 /// assertThat(actual).isEqualTo(expected);
-/// }</pre>
+/// }
+/// ```
 public final class BufferAssertions {
 
     private BufferAssertions() {

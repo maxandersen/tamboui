@@ -5,16 +5,17 @@
 package dev.tamboui.text;
 
 /// A wrapper around a string that is masked when displayed.
-/// <p>
+///
 /// The masked string is displayed as a series of the same character. This might be used to display
 /// a password field or similar secure data.
-/// <p>
+///
 /// Example:
-/// <pre>{@code
+/// ```java
 /// Masked password = new Masked("secret123", '*');
 /// Span span = Span.styled(password.value(), Style.EMPTY.fg(Color.RED));
 /// // span will display as "*********"
-/// }</pre>
+/// }
+/// ```
 public final class Masked {
 
     private final String inner;

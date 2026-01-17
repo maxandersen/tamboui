@@ -1,5 +1,5 @@
 /// CSS styling support for TamboUI TUI library.
-/// <p>
+///
 /// This module provides CSS-based styling capabilities for TamboUI widgets,
 /// including a CSS parser, selector matching, and style cascading.
 module dev.tamboui.css {

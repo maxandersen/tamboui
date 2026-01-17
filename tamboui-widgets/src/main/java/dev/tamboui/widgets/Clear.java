@@ -11,19 +11,21 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
 
 /// A widget that clears/resets the area it is rendered to.
-/// <p>
+///
 /// This widget is useful for layering widgets on top of each other,
 /// such as rendering popups or modal dialogs over existing content.
 /// By first rendering {@code Clear} to an area, you can ensure the
 /// area is reset before rendering other widgets on top.
 ///
-/// <pre>{@code
+/// ```java
 /// // Clear an area before rendering a popup
 /// frame.renderWidget(Clear.INSTANCE, popupArea);
 /// frame.renderWidget(popupContent, popupArea);
-/// }</pre>
+/// }
+/// ```
 ///
-/// <p><b>Note:</b> This widget cannot be used to clear the terminal on the
+///
+/// **Note:** This widget cannot be used to clear the terminal on the
 /// first render, as the rendering system assumes the render area starts empty.
 /// Use {@code Terminal.clear()} instead for initial screen clearing.
 ///
@@ -31,7 +33,7 @@ import dev.tamboui.widget.Widget;
 public final class Clear implements Widget {
 
     /// Singleton instance of the Clear widget.
-    /// <p>
+    ///
     /// Since Clear has no configuration, a single instance can be reused.
     public static final Clear INSTANCE = new Clear();
 

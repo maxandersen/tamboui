@@ -10,11 +10,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /// Marks a method as an action handler for the specified action.
-/// <p>
+///
 /// When used with the annotation processor, methods annotated with {@code @OnAction}
 /// will be automatically registered with an {@code ActionHandler} via generated code.
 ///
-/// <pre>{@code
+/// ```java
 /// public class MyApp {
 ///      @OnAction(Actions.QUIT)
 ///      void quit(Event event) {
@@ -26,19 +26,20 @@ import java.lang.annotation.Target;
 ///          saveDocument();
 ///      }
 /// }
-/// }</pre>
-/// <p>
+/// }
+/// ```
+///
 /// The annotated method must:
-/// <ul>
-///    <li>Have exactly one parameter of type {@code Event} (or a subtype)</li>
-///    <li>Return {@code void}</li>
-///    <li>Be accessible (not private)</li>
-/// </ul>
+///
+/// - Have exactly one parameter of type {@code Event} (or a subtype)
+/// - Return {@code void}
+/// - Be accessible (not private)
+///
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface OnAction {
     /// The action name to handle.
-    /// <p>
+    ///
     /// Can be a constant from {@code Actions} or a custom string.
     ///
     /// @return the action name

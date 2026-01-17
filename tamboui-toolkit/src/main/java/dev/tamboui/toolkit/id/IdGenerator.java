@@ -5,7 +5,7 @@ import dev.tamboui.toolkit.element.Element;
 import java.util.concurrent.atomic.AtomicLong;
 
 /// Generates unique IDs for elements and components.
-/// <p>
+///
 /// IDs are formed by combining the class name with a unique counter.
 /// This ensures that each instance receives a distinct identifier.
 public class IdGenerator {

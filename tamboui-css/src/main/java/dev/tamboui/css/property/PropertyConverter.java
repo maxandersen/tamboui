@@ -27,7 +27,7 @@ public interface PropertyConverter<T> {
     Optional<T> convert(String value, Map<String, String> variables);
 
     /// Resolves variable references in a value.
-    /// <p>
+    ///
     /// This method extracts all $variable patterns from the input string and
     /// replaces each with its value from the variables map. This approach is
     /// deterministic regardless of the iteration order of the variables map,

@@ -5,7 +5,7 @@
 package dev.tamboui.tui.event;
 
 /// Represents a terminal window resize event.
-/// <p>
+///
 /// This event is triggered when the terminal window size changes,
 /// typically due to the user resizing the terminal window.
 public final class ResizeEvent implements Event {

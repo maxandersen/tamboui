@@ -18,17 +18,18 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
 /// An element that displays an error placeholder when another element fails to render.
-/// <p>
+///
 /// Used by fault-tolerant rendering to show a visual indication that an element
 /// encountered an error during rendering, while allowing the rest of the UI to continue.
 ///
-/// <pre>{@code
+/// ```java
 /// // Typically created automatically during fault-tolerant rendering
 /// ErrorPlaceholder placeholder = ErrorPlaceholder.from(
 ///      new RuntimeException("Widget failed"),
 ///      "my-widget"
 /// );
-/// }</pre>
+/// }
+/// ```
 public final class ErrorPlaceholder implements Element {
 
     private final Throwable cause;

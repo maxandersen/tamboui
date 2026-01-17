@@ -10,11 +10,11 @@ import picocli.CommandLine.Option;
 import java.time.Duration;
 
 /// PicoCLI mixin that provides common TUI-related command line options.
-/// <p>
+///
 /// Use this mixin to add TUI options to your existing commands without
 /// extending {@link TuiCommand}.
 ///
-/// <pre>{@code
+/// ```java
 /// @Command(name = "myapp")
 /// public class MyApp implements Callable<Integer> {
 ///
@@ -30,7 +30,8 @@ import java.time.Duration;
 ///          return 0;
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see TuiCommand
 public class TuiMixin {

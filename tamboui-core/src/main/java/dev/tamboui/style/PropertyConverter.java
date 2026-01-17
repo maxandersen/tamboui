@@ -7,7 +7,7 @@ package dev.tamboui.style;
 import java.util.Optional;
 
 /// A functional interface for converting string values to typed property values.
-/// <p>
+///
 /// Converters are used by {@link PropertyKey} to parse string representations
 /// into strongly-typed values.
 ///

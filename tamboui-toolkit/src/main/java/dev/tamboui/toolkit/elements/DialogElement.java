@@ -33,29 +33,30 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A dialog element that auto-centers in its parent area.
-/// <p>
+///
 /// DialogElement simplifies creating modal dialogs by automatically:
-/// <ul>
-///    <li>Centering the dialog in the parent area</li>
-///    <li>Clearing the background before rendering</li>
-///    <li>Calculating dimensions from content (or using fixed dimensions)</li>
-/// </ul>
-/// <p>
+///
+/// - Centering the dialog in the parent area
+/// - Clearing the background before rendering
+/// - Calculating dimensions from content (or using fixed dimensions)
+///
+///
 /// Layout properties for dialog content can be set via CSS or programmatically:
-/// <ul>
-///    <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
-///    <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
-///    <li>{@code spacing} - Gap between children in cells</li>
-/// </ul>
-/// <p>
+///
+/// - {@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code spacing} - Gap between children in cells
+///
+///
 /// Programmatic values override CSS values when both are set.
 ///
-/// <pre>{@code
+/// ```java
 /// dialog("Confirm Delete",
 ///      text("Delete 3 files?"),
 ///      text("[y] Yes  [n] No").dim()
 /// ).rounded().borderColor(Color.YELLOW)
-/// }</pre>
+/// }
+/// ```
 public final class DialogElement extends ContainerElement<DialogElement> {
 
     private String title;
@@ -138,7 +139,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     /// Sets the layout direction for children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code direction} property.
     ///
     /// @param direction the layout direction
@@ -165,7 +166,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     /// Sets the flex layout mode for positioning children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code flex} property.
     ///
     /// @param flex the flex mode
@@ -176,7 +177,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     /// Sets the spacing (gap) between children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code spacing} property.
     ///
     /// @param spacing the spacing in cells
@@ -205,7 +206,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     /// Handles key events for the dialog.
-    /// <p>
+    ///
     /// Routes events to children first (via ContainerElement).
     /// Then handles Enter for confirm and Escape for cancel.
     /// Being modal, the dialog consumes all key events.

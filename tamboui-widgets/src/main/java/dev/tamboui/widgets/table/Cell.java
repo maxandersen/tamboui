@@ -10,11 +10,11 @@ import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 
 /// A cell in a {@link Table}.
-/// <p>
+///
 /// A cell contains styled text content that can be a single line or multi-line text.
 /// Cells can have their own style which takes precedence over row and table styles.
 ///
-/// <pre>{@code
+/// ```java
 /// // Simple cell
 /// Cell.from("Hello")
 ///
@@ -23,7 +23,8 @@ import dev.tamboui.text.Text;
 ///
 /// // Multi-line cell
 /// Cell.from(Text.from("Line 1\nLine 2"))
-/// }</pre>
+/// }
+/// ```
 public final class Cell {
 
     private final Text content;

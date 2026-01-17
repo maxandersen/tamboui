@@ -11,13 +11,13 @@ import dev.tamboui.tui.bindings.BindingSets;
 import java.util.Optional;
 
 /// Represents a mouse input event.
-/// <p>
+///
 /// MouseEvent is associated with {@link Bindings} that determine how semantic
 /// actions are mapped to mouse inputs. Use the convenience methods like
 /// {@link #isClick()}, {@link #isRightClick()}, etc. to check if this event
 /// matches a semantic action according to the configured bindings.
 ///
-/// <pre>{@code
+/// ```java
 /// // Check semantic actions
 /// if (event.isClick()) {
 ///      handleClick(event.x(), event.y());
@@ -35,7 +35,8 @@ import java.util.Optional;
 /// if (event.matches("myApp.contextMenu")) {
 ///      showCustomMenu();
 /// }
-/// }</pre>
+/// }
+/// ```
 public final class MouseEvent implements Event {
 
     private final MouseEventKind kind;

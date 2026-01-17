@@ -7,17 +7,18 @@ package dev.tamboui.style;
 import dev.tamboui.layout.Alignment;
 
 /// Standard property keys for style-aware widgets.
-/// <p>
+///
 /// This class defines the canonical property keys for common styling properties.
 /// Widgets should use these keys to ensure consistency.
 ///
-/// <h2>Usage in widgets:</h2>
-/// <pre>{@code
+/// ## Usage in widgets:
+/// ```java
 /// Block.builder()
 ///      .resolver(styleResolver)
 ///      .background(Color.BLUE)
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class StandardPropertyKeys {
 
     private StandardPropertyKeys() {
@@ -49,7 +50,7 @@ public final class StandardPropertyKeys {
     // ═══════════════════════════════════════════════════════════════
 
     /// The {@code text-align} property for text alignment.
-    /// <p>
+    ///
     /// Supported values: {@code left}, {@code center}, {@code right}
     public static final PropertyKey<Alignment> TEXT_ALIGN =
             PropertyKey.of("text-align", AlignmentConverter.INSTANCE);

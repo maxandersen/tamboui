@@ -14,20 +14,20 @@ import dev.tamboui.style.Style;
 import java.io.OutputStream;
 
 /// Renders images using Unicode Braille patterns.
-/// <p>
+///
 /// Each terminal cell can display a 2x4 grid of Braille dots (8 dots total),
 /// providing the highest character-based resolution at 2x4 virtual pixels per cell.
-/// <p>
+///
 /// Braille patterns use Unicode characters from U+2800 to U+28FF.
 /// The 8 dots are mapped to bits as follows:
-/// <pre>
+/// ```java
 /// Dot positions:  Bit values:
 ///    1 4           0x01 0x08
 ///    2 5           0x02 0x10
 ///    3 6           0x04 0x20
 ///    7 8           0x40 0x80
-/// </pre>
-/// <p>
+/// ```
+///
 /// Uses adaptive percentile-based thresholding to determine which pixels are "on".
 /// By default, the brightest 75% of pixels are shown as dots.
 public final class BrailleProtocol implements ImageProtocol {
@@ -36,7 +36,7 @@ public final class BrailleProtocol implements ImageProtocol {
     private static final int BRAILLE_BASE = 0x2800;
 
     /// Braille dot bit values.
-    /// <p>
+    ///
     /// Index [column][row] where column is 0-1 and row is 0-3.
     private static final int[][] BRAILLE_DOTS = {
         {0x01, 0x02, 0x04, 0x40},  // Column 0: bits for rows 0-3
@@ -49,7 +49,7 @@ public final class BrailleProtocol implements ImageProtocol {
     private final int percentile;
 
     /// Creates a new Braille protocol instance with default percentile threshold.
-    /// <p>
+    ///
     /// By default, the brightest 75% of pixels are shown as dots (25th percentile).
     public BrailleProtocol() {
         this(25);
@@ -122,7 +122,7 @@ public final class BrailleProtocol implements ImageProtocol {
     }
 
     /// Calculates the luminance threshold based on the configured percentile.
-    /// <p>
+    ///
     /// Builds a histogram of luminance values and finds the value at the given percentile.
     private int calculatePercentileThreshold(ImageData image) {
         // Build luminance histogram (256 buckets)
@@ -177,7 +177,7 @@ public final class BrailleProtocol implements ImageProtocol {
     }
 
     /// Calculates the luminance of a pixel.
-    /// <p>
+    ///
     /// Uses the standard luminance formula: 0.299*R + 0.587*G + 0.114*B
     private static int luminanceFor(int argb) {
         int r = ImageData.red(argb);

@@ -20,20 +20,21 @@ import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
 /// A progress bar widget that renders a bar filled according to the progress value.
-/// <p>
+///
 /// Progress can be set as a percentage (0-100) or as a ratio (0.0-1.0).
 /// The gauge can optionally display a label centered in the bar.
-/// <p>
+///
 /// When unicode mode is enabled, the widget uses block characters for smoother
 /// visual progression with 8 extra fractional parts per cell.
 ///
-/// <pre>{@code
+/// ```java
 /// Gauge gauge = Gauge.builder()
 ///      .percent(75)
 ///      .label("75%")
 ///      .gaugeStyle(Style.EMPTY.fg(Color.GREEN))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class Gauge implements Widget {
 
     // Unicode block characters for sub-cell precision (1/8 increments)
@@ -50,7 +51,7 @@ public final class Gauge implements Widget {
     };
 
     /// Property key for the gauge (filled portion) color.
-    /// <p>
+    ///
     /// CSS property name: {@code gauge-color}
     public static final PropertyKey<Color> GAUGE_COLOR =
             PropertyKey.of("gauge-color", ColorConverter.INSTANCE);
@@ -262,7 +263,7 @@ public final class Gauge implements Widget {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code gauge-color} and {@code background}
         /// will be resolved if not set programmatically.
         ///
@@ -274,7 +275,7 @@ public final class Gauge implements Widget {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -285,7 +286,7 @@ public final class Gauge implements Widget {
         }
 
         /// Sets the gauge (filled portion) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the gauge color

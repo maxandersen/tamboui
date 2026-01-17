@@ -418,7 +418,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
 
         /// Sets a function to resolve styles for each item based on position.
-        /// <p>
+        ///
         /// The function receives the item index (0-based) and total item count,
         /// and returns a Style to apply to that item. This enables positional
         /// styling like alternating row colors.
@@ -431,7 +431,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code color} and {@code background}
         /// will be resolved if not set programmatically.
         ///
@@ -495,14 +495,14 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
 
         /// Sets the overflow mode for list item text.
-        /// <p>
+        ///
         /// Controls how text is handled when it exceeds the available width:
-        /// <ul>
-        ///    <li>{@code CLIP} - silently truncate at boundary (default)</li>
-        ///    <li>{@code ELLIPSIS} - truncate with "..." at end</li>
-        ///    <li>{@code ELLIPSIS_START} - truncate with "..." at start</li>
-        ///    <li>{@code ELLIPSIS_MIDDLE} - truncate with "..." in middle</li>
-        /// </ul>
+        ///
+        /// - {@code CLIP} - silently truncate at boundary (default)
+        /// - {@code ELLIPSIS} - truncate with "..." at end
+        /// - {@code ELLIPSIS_START} - truncate with "..." at start
+        /// - {@code ELLIPSIS_MIDDLE} - truncate with "..." in middle
+        ///
         /// Note: WRAP_CHARACTER and WRAP_WORD are not supported for list items.
         ///
         /// @param overflow the overflow mode

@@ -30,7 +30,7 @@ import dev.tamboui.widgets.text.Overflow;
 import dev.tamboui.widgets.text.OverflowConverter;
 
 /// A paragraph widget for displaying styled text.
-/// <p>
+///
 /// Supports style-aware properties: {@code text-overflow}, {@code text-align},
 /// {@code background}, and {@code color}.
 public final class Paragraph implements Widget {
@@ -584,7 +584,7 @@ public final class Paragraph implements Widget {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code text-overflow} and {@code text-align}
         /// will fall back to resolved values if not set programmatically.
         ///

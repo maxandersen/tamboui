@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 
 /// Static factory methods for building UI elements with the DSL.
 /// Import statically to use:
-/// <pre>
+/// ```java
 /// import static toolkit.dev.tamboui.Toolkit.*;
 ///
 /// panel("Title",
@@ -52,7 +52,7 @@ import java.util.function.Supplier;
 ///          text("Right")
 ///      )
 /// ).rounded()
-/// </pre>
+/// ```
 public final class Toolkit {
 
     private Toolkit() {
@@ -92,12 +92,13 @@ public final class Toolkit {
     // ==================== Wave Text ====================
 
     /// Creates a wave text element with the given text.
-    /// <p>
+    ///
     /// By default, a dark "shadow" moves through otherwise bright text.
-    /// <pre>{@code
+    /// ```java
     /// waveText("Loading...").color(Color.CYAN)
     /// waveText("Thinking...").inverted()  // Bright peak on dim text
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param text the text to display
     /// @return a new wave text element
@@ -173,7 +174,7 @@ public final class Toolkit {
     // ==================== Dialog ====================
 
     /// Creates a dialog with a title and children.
-    /// <p>
+    ///
     /// Dialogs auto-center in their parent area and clear the background.
     ///
     /// @param title the dialog title
@@ -276,12 +277,13 @@ public final class Toolkit {
     // ==================== Lazy Elements ====================
 
     /// Creates a lazy element that evaluates the supplier on each render.
-    /// <p>
+    ///
     /// This allows state to be captured in the closure:
-    /// <pre>{@code
+    /// ```java
     /// int count = 0;
     /// lazy(() -> text("Count: " + count))
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param supplier the supplier that provides the element
     /// @return a new lazy element
@@ -291,9 +293,10 @@ public final class Toolkit {
 
     /// Creates a panel with a title and lazy content.
     /// The content supplier is evaluated on each render.
-    /// <pre>{@code
+    /// ```java
     /// panel("Counter", () -> text("Count: " + count))
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param title the panel title
     /// @param contentSupplier the supplier that provides the content
@@ -435,14 +438,15 @@ public final class Toolkit {
     }
 
     /// Creates a list with styled element items.
-    /// <p>
+    ///
     /// This allows using styled elements directly:
-    /// <pre>{@code
+    /// ```java
     /// list(
     ///      text("Hello").green(),
     ///      text("World").cyan()
     /// )
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param elements the list items as styled elements
     /// @return a new list container
@@ -611,7 +615,7 @@ public final class Toolkit {
     // ==================== Input Utilities ====================
 
     /// Handles common key events for text input.
-    /// <p>
+    ///
     /// Handles: character input, backspace, delete, left/right arrows, home/end.
     ///
     /// @param state the text input state to modify

@@ -7,10 +7,10 @@ package dev.tamboui.css.cascade;
 import java.util.Objects;
 
 /// Represents the current pseudo-class state of an element.
-/// <p>
+///
 /// This is used during selector matching to determine if pseudo-class
 /// selectors like :focus, :hover, :disabled match the element.
-/// <p>
+///
 /// For positional pseudo-classes like :nth-child(even), the nthChild field
 /// stores the 1-based position (0 means position is not set).
 public final class PseudoClassState {
@@ -155,7 +155,7 @@ public final class PseudoClassState {
     }
 
     /// Checks if the given pseudo-class is active.
-    /// <p>
+    ///
     /// Supports simple pseudo-classes (focus, hover, etc.) and functional
     /// pseudo-classes like nth-child(even) and nth-child(odd).
     ///

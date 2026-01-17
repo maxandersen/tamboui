@@ -19,17 +19,17 @@ import java.util.Map;
 import java.util.Properties;
 
 /// Factory for predefined binding sets.
-/// <p>
-/// Available binding sets:
-/// <ul>
-///    <li>{@link #standard()} - Arrow keys only, no vim/emacs bindings (default)</li>
-///    <li>{@link #vim()} - Vim-style navigation (hjkl, g/G, Ctrl+u/d)</li>
-///    <li>{@link #emacs()} - Emacs-style navigation (Ctrl+n/p/f/b, etc.)</li>
-///    <li>{@link #intellij()} - IntelliJ IDEA-style bindings</li>
-///    <li>{@link #vscode()} - Visual Studio Code-style bindings</li>
-/// </ul>
 ///
-/// <pre>{@code
+/// Available binding sets:
+///
+/// - {@link #standard()} - Arrow keys only, no vim/emacs bindings (default)
+/// - {@link #vim()} - Vim-style navigation (hjkl, g/G, Ctrl+u/d)
+/// - {@link #emacs()} - Emacs-style navigation (Ctrl+n/p/f/b, etc.)
+/// - {@link #intellij()} - IntelliJ IDEA-style bindings
+/// - {@link #vscode()} - Visual Studio Code-style bindings
+///
+///
+/// ```java
 /// // Use a predefined binding set
 /// Bindings bindings = BindingSets.vim();
 ///
@@ -39,7 +39,8 @@ import java.util.Properties;
 ///      .bind(KeyTrigger.ch('x'), Actions.QUIT)
 ///      .bind(MouseTrigger.rightClick(), "contextMenu")
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class BindingSets {
 
     private static final String BINDINGS_RESOURCE_PATH = "dev/tamboui/tui/bindings/";
@@ -72,7 +73,7 @@ public final class BindingSets {
     }
 
     /// Standard binding set using only arrow keys and standard keys.
-    /// <p>
+    ///
     /// No vim or emacs-style bindings. This is the default set,
     /// safe for use with text input (no letter keys bound to navigation).
     ///
@@ -82,13 +83,13 @@ public final class BindingSets {
     }
 
     /// Vim-style binding set with hjkl navigation.
-    /// <p>
+    ///
     /// Includes:
-    /// <ul>
-    ///    <li>hjkl for directional navigation</li>
-    ///    <li>g/G for home/end</li>
-    ///    <li>Ctrl+u/d for page up/down</li>
-    /// </ul>
+    ///
+    /// - hjkl for directional navigation
+    /// - g/G for home/end
+    /// - Ctrl+u/d for page up/down
+    ///
     ///
     /// @return the vim bindings
     public static Bindings vim() {
@@ -96,14 +97,14 @@ public final class BindingSets {
     }
 
     /// Emacs-style binding set with Ctrl+n/p/f/b navigation.
-    /// <p>
+    ///
     /// Includes:
-    /// <ul>
-    ///    <li>Ctrl+n/p/f/b for directional navigation</li>
-    ///    <li>Alt+v/Ctrl+v for page up/down</li>
-    ///    <li>Ctrl+a/e for home/end (line-level)</li>
-    ///    <li>Ctrl+g as cancel</li>
-    /// </ul>
+    ///
+    /// - Ctrl+n/p/f/b for directional navigation
+    /// - Alt+v/Ctrl+v for page up/down
+    /// - Ctrl+a/e for home/end (line-level)
+    /// - Ctrl+g as cancel
+    ///
     ///
     /// @return the emacs bindings
     public static Bindings emacs() {
@@ -111,7 +112,7 @@ public final class BindingSets {
     }
 
     /// IntelliJ IDEA-style binding set.
-    /// <p>
+    ///
     /// Based on IntelliJ's default key bindings for navigation.
     ///
     /// @return the IntelliJ bindings
@@ -120,7 +121,7 @@ public final class BindingSets {
     }
 
     /// Visual Studio Code-style binding set.
-    /// <p>
+    ///
     /// Based on VS Code's default key bindings for navigation.
     ///
     /// @return the VS Code bindings
@@ -129,7 +130,7 @@ public final class BindingSets {
     }
 
     /// Returns the default bindings.
-    /// <p>
+    ///
     /// Currently returns {@link #standard()}.
     ///
     /// @return the default bindings
@@ -195,9 +196,9 @@ public final class BindingSets {
     }
 
     /// Loads bindings from a properties file.
-    /// <p>
+    ///
     /// The file format uses standard Java properties:
-    /// <pre>{@code
+    /// ```java
     /// # Navigation
     /// moveUp = Up, k, K
     /// moveDown = Down, j, J
@@ -208,23 +209,24 @@ public final class BindingSets {
     /// click = Mouse.Left.Press
     /// rightClick = Mouse.Right.Press
     /// ctrlClick = Ctrl+Mouse.Left.Press
-    /// }</pre>
-    /// <p>
+    /// }
+    /// ```
+    ///
     /// Key binding syntax:
-    /// <ul>
-    ///    <li>Key names: Up, Down, Enter, Tab, Escape, Backspace, Delete, Home, End, PageUp, PageDown, F1-F12</li>
-    ///    <li>Characters: Single character like k, q</li>
-    ///    <li>Modifiers: Ctrl+c, Alt+x, Shift+Tab</li>
-    ///    <li>Space: Use the word "Space"</li>
-    /// </ul>
-    /// <p>
+    ///
+    /// - Key names: Up, Down, Enter, Tab, Escape, Backspace, Delete, Home, End, PageUp, PageDown, F1-F12
+    /// - Characters: Single character like k, q
+    /// - Modifiers: Ctrl+c, Alt+x, Shift+Tab
+    /// - Space: Use the word "Space"
+    ///
+    ///
     /// Mouse binding syntax:
-    /// <ul>
-    ///    <li>Format: [Modifiers+]Mouse.Button.Kind</li>
-    ///    <li>Buttons: Left, Right, Middle</li>
-    ///    <li>Kinds: Press, Release, Drag, ScrollUp, ScrollDown</li>
-    ///    <li>Example: Ctrl+Mouse.Left.Press</li>
-    /// </ul>
+    ///
+    /// - Format: [Modifiers+]Mouse.Button.Kind
+    /// - Buttons: Left, Right, Middle
+    /// - Kinds: Press, Release, Drag, ScrollUp, ScrollDown
+    /// - Example: Ctrl+Mouse.Left.Press
+    ///
     ///
     /// @param path the path to the properties file
     /// @return the loaded bindings
@@ -236,7 +238,7 @@ public final class BindingSets {
     }
 
     /// Loads bindings from an input stream containing properties.
-    /// <p>
+    ///
     /// The loaded bindings will be based on the standard bindings,
     /// with properties overriding/adding to them.
     ///

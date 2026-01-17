@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 /*
@@ -33,7 +33,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 /// Demo TUI application showcasing the Calendar widget.
-/// <p>
+///
 /// Demonstrates monthly calendar views with:
 /// - Different styling options
 /// - Event highlighting

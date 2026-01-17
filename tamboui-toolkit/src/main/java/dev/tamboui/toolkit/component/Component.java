@@ -18,11 +18,11 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 
 /// Base class for stateful components with event handling.
-/// <p>
+///
 /// Components handle key and mouse events when focused using
 /// {@code @OnAction} annotations:
 ///
-/// <pre>{@code
+/// ```java
 /// public class CounterComponent extends Component<CounterComponent> {
 ///      private int count = 0;
 ///
@@ -36,7 +36,8 @@ import dev.tamboui.tui.event.MouseEvent;
 ///          return text("Count: " + count);
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 public abstract class Component<T extends Component<T>> extends StyledElement<T> implements Focusable {
 
     private ActionHandler actionHandler;

@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /// A demo application that runs on the Java module path using JPMS.
-/// <p>
+///
 /// This demo showcases that TamboUI works correctly when running
 /// as a modular application with explicit module dependencies.
 public class ModularDemo {

@@ -17,12 +17,12 @@ import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.widget.StatefulWidget;
 
 /// A widget that renders text with an animated wave brightness effect.
-/// <p>
+///
 /// By default, the wave creates a dark "shadow" that moves through otherwise
 /// bright text. This can be inverted to have a bright peak moving through
 /// dim text.
 ///
-/// <pre>{@code
+/// ```java
 /// // Dark shadow moving through bright text (default)
 /// WaveText wave = WaveText.builder()
 ///      .text("Processing...")
@@ -41,18 +41,19 @@ import dev.tamboui.widget.StatefulWidget;
 ///      .text("Thinking...")
 ///      .mode(Mode.OSCILLATE)
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 ///
-/// <h2>Configuration Options</h2>
-/// <ul>
-///    <li><b>color</b> - Base color of the text</li>
-///    <li><b>dimFactor</b> - Brightness of the dim portion (0.0-1.0, default 0.3)</li>
-///    <li><b>peakWidth</b> - Width of the wave peak in characters (default 3)</li>
-///    <li><b>peakCount</b> - Number of peaks in the wave (default 1)</li>
-///    <li><b>speed</b> - Animation speed multiplier (default 1.0)</li>
-///    <li><b>mode</b> - LOOP (continuous) or OSCILLATE (back-and-forth)</li>
-///    <li><b>inverted</b> - If true, bright peak on dim text; if false, dark shadow on bright text</li>
-/// </ul>
+/// ## Configuration Options
+///
+/// - **color** - Base color of the text
+/// - **dimFactor** - Brightness of the dim portion (0.0-1.0, default 0.3)
+/// - **peakWidth** - Width of the wave peak in characters (default 3)
+/// - **peakCount** - Number of peaks in the wave (default 1)
+/// - **speed** - Animation speed multiplier (default 1.0)
+/// - **mode** - LOOP (continuous) or OSCILLATE (back-and-forth)
+/// - **inverted** - If true, bright peak on dim text; if false, dark shadow on bright text
+///
 public final class WaveText implements StatefulWidget<WaveTextState> {
 
     /// Animation mode for the wave.
@@ -277,7 +278,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the dim factor for the wave effect.
-        /// <p>
+        ///
         /// A value of 0.0 means completely black, 1.0 means no dimming.
         /// Default is 0.3.
         ///
@@ -289,7 +290,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the width of the wave peak in characters.
-        /// <p>
+        ///
         /// Larger values create a wider wave area. Default is 3.
         ///
         /// @param peakWidth the peak width
@@ -300,7 +301,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the number of peaks in the wave.
-        /// <p>
+        ///
         /// Multiple peaks create a more dynamic effect. Default is 1.
         ///
         /// @param peakCount the number of peaks
@@ -311,7 +312,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the animation speed multiplier.
-        /// <p>
+        ///
         /// Values greater than 1.0 speed up the animation,
         /// values less than 1.0 slow it down. Default is 1.0.
         ///
@@ -323,7 +324,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code color}, {@code wave-dim-factor},
         /// {@code wave-peak-width}, {@code wave-peak-count}, and {@code wave-speed}
         /// will be resolved from the styling system if not set programmatically.
@@ -336,7 +337,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the animation mode.
-        /// <p>
+        ///
         /// {@link Mode#LOOP} creates continuous movement in one direction.
         /// {@link Mode#OSCILLATE} creates back-and-forth movement.
         /// Default is LOOP.
@@ -349,7 +350,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the wave to oscillate back and forth.
-        /// <p>
+        ///
         /// Shorthand for {@code mode(Mode.OSCILLATE)}.
         ///
         /// @return this builder
@@ -359,7 +360,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets whether the effect is inverted.
-        /// <p>
+        ///
         /// When false (default), a dark shadow moves through bright text.
         /// When true, a bright peak moves through dim text.
         ///
@@ -371,7 +372,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         }
 
         /// Sets the base style (modifiers like bold, italic).
-        /// <p>
+        ///
         /// The foreground color will be overridden by the wave effect.
         ///
         /// @param style the base style

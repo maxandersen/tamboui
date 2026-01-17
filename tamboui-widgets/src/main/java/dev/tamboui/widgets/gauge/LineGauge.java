@@ -19,18 +19,19 @@ import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 
 /// A progress indicator that renders as a horizontal line.
-/// <p>
+///
 /// Unlike {@link Gauge}, LineGauge renders on a single line and uses line-drawing
 /// characters to show progress. It's more compact and suitable for status bars.
 ///
-/// <pre>{@code
+/// ```java
 /// LineGauge gauge = LineGauge.builder()
 ///      .ratio(0.75)
 ///      .label("Progress: ")
 ///      .lineSet(LineGauge.THICK)
 ///      .filledStyle(Style.EMPTY.fg(Color.GREEN))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class LineGauge implements Widget {
 
     /// Line character set using thin lines.
@@ -43,13 +44,13 @@ public final class LineGauge implements Widget {
     public static final LineSet DOUBLE = new LineSet("═", "═");
 
     /// Property key for the filled portion color.
-    /// <p>
+    ///
     /// CSS property name: {@code filled-color}
     public static final PropertyKey<Color> FILLED_COLOR =
             PropertyKey.of("filled-color", ColorConverter.INSTANCE);
 
     /// Property key for the unfilled portion color.
-    /// <p>
+    ///
     /// CSS property name: {@code unfilled-color}
     public static final PropertyKey<Color> UNFILLED_COLOR =
             PropertyKey.of("unfilled-color", ColorConverter.INSTANCE);
@@ -274,7 +275,7 @@ public final class LineGauge implements Widget {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code filled-color}, {@code unfilled-color},
         /// and {@code background} will be resolved if not set programmatically.
         ///
@@ -286,7 +287,7 @@ public final class LineGauge implements Widget {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -297,7 +298,7 @@ public final class LineGauge implements Widget {
         }
 
         /// Sets the filled portion color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the filled color
@@ -308,7 +309,7 @@ public final class LineGauge implements Widget {
         }
 
         /// Sets the unfilled portion color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the unfilled color

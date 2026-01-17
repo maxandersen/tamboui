@@ -5,17 +5,18 @@
 package dev.tamboui.tui.bindings;
 
 /// String constants for common semantic actions.
-/// <p>
+///
 /// These constants provide type-safe references to well-known actions while
 /// allowing custom actions to be defined as arbitrary strings.
 ///
-/// <pre>{@code
+/// ```java
 /// // Using predefined actions
 /// if (event.matches(Actions.MOVE_UP)) { ... }
 ///
 /// // Using custom string actions
 /// if (event.matches("myApp.customAction")) { ... }
-/// }</pre>
+/// }
+/// ```
 public final class Actions {
 
     private Actions() {

@@ -30,14 +30,14 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /// Default implementation of RenderContext with internal framework methods.
-/// <p>
-/// <strong>INTERNAL USE ONLY</strong> - This class is used internally by the toolkit framework.
+///
+/// **INTERNAL USE ONLY** - This class is used internally by the toolkit framework.
 /// User code and element implementations should only interact with the {@link RenderContext} interface.
-/// <p>
-/// <strong>CODE SMELL WARNING:</strong> If you find yourself casting {@code RenderContext} to
+///
+/// **CODE SMELL WARNING:** If you find yourself casting {@code RenderContext} to
 /// {@code DefaultRenderContext} in your code, this is a design problem. The only legitimate
 /// user of this class's internal methods is {@link StyledElement#render}.
-/// <p>
+///
 /// Methods like {@link #withElement}, {@link #registerElement}, and stack manipulation
 /// are framework internals that should never be called directly from element implementations.
 public final class DefaultRenderContext implements RenderContext {
@@ -91,7 +91,7 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     /// Enables or disables fault-tolerant rendering.
-    /// <p>
+    ///
     /// When enabled, exceptions thrown during child rendering are caught
     /// and an error placeholder is displayed instead.
     ///
@@ -314,14 +314,14 @@ public final class DefaultRenderContext implements RenderContext {
     // ═══════════════════════════════════════════════════════════════
 
     /// Returns the focus manager.
-    /// <p>
+    ///
     /// Internal use only.
     public FocusManager focusManager() {
         return focusManager;
     }
 
     /// Returns the event router.
-    /// <p>
+    ///
     /// Internal use only.
     public EventRouter eventRouter() {
         return eventRouter;
@@ -329,7 +329,7 @@ public final class DefaultRenderContext implements RenderContext {
 
     /// Registers an element for event routing and focus management.
     /// Called by container elements after rendering children.
-    /// <p>
+    ///
     /// Internal use only.
     ///
     /// @param element the element to register
@@ -349,11 +349,11 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     /// Executes an action with an element and style pushed onto their stacks.
-    /// <p>
+    ///
     /// The style is merged with the current style. Both the element and merged style
     /// are available via {@link #currentElement()} and {@link #currentStyle()}.
     /// This enables {@link #childStyle(String)} to work without passing the parent.
-    /// <p>
+    ///
     /// Internal use only - called by StyledElement.render().
     ///
     /// @param element the element being rendered
@@ -364,11 +364,11 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     /// Executes an action with an element, style, and CSS resolver pushed onto their stacks.
-    /// <p>
+    ///
     /// The style is merged with the current style. The element, merged style, and resolver
     /// are available via {@link #currentElement()}, {@link #currentStyle()}, and
     /// {@link #currentResolver()}.
-    /// <p>
+    ///
     /// Internal use only - called by StyledElement.render().
     ///
     /// @param element the element being rendered
@@ -399,7 +399,7 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     /// Returns the current CSS resolver from the resolver stack, if any.
-    /// <p>
+    ///
     /// This allows child elements to access CSS properties from their parent elements
     /// that are not part of the Style cascade (e.g., border-type).
     public Optional<CssStyleResolver> currentResolver() {

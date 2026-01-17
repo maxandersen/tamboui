@@ -9,7 +9,7 @@ import java.io.StringWriter;
 import java.util.Objects;
 
 /// Immutable container for render error information.
-/// <p>
+///
 /// Captures the exception that occurred during rendering along with a timestamp
 /// and a pre-formatted stack trace for display.
 public final class RenderError {

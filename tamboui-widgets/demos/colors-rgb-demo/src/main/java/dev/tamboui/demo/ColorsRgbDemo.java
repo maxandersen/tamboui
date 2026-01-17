@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 /*
@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// Demo TUI application showcasing RGB color support.
-/// <p>
+///
 /// Displays the full range of RGB colors in an animated gradient.
 /// Uses half-block characters (▀) to display two rows of pixels per screen row.
-/// <p>
+///
 /// Requires a terminal that supports 24-bit color (true color).
 public class ColorsRgbDemo {
 
@@ -135,7 +135,7 @@ public class ColorsRgbDemo {
     }
 
     /// Widget that displays the full range of RGB colors.
-    /// <p>
+    ///
     /// Uses half-block characters (▀) to display two rows of pixels per screen row.
     private static class ColorsWidget {
         private final List<List<Color.Rgb>> colors = new ArrayList<>();

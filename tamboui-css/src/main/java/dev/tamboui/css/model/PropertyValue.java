@@ -7,7 +7,7 @@ package dev.tamboui.css.model;
 import java.util.Objects;
 
 /// Represents a CSS property value as parsed from the stylesheet.
-/// <p>
+///
 /// The raw value is stored as a string and converted to the appropriate
 /// type when applied to elements.
 public final class PropertyValue {

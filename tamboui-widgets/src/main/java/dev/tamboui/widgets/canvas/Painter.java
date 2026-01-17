@@ -9,11 +9,11 @@ import dev.tamboui.style.Color;
 import java.util.Optional;
 
 /// Provides an interface for drawing on a {@link Canvas} grid.
-/// <p>
+///
 /// The Painter handles coordinate transformation from canvas space
 /// (floating-point coordinates with configurable bounds) to grid space
 /// (integer coordinates within the terminal area).
-/// <p>
+///
 /// Canvas coordinates use a mathematical coordinate system with the
 /// origin at the lower-left corner, while grid coordinates use the
 /// upper-left corner as origin (matching terminal conventions).
@@ -30,7 +30,7 @@ public class Painter {
     }
 
     /// Converts canvas coordinates to grid coordinates.
-    /// <p>
+    ///
     /// The canvas uses a mathematical coordinate system with the origin
     /// at the lower-left corner. This method transforms those coordinates
     /// to grid positions suitable for terminal rendering.

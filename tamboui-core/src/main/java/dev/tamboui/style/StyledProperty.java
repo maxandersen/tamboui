@@ -8,18 +8,18 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /// A property value that can be set programmatically or resolved from a style source.
-/// <p>
-/// StyledProperty encapsulates the common pattern of having a property that can be:
-/// <ol>
-///    <li>Set explicitly via a fluent API (programmatic value)</li>
-///    <li>Resolved from a styling system</li>
-///    <li>Falling back to a default value</li>
-/// </ol>
-/// <p>
-/// Resolution order: <strong>programmatic → resolver → default</strong>
 ///
-/// <h2>Usage in toolkit elements:</h2>
-/// <pre>{@code
+/// StyledProperty encapsulates the common pattern of having a property that can be:
+///
+/// 1. Set explicitly via a fluent API (programmatic value)
+/// 1. Resolved from a styling system
+/// 1. Falling back to a default value
+///
+///
+/// Resolution order: **programmatic → resolver → default**
+///
+/// ## Usage in toolkit elements:
+/// ```java
 /// public class MyElement extends StyledElement<MyElement> {
 ///      private final StyledProperty<Color> borderColor =
 ///          styledProperty(StandardPropertyKeys.BORDER_COLOR, Color.WHITE);
@@ -34,13 +34,15 @@ import java.util.function.Supplier;
 ///          // render with color...
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
-/// <h2>Usage in standalone widgets:</h2>
-/// <pre>{@code
+/// ## Usage in standalone widgets:
+/// ```java
 /// StyledProperty<Color> color = StyledProperty.of(BORDER_COLOR, Color.WHITE);
 /// color.resolve(resolver);
-/// }</pre>
+/// }
+/// ```
 ///
 /// @param <T> the type of the property value
 public final class StyledProperty<T> {
@@ -57,7 +59,7 @@ public final class StyledProperty<T> {
     }
 
     /// Creates a styled property with the given key and no default value.
-    /// <p>
+    ///
     /// The returned property is unbound - {@link #resolve()} will use an empty resolver.
     /// Use {@link #of(PropertyKey, Object, Supplier)} to create a bound property.
     ///
@@ -69,7 +71,7 @@ public final class StyledProperty<T> {
     }
 
     /// Creates a styled property with the given key and default value.
-    /// <p>
+    ///
     /// The returned property is unbound - {@link #resolve()} will use an empty resolver.
     /// Use {@link #of(PropertyKey, Object, Supplier)} to create a bound property.
     ///
@@ -82,7 +84,7 @@ public final class StyledProperty<T> {
     }
 
     /// Creates a styled property bound to a resolver supplier.
-    /// <p>
+    ///
     /// When {@link #resolve()} is called, it will use the resolver from the supplier.
     /// This is typically used by elements that maintain a current resolver during rendering.
     ///
@@ -97,7 +99,7 @@ public final class StyledProperty<T> {
     }
 
     /// Sets the programmatic value for this property.
-    /// <p>
+    ///
     /// When set, this value takes precedence over any resolved value.
     ///
     /// @param value the value to set, or null to clear
@@ -127,13 +129,13 @@ public final class StyledProperty<T> {
     }
 
     /// Resolves the effective value for this property.
-    /// <p>
+    ///
     /// Resolution order:
-    /// <ol>
-    ///    <li>Programmatic value (if set via {@link #set})</li>
-    ///    <li>Resolved value from the resolver</li>
-    ///    <li>Default value</li>
-    /// </ol>
+    ///
+    /// 1. Programmatic value (if set via {@link #set})
+    /// 1. Resolved value from the resolver
+    /// 1. Default value
+    ///
     ///
     /// @param resolver the property resolver to use for resolution
     /// @return the resolved value, or null if no value is available
@@ -145,7 +147,7 @@ public final class StyledProperty<T> {
     }
 
     /// Resolves the effective value using the bound resolver, or empty if unbound.
-    /// <p>
+    ///
     /// For bound properties (created with a resolver supplier), this uses the current
     /// resolver from the supplier. For unbound properties, this is equivalent to
     /// returning the programmatic value or default.

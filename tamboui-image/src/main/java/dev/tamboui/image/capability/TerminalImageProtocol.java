@@ -5,7 +5,7 @@
 package dev.tamboui.image.capability;
 
 /// Types of image display support available in terminals.
-/// <p>
+///
 /// Listed in order of preference (best quality first).
 public enum TerminalImageProtocol {
     /// Kitty Graphics Protocol - modern, high-quality image display.

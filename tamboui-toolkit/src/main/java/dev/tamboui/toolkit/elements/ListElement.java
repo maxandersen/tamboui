@@ -32,13 +32,13 @@ import java.util.List;
 import java.util.function.Function;
 
 /// A scrollable container that displays a list of selectable items.
-/// <p>
+///
 /// Unlike {@code ListWidget} (which only displays text), {@code ListElement}
 /// can display any {@link StyledElement} as list items, including complex
 /// layouts like rows with multiple styled children.
-/// <p>
+///
 /// Example usage:
-/// <pre>{@code
+/// ```java
 /// list("Item 1", "Item 2", "Item 3")
 ///      .state(listState)
 ///      .highlightColor(Color.YELLOW)
@@ -50,17 +50,18 @@ import java.util.function.Function;
 ///      row(text("Name: ").bold(), text("John").green()),
 ///      row(text("Age: ").bold(), text("25").cyan())
 /// ).state(listState)
-/// }</pre>
-/// <p>
+/// }
+/// ```
+///
 /// CSS selectors:
-/// <ul>
-///    <li>{@code ListElement} - styles the container (border, background)</li>
-///    <li>{@code ListElement-item} - styles each list item</li>
-///    <li>{@code ListElement-item:selected} - styles the selected item</li>
-///    <li>{@code ListElement-item:nth-child(odd/even)} - zebra striping</li>
-///    <li>{@code ListElement-scrollbar-thumb} - styles the scrollbar thumb</li>
-///    <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
-/// </ul>
+///
+/// - {@code ListElement} - styles the container (border, background)
+/// - {@code ListElement-item} - styles each list item
+/// - {@code ListElement-item:selected} - styles the selected item
+/// - {@code ListElement-item:nth-child(odd/even)} - zebra striping
+/// - {@code ListElement-scrollbar-thumb} - styles the scrollbar thumb
+/// - {@code ListElement-scrollbar-track} - styles the scrollbar track
+///
 ///
 /// @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
 public final class ListElement<T> extends StyledElement<ListElement<T>> {
@@ -228,7 +229,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Sets the data items and a renderer function.
-    /// <p>
+    ///
     /// The renderer function is called at render time to convert each data item
     /// to a styled element. This allows the list to reflect the current state of your data.
     ///
@@ -246,7 +247,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Sets the renderer function for converting data items to styled elements.
-    /// <p>
+    ///
     /// The renderer is called at render time for each data item.
     ///
     /// @param renderer function to convert each item to a styled element
@@ -257,10 +258,10 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Enables auto-scroll to keep the selected item visible.
-    /// <p>
+    ///
     /// When enabled, the list automatically scrolls to show the selected item
     /// before rendering.
-    /// <p>
+    ///
     /// Note: Cannot be combined with {@link #scrollToEnd()} or {@link #stickyScroll()}.
     ///
     /// @return this element
@@ -285,15 +286,15 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Scrolls the list to show the last items.
-    /// <p>
+    ///
     /// Unlike {@link #autoScroll()}, this scrolls to the end immediately
     /// without requiring a selection. Useful for chat messages, logs, or
     /// other content where you want to always show the most recent items.
-    /// <p>
+    ///
     /// Note: This always forces scroll to end, overriding any user scrolling.
     /// For logs or chat where you want auto-scroll that pauses when the user
     /// scrolls up, use {@link #stickyScroll()} instead.
-    /// <p>
+    ///
     /// Note: Cannot be combined with {@link #autoScroll()} or {@link #stickyScroll()}.
     ///
     /// @return this element
@@ -305,14 +306,14 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Enables sticky scroll behavior for the list.
-    /// <p>
+    ///
     /// With sticky scroll, the list automatically scrolls to show new items
     /// at the bottom, but pauses auto-scrolling when the user scrolls up.
     /// Auto-scrolling resumes when the user scrolls back to the bottom.
-    /// <p>
+    ///
     /// This is ideal for logs, chat messages, or activity feeds where you want
     /// to show the latest content but allow users to scroll back through history.
-    /// <p>
+    ///
     /// Note: Cannot be combined with {@link #autoScroll()} or {@link #scrollToEnd()}.
     ///
     /// @return this element
@@ -359,7 +360,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Configures the list for display-only mode (non-interactive scrolling).
-    /// <p>
+    ///
     /// This disables visual selection feedback by setting an empty highlight symbol
     /// and empty highlight style. Useful for displaying chat messages, logs, or
     /// other content where selection is not meaningful.
@@ -660,7 +661,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /// Returns the height of an item (in rows) given the available content width.
-    /// <p>
+    ///
     /// Uses {@link dev.tamboui.toolkit.element.Element#preferredHeight(int, RenderContext)} to allow
     /// elements like text to calculate wrapped height based on available width and CSS properties.
     ///

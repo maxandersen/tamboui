@@ -15,7 +15,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
 /// Panama FFI bindings to Windows Kernel32 functions for console operations.
-/// <p>
+///
 /// This class provides low-level access to Windows console control functions
 /// including console mode manipulation, screen buffer operations, and input handling.
 public final class Kernel32 {
@@ -232,7 +232,7 @@ public final class Kernel32 {
     /// @param handle    handle to the object
     /// @param timeoutMs timeout interval in milliseconds, or -1 (INFINITE) for no timeout
     /// @return WAIT_OBJECT_0 if the object is signaled, WAIT_TIMEOUT if timeout elapsed,
-    ///          or WAIT_FAILED on error
+    /// or WAIT_FAILED on error
     public static int waitForSingleObject(MemorySegment handle, int timeoutMs) {
         try {
             return (int) WAIT_FOR_SINGLE_OBJECT.invokeExact(handle, timeoutMs);

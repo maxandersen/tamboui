@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /// Represents a CSS rule consisting of a selector and declarations.
-/// <p>
+///
 /// Example: {@code .error { color: red; text-style: bold; }}
 public final class Rule {
 

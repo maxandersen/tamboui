@@ -310,12 +310,14 @@ public final class Buffer {
     /// Each row becomes a line of output with embedded ANSI escape codes for styling.
     /// The result can be printed directly to stdout without needing the full TUI system.
     ///
-    /// <p>Example usage:
-    /// <pre>{@code
+    ///
+    /// Example usage:
+    /// ```java
     /// Buffer buffer = Buffer.empty(Rect.of(80, 3));
     /// myWidget.render(buffer.area(), buffer);
     /// System.out.println(buffer.toAnsiString());
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @return an ANSI string representation of the buffer
     public String toAnsiString() {

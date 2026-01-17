@@ -232,7 +232,7 @@ public interface Constraint {
     }
 
     /// Fit to content size.
-    /// <p>
+    ///
     /// When used, the container will query the element for its preferred size
     /// (via {@code preferredWidth()} or {@code preferredHeight()}).
     final class Fit implements Constraint {
@@ -361,7 +361,7 @@ public interface Constraint {
     }
 
     /// Creates a fit-to-content constraint.
-    /// <p>
+    ///
     /// The container will query the element for its preferred size.
     ///
     /// @return fit constraint

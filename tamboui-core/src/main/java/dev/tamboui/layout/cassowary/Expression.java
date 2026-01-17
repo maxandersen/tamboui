@@ -14,15 +14,18 @@ import java.util.Map;
 
 /// A linear expression of the form: constant + c1*v1 + c2*v2 + ... + cn*vn.
 ///
-/// <p>Expressions are immutable and support fluent operations for building
+///
+/// Expressions are immutable and support fluent operations for building
 /// complex expressions. They can be combined using arithmetic operations
 /// and converted to constraints.
 ///
-/// <p>This implementation uses {@link Fraction} for exact arithmetic,
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
 /// avoiding the cumulative rounding errors that occur with floating-point.
 ///
-/// <p>Example usage:
-/// <pre>
+///
+/// Example usage:
+/// ```java
 /// Variable x = new Variable("x");
 /// Variable y = new Variable("y");
 ///
@@ -33,7 +36,7 @@ import java.util.Map;
 ///
 /// // Create constraint: 2*x + 3*y + 10 == 0
 /// CassowaryConstraint c = expr.equalTo(0, Strength.REQUIRED);
-/// </pre>
+/// ```
 public final class Expression {
 
     private static final Expression ZERO = new Expression(Collections.emptyList(), Fraction.ZERO);

@@ -5,17 +5,18 @@
 package dev.tamboui.widgets.wavetext;
 
 /// State for the {@link WaveText} widget, tracking animation progress.
-/// <p>
+///
 /// The tick value controls where the bright peak appears in the wave effect.
 /// Call {@link #tick()} each frame to advance the animation.
 ///
-/// <pre>{@code
+/// ```java
 /// WaveTextState state = new WaveTextState();
 ///
 /// // In your render loop:
 /// state.tick();  // Advance animation
 /// frame.renderStatefulWidget(waveText, area, state);
-/// }</pre>
+/// }
+/// ```
 public final class WaveTextState {
 
     private long tick;
@@ -40,7 +41,7 @@ public final class WaveTextState {
     }
 
     /// Advances the tick by 1 and returns the new value.
-    /// <p>
+    ///
     /// Call this once per frame to animate the wave.
     ///
     /// @return the new tick value

@@ -8,7 +8,7 @@ import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.ValueLayout;
 
 /// Platform-specific constants for Unix terminal operations.
-/// <p>
+///
 /// This class provides the correct values for termios flags, control character
 /// indices, and structure layouts that differ between Linux and macOS.
 public final class PlatformConstants {
@@ -83,7 +83,7 @@ public final class PlatformConstants {
     public static final int SIGWINCH = 28;
 
     /// Termios structure layout.
-    /// <p>
+    ///
     /// Linux layout:
     /// - c_iflag (4 bytes)
     /// - c_oflag (4 bytes)
@@ -94,7 +94,7 @@ public final class PlatformConstants {
     /// - padding (3 bytes)
     /// - c_ispeed (4 bytes)
     /// - c_ospeed (4 bytes)
-    /// <p>
+    ///
     /// macOS layout:
     /// - c_iflag (8 bytes - unsigned long)
     /// - c_oflag (8 bytes)

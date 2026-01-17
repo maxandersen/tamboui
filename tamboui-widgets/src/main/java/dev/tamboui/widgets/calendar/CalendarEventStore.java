@@ -12,17 +12,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /// A simple {@link DateStyler} implementation backed by a {@link HashMap}.
-/// <p>
+///
 /// Allows storing styles for specific dates and retrieving them during
 /// calendar rendering.
 ///
-/// <pre>{@code
+/// ```java
 /// CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold())
 ///      .add(LocalDate.of(2025, 12, 25), Style.EMPTY.fg(Color.GREEN))
 ///      .add(LocalDate.of(2025, 1, 1), Style.EMPTY.fg(Color.YELLOW));
 ///
 /// Monthly calendar = Monthly.of(LocalDate.now(), events);
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see DateStyler
 /// @see Monthly

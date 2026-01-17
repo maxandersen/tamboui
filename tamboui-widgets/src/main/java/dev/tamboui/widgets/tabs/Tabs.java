@@ -24,11 +24,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A horizontal set of tabs with a single tab selected.
-/// <p>
+///
 /// Each tab title is stored as a {@link Line} and can be individually styled.
 /// The selected tab is highlighted using the highlight style.
 ///
-/// <pre>{@code
+/// ```java
 /// Tabs tabs = Tabs.builder()
 ///      .titles("Home", "Settings", "About")
 ///      .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
@@ -38,11 +38,12 @@ import java.util.List;
 ///
 /// TabsState state = new TabsState(0); // Select first tab
 /// frame.renderStatefulWidget(tabs, area, state);
-/// }</pre>
+/// }
+/// ```
 public final class Tabs implements StatefulWidget<TabsState> {
 
     /// Property key for the selected tab highlight color.
-    /// <p>
+    ///
     /// CSS property name: {@code highlight-color}
     public static final PropertyKey<Color> HIGHLIGHT_COLOR =
             PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
@@ -282,7 +283,7 @@ public final class Tabs implements StatefulWidget<TabsState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code background} and {@code highlight-color}
         /// will be resolved if not set programmatically.
         ///
@@ -294,7 +295,7 @@ public final class Tabs implements StatefulWidget<TabsState> {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -305,7 +306,7 @@ public final class Tabs implements StatefulWidget<TabsState> {
         }
 
         /// Sets the selected tab highlight color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the highlight color

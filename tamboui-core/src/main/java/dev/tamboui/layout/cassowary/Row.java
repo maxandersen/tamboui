@@ -11,12 +11,15 @@ import java.util.Map;
 
 /// A row in the simplex tableau.
 ///
-/// <p>Represents a linear equation of the form:
+///
+/// Represents a linear equation of the form:
 /// {@code constant + sum(coefficient * symbol) = 0}
 ///
-/// <p>Each row represents a basic variable expressed in terms of non-basic variables.
 ///
-/// <p>This implementation uses {@link Fraction} for exact arithmetic,
+/// Each row represents a basic variable expressed in terms of non-basic variables.
+///
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
 /// avoiding the cumulative rounding errors that occur with floating-point.
 final class Row {
 
@@ -77,7 +80,8 @@ final class Row {
 
     /// Adds a symbol to this row with the given coefficient.
     ///
-    /// <p>If the symbol already exists, the coefficients are added.
+    ///
+    /// If the symbol already exists, the coefficients are added.
     /// If the resulting coefficient is zero, the symbol is removed.
     ///
     /// @param symbol      the symbol to add
@@ -102,7 +106,8 @@ final class Row {
 
     /// Inserts another row into this row, scaled by the given coefficient.
     ///
-    /// <p>This is equivalent to: this += other * coefficient
+    ///
+    /// This is equivalent to: this += other * coefficient
     ///
     /// @param other       the row to insert
     /// @param coefficient the scale factor
@@ -124,10 +129,12 @@ final class Row {
 
     /// Solves the row for the given symbol.
     ///
-    /// <p>Rearranges the row so that the symbol becomes the basic variable
+    ///
+    /// Rearranges the row so that the symbol becomes the basic variable
     /// (coefficient of -1), with all other terms on the right-hand side.
     ///
-    /// <p>For example, if the row is: {@code 3 + 2*x + y = 0}
+    ///
+    /// For example, if the row is: {@code 3 + 2*x + y = 0}
     /// and we solve for x, the result is: {@code x = -1.5 - 0.5*y}
     ///
     /// @param symbol the symbol to solve for
@@ -143,7 +150,8 @@ final class Row {
 
     /// Solves the row for the given symbol, substituting another symbol.
     ///
-    /// <p>This performs a pivot operation: the lhs symbol is moved out
+    ///
+    /// This performs a pivot operation: the lhs symbol is moved out
     /// and the rhs symbol takes its place as a basic variable.
     ///
     /// @param lhs the leaving symbol
@@ -155,7 +163,8 @@ final class Row {
 
     /// Substitutes a symbol with the given row.
     ///
-    /// <p>Replaces all occurrences of the symbol with the expression
+    ///
+    /// Replaces all occurrences of the symbol with the expression
     /// represented by the row.
     ///
     /// @param symbol the symbol to substitute

@@ -70,7 +70,7 @@ public final class Frame {
     }
 
     /// Renders a widget to the given area.
-    /// <p>
+    ///
     /// If the widget implements {@link RawOutputCapable}, the raw output stream
     /// will be passed to enable native terminal protocol rendering.
     ///
@@ -126,7 +126,7 @@ public final class Frame {
     }
 
     /// Returns the raw output stream for native protocol rendering.
-    /// <p>
+    ///
     /// Package-private: use {@link FrameInternal#rawOutput(Frame)} to access.
     ///
     /// @return the raw output stream, or null if not available

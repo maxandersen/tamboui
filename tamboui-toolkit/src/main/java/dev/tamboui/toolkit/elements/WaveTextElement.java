@@ -14,11 +14,11 @@ import dev.tamboui.widgets.wavetext.WaveText;
 import dev.tamboui.widgets.wavetext.WaveTextState;
 
 /// An element that displays text with an animated wave brightness effect.
-/// <p>
+///
 /// By default, a dark "shadow" moves through otherwise bright text.
 /// This can be inverted to have a bright peak moving through dim text.
 ///
-/// <pre>{@code
+/// ```java
 /// // Dark shadow on bright text (default)
 /// waveText("Loading...", Color.CYAN)
 ///
@@ -31,7 +31,8 @@ import dev.tamboui.widgets.wavetext.WaveTextState;
 ///
 /// // Inverted: bright peak on dim text
 /// waveText("Thinking...").inverted()
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see WaveText
 public final class WaveTextElement extends StyledElement<WaveTextElement> {
@@ -83,7 +84,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the dim factor for non-peak characters.
-    /// <p>
+    ///
     /// A value of 0.0 means completely black, 1.0 means no dimming.
     /// Default is 0.3.
     ///
@@ -95,7 +96,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the width of the bright peak in characters.
-    /// <p>
+    ///
     /// Larger values create a wider bright area. Default is 3.
     ///
     /// @param peakWidth the peak width
@@ -106,7 +107,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the animation speed multiplier.
-    /// <p>
+    ///
     /// Values greater than 1.0 speed up the animation,
     /// values less than 1.0 slow it down. Default is 1.0.
     ///
@@ -118,7 +119,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the number of peaks in the wave.
-    /// <p>
+    ///
     /// Multiple peaks create a more dynamic effect. Default is 1.
     ///
     /// @param peakCount the number of peaks
@@ -129,7 +130,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the animation mode.
-    /// <p>
+    ///
     /// {@link WaveText.Mode#LOOP} creates continuous movement in one direction.
     /// {@link WaveText.Mode#OSCILLATE} creates back-and-forth movement.
     /// Default is LOOP.
@@ -142,7 +143,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the wave to oscillate back and forth.
-    /// <p>
+    ///
     /// Shorthand for {@code mode(WaveText.Mode.OSCILLATE)}.
     ///
     /// @return this element for chaining
@@ -152,7 +153,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets whether the effect is inverted.
-    /// <p>
+    ///
     /// When false (default), a dark shadow moves through bright text.
     /// When true, a bright peak moves through dim text.
     ///
@@ -172,7 +173,7 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     }
 
     /// Sets the state for animation.
-    /// <p>
+    ///
     /// If not set, an internal state is used and advanced automatically.
     ///
     /// @param state the wave text state

@@ -17,7 +17,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
 /// Panama FFI bindings to libc functions for terminal operations.
-/// <p>
+///
 /// This class provides low-level access to Unix terminal control functions
 /// including termios manipulation, terminal size queries, and non-blocking I/O.
 public final class LibC {
@@ -236,7 +236,7 @@ public final class LibC {
     }
 
     /// Performs an I/O control operation.
-    /// <p>
+    ///
     /// Uses a thread-local call state segment to avoid per-call Arena allocation.
     ///
     /// @param fd      file descriptor
@@ -280,7 +280,7 @@ public final class LibC {
     }
 
     /// Writes to a file descriptor.
-    /// <p>
+    ///
     /// Uses a thread-local call state segment to avoid per-call Arena allocation.
     ///
     /// @param fd    file descriptor
@@ -301,7 +301,7 @@ public final class LibC {
     }
 
     /// Waits for events on file descriptors.
-    /// <p>
+    ///
     /// Uses a thread-local call state segment to capture errno.
     /// Check {@link #getLastErrno()} after a -1 return to determine the cause.
     ///
@@ -371,7 +371,7 @@ public final class LibC {
     }
 
     /// Installs a signal handler using signal().
-    /// <p>
+    ///
     /// Note: This is deprecated on macOS. Use {@link #sigaction(int, MemorySegment, MemorySegment)} instead.
     ///
     /// @param signum  the signal number
@@ -386,7 +386,7 @@ public final class LibC {
     }
     
     /// Installs a signal handler using sigaction().
-    /// <p>
+    ///
     /// This is the preferred method on macOS as signal() is deprecated.
     ///
     /// @param signum the signal number
@@ -418,7 +418,7 @@ public final class LibC {
     }
 
     /// Sets the flags in a sigaction structure.
-    /// <p>
+    ///
     /// Note: On Linux, sa_flags is a long (8 bytes), on macOS it's an int (4 bytes).
     ///
     /// @param sigactionStruct the sigaction structure
@@ -434,7 +434,7 @@ public final class LibC {
 
     /// Sets the trampoline pointer in a sigaction structure.
     /// For simple signal handlers, this should be set to NULL.
-    /// <p>
+    ///
     /// Note: This is macOS-specific. On Linux, this method does nothing.
     ///
     /// @param sigactionStruct the sigaction structure
@@ -447,7 +447,7 @@ public final class LibC {
     }
 
     /// Sets the signal mask in a sigaction structure.
-    /// <p>
+    ///
     /// Note: On macOS, sa_mask is a simple int. On Linux, it's a 128-byte sigset_t.
     /// This method only sets the mask on macOS. On Linux, the mask is zeroed by default.
     ///
@@ -469,10 +469,10 @@ public final class LibC {
     }
 
     /// Creates an upcall stub for a signal handler.
-    /// <p>
+    ///
     /// The returned memory segment is valid for the lifetime of the provided arena.
     /// The handler will be called with the signal number as parameter.
-    /// <p>
+    ///
     /// This follows the jextract pattern: create unbound MethodHandle first,
     /// then bind when creating the upcall stub.
     ///
@@ -493,7 +493,7 @@ public final class LibC {
     }
 
     /// Layout for the termios structure.
-    /// <p>
+    ///
     /// Platform-specific: Linux uses 4-byte ints for flags, macOS uses 8-byte longs.
     public static final MemoryLayout TERMIOS_LAYOUT = PlatformConstants.TERMIOS_LAYOUT;
 
@@ -521,22 +521,22 @@ public final class LibC {
     );
 
     /// Layout for the sigaction structure.
-    /// <p>
+    ///
     /// macOS struct __sigaction (24 bytes):
-    /// <pre>
+    /// ```java
     ///      union __sigaction_u __sigaction_u;  // 8 bytes - handler pointer
     ///      void (*sa_tramp)(...);              // 8 bytes - trampoline pointer
     ///      int sa_mask;                        // 4 bytes - signal mask
     ///      int sa_flags;                       // 4 bytes - flags
-    /// </pre>
-    /// <p>
+    /// ```
+    ///
     /// Linux struct sigaction (152 bytes):
-    /// <pre>
+    /// ```java
     ///      void (*sa_handler)(int);            // 8 bytes - handler pointer
     ///      unsigned long sa_flags;             // 8 bytes - flags
     ///      void (*sa_restorer)(void);          // 8 bytes - restorer (unused)
     ///      sigset_t sa_mask;                   // 128 bytes - signal mask (1024 bits)
-    /// </pre>
+    /// ```
     public static final MemoryLayout SIGACTION_LAYOUT = PlatformConstants.isMacOS()
             ? MemoryLayout.structLayout(
                     SIGACTION_U_LAYOUT_MACOS.withName("__sigaction_u"),

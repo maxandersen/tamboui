@@ -17,18 +17,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /// Renders images using the Sixel graphics protocol.
-/// <p>
+///
 /// Sixel is a DEC standard from the 1980s that encodes images as 6-pixel-high
 /// horizontal strips. Each strip is encoded using ASCII characters where each
 /// character represents a vertical column of 6 pixels.
-/// <p>
+///
 /// Sixel is supported by: xterm (with configuration), mlterm, mintty, WezTerm,
 /// Rio, Konsole (22+), and other terminals.
 ///
-/// <h2>Protocol Format</h2>
-/// <pre>
+/// ## Protocol Format
+/// ```java
 /// ESC P [params] q [data] ESC \
-/// </pre>
+/// ```
 ///
 /// @see <a href="https://en.wikipedia.org/wiki/Sixel">Sixel on Wikipedia</a>
 public final class SixelProtocol implements ImageProtocol {

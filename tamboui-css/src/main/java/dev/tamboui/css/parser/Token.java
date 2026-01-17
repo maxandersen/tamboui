@@ -7,7 +7,7 @@ package dev.tamboui.css.parser;
 import java.util.Objects;
 
 /// Represents a token in the CSS lexer output.
-/// <p>
+///
 /// Tokens are the building blocks produced by the lexer that the parser
 /// uses to construct the CSS AST.
 public abstract class Token {

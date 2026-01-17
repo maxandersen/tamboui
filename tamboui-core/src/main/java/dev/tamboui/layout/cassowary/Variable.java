@@ -10,11 +10,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /// A variable in the Cassowary constraint system.
 ///
-/// <p>Variables represent unknown values to be solved for, such as widget
+///
+/// Variables represent unknown values to be solved for, such as widget
 /// positions or sizes. Each variable has a unique identifier and an optional
 /// name for debugging purposes.
 ///
-/// <p>Variables use identity semantics - two variables are equal only if they
+///
+/// Variables use identity semantics - two variables are equal only if they
 /// are the same instance.
 public final class Variable {
 

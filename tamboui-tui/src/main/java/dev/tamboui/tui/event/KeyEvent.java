@@ -11,13 +11,13 @@ import dev.tamboui.tui.bindings.BindingSets;
 import java.util.Optional;
 
 /// Represents a keyboard input event.
-/// <p>
+///
 /// KeyEvent is associated with {@link Bindings} that determine how semantic
 /// actions (like "move up" or "quit") are mapped to key presses. Use the
 /// convenience methods like {@link #isUp()}, {@link #isDown()}, etc. to check
 /// if this event matches a semantic action according to the configured bindings.
 ///
-/// <pre>{@code
+/// ```java
 /// // Check semantic actions
 /// if (event.isUp()) {
 ///      state.moveUp();
@@ -35,7 +35,8 @@ import java.util.Optional;
 /// if (event.matches("myApp.customAction")) {
 ///      handleCustomAction();
 /// }
-/// }</pre>
+/// }
+/// ```
 public final class KeyEvent implements Event {
 
     private final KeyCode code;

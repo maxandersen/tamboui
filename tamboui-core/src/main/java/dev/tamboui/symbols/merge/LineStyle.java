@@ -5,7 +5,7 @@
 package dev.tamboui.symbols.merge;
 
 /// A visual style defining the appearance of a single line making up a block border.
-/// <p>
+///
 /// This is an internal type used to represent the different styles of lines that can be used in
 /// border symbols.
 enum LineStyle {
@@ -43,7 +43,7 @@ enum LineStyle {
     QUADRUPLE_DASH_THICK;
 
     /// Merges line styles.
-    /// <p>
+    ///
     /// If the other style is NOTHING, returns this style. Otherwise, returns the other style.
     LineStyle merge(LineStyle other) {
         return other == NOTHING ? this : other;

@@ -22,20 +22,20 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A vertical layout container that arranges children in a column.
-/// <p>
+///
 /// Layout properties can be set via CSS or programmatically:
-/// <ul>
-///    <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
-///    <li>{@code spacing} - Gap between children in cells</li>
-///    <li>{@code margin} - Margin around the column</li>
-/// </ul>
-/// <p>
+///
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code spacing} - Gap between children in cells
+/// - {@code margin} - Margin around the column
+///
+///
 /// Programmatic values override CSS values when both are set.
-/// <p>
+///
 /// Example usage:
-/// <pre>
+/// ```java
 /// column(child1, child2, child3).flex(Flex.CENTER).spacing(1)
-/// </pre>
+/// ```
 public final class Column extends ContainerElement<Column> {
 
     private Integer spacing;
@@ -50,7 +50,7 @@ public final class Column extends ContainerElement<Column> {
     }
 
     /// Sets the spacing between children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code spacing} property.
     ///
     /// @param spacing spacing in cells between adjacent children
@@ -61,7 +61,7 @@ public final class Column extends ContainerElement<Column> {
     }
 
     /// Sets how remaining space is distributed among children.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code flex} property.
     ///
     /// @param flex the flex mode for space distribution
@@ -73,7 +73,7 @@ public final class Column extends ContainerElement<Column> {
     }
 
     /// Sets the margin around the column.
-    /// <p>
+    ///
     /// Can also be set via CSS {@code margin} property.
     ///
     /// @param margin the margin

@@ -21,16 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// A widget that displays error information with a stack trace.
-/// <p>
-/// Used to show exceptions that occur during rendering. The widget displays:
-/// <ul>
-///    <li>Exception type in red</li>
-///    <li>Error message</li>
-///    <li>Scrollable stack trace</li>
-///    <li>Footer with instructions</li>
-/// </ul>
 ///
-/// <pre>{@code
+/// Used to show exceptions that occur during rendering. The widget displays:
+///
+/// - Exception type in red
+/// - Error message
+/// - Scrollable stack trace
+/// - Footer with instructions
+///
+///
+/// ```java
 /// ErrorDisplay display = ErrorDisplay.builder()
 ///      .error(exception)
 ///      .scroll(scrollOffset)
@@ -39,7 +39,8 @@ import java.util.List;
 ///      .build();
 ///
 /// display.render(area, buffer);
-/// }</pre>
+/// }
+/// ```
 public final class ErrorDisplay implements Widget {
 
     private final Throwable error;
@@ -144,7 +145,7 @@ public final class ErrorDisplay implements Widget {
     }
 
     /// Returns the total number of content lines.
-    /// <p>
+    ///
     /// Useful for calculating scroll bounds.
     ///
     /// @return the number of lines

@@ -5,17 +5,18 @@
 package dev.tamboui.widgets.tabs;
 
 /// State for a {@link Tabs} widget.
-/// <p>
+///
 /// Tracks the currently selected tab index.
 ///
-/// <pre>{@code
+/// ```java
 /// TabsState state = new TabsState();
 /// state.select(0); // Select first tab
 ///
 /// // In event handling:
 /// state.selectNext(tabs.size());
 /// state.selectPrevious(tabs.size());
-/// }</pre>
+/// }
+/// ```
 public final class TabsState {
 
     private Integer selected;

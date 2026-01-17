@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /// Windows terminal operations using Panama FFI.
-/// <p>
+///
 /// This class provides higher-level terminal operations built on top of
 /// the low-level Kernel32 bindings.
 public final class WindowsTerminal implements PlatformTerminal {

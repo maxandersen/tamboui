@@ -1,5 +1,5 @@
 /// Core types and abstractions for TamboUI TUI library.
-/// <p>
+///
 /// This module provides the fundamental building blocks for terminal user interfaces:
 /// buffers, cells, layouts, styles, text, and widget interfaces.
 module dev.tamboui.core {

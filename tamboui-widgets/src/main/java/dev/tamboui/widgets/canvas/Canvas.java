@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /// A widget for drawing arbitrary shapes on a terminal grid.
-/// <p>
+///
 /// The Canvas widget provides a mathematical coordinate system where
 /// shapes can be drawn using floating-point coordinates. The widget
 /// handles the transformation from canvas space to terminal cells.
 ///
-/// <pre>{@code
+/// ```java
 /// Canvas canvas = Canvas.builder()
 ///      .xBounds(-180, 180)
 ///      .yBounds(-90, 90)
@@ -34,7 +34,8 @@ import java.util.function.Consumer;
 ///          ctx.print(0, 0, "Center");
 ///      })
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Shape
 /// @see Context
@@ -306,7 +307,7 @@ public final class Canvas implements Widget {
         }
 
         /// Sets the paint callback for drawing shapes.
-        /// <p>
+        ///
         /// The callback receives a {@link Context} that can be used to
         /// draw shapes and print text.
         public Builder paint(Consumer<Context> callback) {

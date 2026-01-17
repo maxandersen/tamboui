@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -29,7 +29,7 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.io.IOException;
 
 /// Demo TUI application showcasing the Block widget.
-/// <p>
+///
 /// Demonstrates various Block features:
 /// - Different border types (plain, rounded, double, thick)
 /// - Border styles (colors)

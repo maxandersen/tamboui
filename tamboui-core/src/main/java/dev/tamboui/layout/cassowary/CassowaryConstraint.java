@@ -6,21 +6,23 @@ package dev.tamboui.layout.cassowary;
 
 /// A constraint in the Cassowary system.
 ///
-/// <p>A constraint represents a linear relationship between variables with an
+///
+/// A constraint represents a linear relationship between variables with an
 /// associated strength. The constraint has the form:
-/// <pre>
+/// ```java
 /// expression relation 0
-/// </pre>
+/// ```
 /// where the relation is one of ==, &lt;=, or &gt;=.
 ///
-/// <p>Constraints should be created using the fluent API on {@link Expression}:
-/// <pre>
+///
+/// Constraints should be created using the fluent API on {@link Expression}:
+/// ```java
 /// // x + y == 100
 /// Expression.variable(x).plus(y).equalTo(100, Strength.REQUIRED)
 ///
 /// // x >= 10
 /// Expression.variable(x).greaterThanOrEqual(10, Strength.STRONG)
-/// </pre>
+/// ```
 public final class CassowaryConstraint {
 
     private final Expression expression;
@@ -29,7 +31,8 @@ public final class CassowaryConstraint {
 
     /// Creates a new constraint.
     ///
-    /// <p>Typically constraints are created through the {@link Expression} API
+    ///
+    /// Typically constraints are created through the {@link Expression} API
     /// rather than using this constructor directly.
     ///
     /// @param expression the linear expression (left-hand side)
@@ -52,7 +55,8 @@ public final class CassowaryConstraint {
 
     /// Returns the expression (left-hand side) of this constraint.
     ///
-    /// <p>The constraint is satisfied when {@code expression relation 0}.
+    ///
+    /// The constraint is satisfied when {@code expression relation 0}.
     ///
     /// @return the constraint expression
     public Expression expression() {

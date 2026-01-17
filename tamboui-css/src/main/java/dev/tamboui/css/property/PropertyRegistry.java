@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /// Registry of CSS property converters.
-/// <p>
+///
 /// Maps CSS property names to their converters and provides
 /// convenience methods for converting property values.
 public final class PropertyRegistry {

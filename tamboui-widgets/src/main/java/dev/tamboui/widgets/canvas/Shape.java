@@ -5,11 +5,11 @@
 package dev.tamboui.widgets.canvas;
 
 /// A shape that can be drawn on a {@link Canvas}.
-/// <p>
+///
 /// Implement this interface to create custom shapes that can be
 /// rendered using the Canvas widget's drawing infrastructure.
 ///
-/// <pre>{@code
+/// ```java
 /// public class Cross implements Shape {
 ///      private final double x, y, size;
 ///      private final Color color;
@@ -28,7 +28,8 @@ package dev.tamboui.widgets.canvas;
 ///          }
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Canvas
 /// @see Painter
@@ -36,7 +37,7 @@ package dev.tamboui.widgets.canvas;
 public interface Shape {
 
     /// Draws this shape using the provided painter.
-    /// <p>
+    ///
     /// The painter provides methods to convert canvas coordinates
     /// to grid positions and to paint colored points.
     ///

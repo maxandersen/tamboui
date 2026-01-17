@@ -8,11 +8,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /// Efficient byte array builder optimized for terminal output.
-/// <p>
+///
 /// This class is designed for the common case of ASCII escape sequences
 /// mixed with UTF-8 cell symbols. It avoids the overhead of StringBuilder
 /// followed by String.getBytes() by building the byte array directly.
-/// <p>
+///
 /// ASCII operations (escape sequences, integers) write bytes directly.
 /// UTF-8 operations (cell symbols) encode only when necessary.
 public final class ByteArrayBuilder {
@@ -43,7 +43,7 @@ public final class ByteArrayBuilder {
     }
 
     /// Appends the CSI (Control Sequence Introducer) escape sequence.
-    /// <p>
+    ///
     /// This is equivalent to appending ESC followed by '['.
     ///
     /// @return this builder for chaining
@@ -76,7 +76,7 @@ public final class ByteArrayBuilder {
     }
 
     /// Appends an ASCII string without charset encoding.
-    /// <p>
+    ///
     /// This method assumes the string contains only ASCII characters (0-127).
     /// It is faster than {@link #appendUtf8(String)} for escape sequences
     /// and other ASCII-only content.
@@ -93,7 +93,7 @@ public final class ByteArrayBuilder {
     }
 
     /// Appends a non-negative integer as ASCII digits.
-    /// <p>
+    ///
     /// This method converts the integer directly to ASCII digit bytes
     /// without creating intermediate String objects.
     ///
@@ -132,10 +132,10 @@ public final class ByteArrayBuilder {
     }
 
     /// Appends a UTF-8 encoded string.
-    /// <p>
+    ///
     /// Use this method for cell symbols which may contain multi-byte
     /// UTF-8 characters (box-drawing, CJK, emoji, etc.).
-    /// <p>
+    ///
     /// Optimized for the common case of ASCII-only strings to avoid
     /// the overhead of {@link String#getBytes(java.nio.charset.Charset)}.
     ///
@@ -181,7 +181,7 @@ public final class ByteArrayBuilder {
     }
 
     /// Returns the internal buffer.
-    /// <p>
+    ///
     /// The returned array may be larger than the actual content.
     /// Use {@link #length()} to determine the valid data length.
     ///
@@ -198,7 +198,7 @@ public final class ByteArrayBuilder {
     }
 
     /// Resets the builder for reuse.
-    /// <p>
+    ///
     /// This method clears the position but retains the allocated buffer
     /// for efficient reuse across frames.
     public void reset() {
@@ -206,7 +206,7 @@ public final class ByteArrayBuilder {
     }
 
     /// Creates a new byte array containing only the valid data.
-    /// <p>
+    ///
     /// This method allocates a new array. For zero-copy writes,
     /// use {@link #buffer()} with {@link #length()} instead.
     ///

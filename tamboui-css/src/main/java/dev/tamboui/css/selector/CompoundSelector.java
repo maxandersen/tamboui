@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 /// A compound selector that combines multiple simple selectors.
-/// <p>
+///
 /// All parts must match for the compound selector to match.
 /// Example: {@code Panel.primary#sidebar:focus { ... }}
 public final class CompoundSelector implements Selector {

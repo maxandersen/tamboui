@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Optional;
 
 /// A group of {@link Bar}s in a {@link BarChart}.
-/// <p>
+///
 /// Groups allow organizing related bars together with an optional group label.
 ///
-/// <pre>{@code
+/// ```java
 /// // Simple group from values
 /// BarGroup group = BarGroup.of(10, 20, 30);
 ///
@@ -29,7 +29,8 @@ import java.util.Optional;
 ///          Bar.of(120, "Mar")
 ///      )
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class BarGroup {
 
     private final List<Bar> bars;

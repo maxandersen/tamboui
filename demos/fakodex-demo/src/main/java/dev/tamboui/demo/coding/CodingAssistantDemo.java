@@ -32,16 +32,16 @@ import java.util.Random;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /// A Codex/Claude Code-like AI coding assistant demo with linear conversation flow.
-/// <p>
+///
 /// This demo showcases a terminal UI similar to modern AI coding assistants with:
-/// <ul>
-///    <li>Linear conversation flow with inline tool calls</li>
-///    <li>Animated spinners for active operations</li>
-///    <li>Code blocks and diffs displayed inline</li>
-///    <li>CSS styling with the toolkit module</li>
-///    <li>Key bindings for navigation</li>
-///    <li>Modern Java constructs (records, var, switch expressions)</li>
-/// </ul>
+///
+/// - Linear conversation flow with inline tool calls
+/// - Animated spinners for active operations
+/// - Code blocks and diffs displayed inline
+/// - CSS styling with the toolkit module
+/// - Key bindings for navigation
+/// - Modern Java constructs (records, var, switch expressions)
+///
 public class CodingAssistantDemo {
 
     // Theme colors - muted, professional palette

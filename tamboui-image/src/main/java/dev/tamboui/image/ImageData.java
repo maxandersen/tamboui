@@ -17,14 +17,15 @@ import java.nio.file.Path;
 import java.util.concurrent.locks.ReentrantLock;
 
 /// Immutable holder for image pixel data.
-/// <p>
+///
 /// Images are stored in ARGB format where each pixel is a 32-bit integer:
 /// bits 24-31 = alpha, bits 16-23 = red, bits 8-15 = green, bits 0-7 = blue.
 ///
-/// <pre>{@code
+/// ```java
 /// ImageData data = ImageData.fromPath(Path.of("photo.png"));
 /// ImageData scaled = data.resize(80, 40);
-/// }</pre>
+/// }
+/// ```
 public final class ImageData {
 
     private final int width;
@@ -286,7 +287,7 @@ public final class ImageData {
     }
 
     /// Encodes this image as PNG bytes.
-    /// <p>
+    ///
     /// The result is cached for subsequent calls.
     ///
     /// @return the PNG-encoded bytes

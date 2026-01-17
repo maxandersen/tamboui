@@ -5,7 +5,7 @@
 package dev.tamboui.widgets.scrollbar;
 
 /// Orientation and position of a {@link Scrollbar}.
-/// <p>
+///
 /// Determines whether the scrollbar is vertical or horizontal,
 /// and which edge of the content area it is placed on.
 public enum ScrollbarOrientation {

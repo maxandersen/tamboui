@@ -5,13 +5,13 @@
 package dev.tamboui.widgets.scrollbar;
 
 /// State for a {@link Scrollbar} widget.
-/// <p>
+///
 /// Tracks the scroll position and content dimensions for proper scrollbar rendering.
-/// <p>
-/// <b>Important:</b> You must set {@link #contentLength(int)} before rendering,
+///
+/// **Important:** You must set {@link #contentLength(int)} before rendering,
 /// otherwise the scrollbar will appear blank.
 ///
-/// <pre>{@code
+/// ```java
 /// // Create state for a list of 100 items
 /// ScrollbarState state = new ScrollbarState()
 ///      .contentLength(100)
@@ -25,7 +25,8 @@ package dev.tamboui.widgets.scrollbar;
 /// state.prev();     // Scroll up one item
 /// state.first();    // Jump to start
 /// state.last();     // Jump to end
-/// }</pre>
+/// }
+/// ```
 public final class ScrollbarState {
 
     private int contentLength;
@@ -33,7 +34,7 @@ public final class ScrollbarState {
     private int viewportContentLength;
 
     /// Creates a new scrollbar state with default values.
-    /// <p>
+    ///
     /// Content length defaults to 0, which will result in a blank scrollbar.
     /// You must call {@link #contentLength(int)} before rendering.
     public ScrollbarState() {
@@ -57,7 +58,7 @@ public final class ScrollbarState {
     }
 
     /// Sets the total length of the scrollable content.
-    /// <p>
+    ///
     /// This is a fluent setter that returns this state for chaining.
     ///
     /// @param contentLength the total number of scrollable items
@@ -77,7 +78,7 @@ public final class ScrollbarState {
     }
 
     /// Sets the current scroll position.
-    /// <p>
+    ///
     /// This is a fluent setter that returns this state for chaining.
     /// The position is clamped to valid bounds.
     ///
@@ -89,17 +90,17 @@ public final class ScrollbarState {
     }
 
     /// Returns the viewport content length.
-    /// <p>
+    ///
     /// If not set (0), the scrollbar will use the track size.
     public int viewportContentLength() {
         return viewportContentLength;
     }
 
     /// Sets the viewport content length.
-    /// <p>
+    ///
     /// This represents the number of items visible in the viewport.
     /// If not set, the scrollbar will use the track size as the viewport length.
-    /// <p>
+    ///
     /// This is a fluent setter that returns this state for chaining.
     ///
     /// @param viewportContentLength the number of visible items
@@ -132,7 +133,7 @@ public final class ScrollbarState {
     }
 
     /// Scrolls by the given amount.
-    /// <p>
+    ///
     /// Positive values scroll down/right, negative values scroll up/left.
     /// The position is clamped to valid bounds.
     ///
@@ -142,7 +143,7 @@ public final class ScrollbarState {
     }
 
     /// Scrolls up by a page (viewport length).
-    /// <p>
+    ///
     /// If viewport content length is not set, scrolls by 1.
     public void pageUp() {
         int pageSize = viewportContentLength > 0 ? viewportContentLength : 1;
@@ -150,7 +151,7 @@ public final class ScrollbarState {
     }
 
     /// Scrolls down by a page (viewport length).
-    /// <p>
+    ///
     /// If viewport content length is not set, scrolls by 1.
     public void pageDown() {
         int pageSize = viewportContentLength > 0 ? viewportContentLength : 1;

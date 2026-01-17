@@ -17,16 +17,16 @@ import dev.tamboui.widget.StatefulWidget;
 import java.util.Objects;
 
 /// A scrollbar widget for displaying scroll position.
-/// <p>
+///
 /// The scrollbar can be oriented vertically (left/right) or horizontally (top/bottom).
 /// It consists of:
-/// <ul>
-///    <li><b>track</b> - the background line</li>
-///    <li><b>thumb</b> - the position indicator that moves along the track</li>
-///    <li><b>begin/end symbols</b> - optional arrows at the ends</li>
-/// </ul>
 ///
-/// <pre>{@code
+/// - **track** - the background line
+/// - **thumb** - the position indicator that moves along the track
+/// - **begin/end symbols** - optional arrows at the ends
+///
+///
+/// ```java
 /// // Create a vertical scrollbar
 /// Scrollbar scrollbar = Scrollbar.builder()
 ///      .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
@@ -40,33 +40,34 @@ import java.util.Objects;
 ///
 /// // Render in a frame
 /// frame.renderStatefulWidget(scrollbar, area, state);
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see ScrollbarState
 /// @see ScrollbarOrientation
 public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
     /// Property key for the thumb (position indicator) color.
-    /// <p>
+    ///
     /// CSS property name: {@code thumb-color}
     public static final PropertyKey<Color> THUMB_COLOR =
             PropertyKey.of("thumb-color", ColorConverter.INSTANCE);
 
     /// Property key for the track (background) color.
-    /// <p>
+    ///
     /// CSS property name: {@code track-color}
     public static final PropertyKey<Color> TRACK_COLOR =
             PropertyKey.of("track-color", ColorConverter.INSTANCE);
 
     /// Scrollbar symbol set for rendering.
-    /// <p>
+    ///
     /// Contains characters used for track, thumb, and optional begin/end markers:
-    /// <ul>
-    ///    <li><b>track</b> - the character for the scrollbar track/background</li>
-    ///    <li><b>thumb</b> - the character for the thumb/position indicator</li>
-    ///    <li><b>begin</b> - the optional character for the start marker (can be null)</li>
-    ///    <li><b>end</b> - the optional character for the end marker (can be null)</li>
-    /// </ul>
+    ///
+    /// - **track** - the character for the scrollbar track/background
+    /// - **thumb** - the character for the thumb/position indicator
+    /// - **begin** - the optional character for the start marker (can be null)
+    /// - **end** - the optional character for the end marker (can be null)
+    ///
     public static final class SymbolSet {
         private final String track;
         private final String thumb;
@@ -408,7 +409,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         /// Sets the symbol set for this scrollbar.
-        /// <p>
+        ///
         /// This sets all symbols at once. Individual symbol setters override these.
         public Builder symbols(SymbolSet symbols) {
             this.symbols = symbols;
@@ -434,7 +435,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         /// Sets the begin marker symbol (e.g., up arrow for vertical scrollbar).
-        /// <p>
+        ///
         /// Set to null to disable the begin marker.
         public Builder beginSymbol(String beginSymbol) {
             this.beginSymbol = beginSymbol;
@@ -442,7 +443,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         /// Sets the end marker symbol (e.g., down arrow for vertical scrollbar).
-        /// <p>
+        ///
         /// Set to null to disable the end marker.
         public Builder endSymbol(String endSymbol) {
             this.endSymbol = endSymbol;
@@ -480,7 +481,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code thumb-color} and {@code track-color}
         /// will be resolved if not set programmatically.
         ///
@@ -492,7 +493,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         /// Sets the thumb (position indicator) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the thumb color
@@ -503,7 +504,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         /// Sets the track (background) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the track color

@@ -15,7 +15,7 @@ import dev.tamboui.tui.event.MouseEvent;
 
 /// Base interface for all DSL elements.
 /// Elements represent UI components that can be rendered to a frame.
-/// <p>
+///
 /// Elements can handle events by implementing event handler methods or
 /// by registering handler lambdas. Events propagate through the element
 /// tree and can be consumed to stop propagation.
@@ -53,11 +53,11 @@ public interface Element {
     }
 
     /// Returns the preferred height of this element given an available width and render context.
-    /// <p>
+    ///
     /// This is useful for elements that may wrap content (like text) where the
     /// height depends on the available width. The render context allows CSS-aware
     /// height calculation where properties like {@code text-overflow} may be set via CSS.
-    /// <p>
+    ///
     /// When context is null, implementations should use programmatic property values only.
     ///
     /// @param availableWidth the available width in cells

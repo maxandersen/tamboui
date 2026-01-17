@@ -109,7 +109,7 @@ public final class ListState {
     }
 
     /// Scrolls the list to show the last items without changing selection.
-    /// <p>
+    ///
     /// This is useful for chat messages, logs, or other content where you want
     /// to always show the most recent items without needing to select them.
     ///

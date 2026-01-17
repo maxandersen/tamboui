@@ -5,7 +5,7 @@
 package dev.tamboui.symbols.merge;
 
 /// Represents a composite border symbol using individual line components.
-/// <p>
+///
 /// This is an internal type specifically used to make the merge logic easier to implement.
 final class BorderSymbol {
     private final LineStyle right;

@@ -23,35 +23,30 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
 /// Main entry point for CSS styling.
-/// <p>
+///
 /// The StyleEngine manages stylesheets, resolves styles for elements,
 /// and supports live stylesheet switching for theming.
 ///
-/// <h2>Stylesheet Types</h2>
-/// <p>
-/// The engine supports two types of stylesheets:
-/// <ul>
-///    <li><b>Inline stylesheets</b>: Added via {@link #addStylesheet(String)} or {@link #loadStylesheet(String)}.
-///        Multiple inline stylesheets can be registered and are <em>all always applied</em>,
-///        in the order they were added. Use these for base styles that should always be present.</li>
-///    <li><b>Named stylesheets</b>: Added via {@link #addStylesheet(String, String)} or
-///        {@link #loadStylesheet(String, String)}. Only <em>one named stylesheet is active</em> at a time,
-///        selectable via {@link #setActiveStylesheet(String)}. Use these for themes that can be switched
-///        at runtime.</li>
-/// </ul>
+/// ## Stylesheet Types
 ///
-/// <h2>Cascade Order</h2>
-/// <p>
+/// The engine supports two types of stylesheets:
+///
+/// - **Inline stylesheets**: Added via {@link #addStylesheet(String)} or {@link #loadStylesheet(String)}. Multiple inline stylesheets can be registered and are *all always applied*, in the order they were added. Use these for base styles that should always be present.
+/// - **Named stylesheets**: Added via {@link #addStylesheet(String, String)} or {@link #loadStylesheet(String, String)}. Only *one named stylesheet is active* at a time, selectable via {@link #setActiveStylesheet(String)}. Use these for themes that can be switched at runtime.
+///
+///
+/// ## Cascade Order
+///
 /// When resolving styles, rules are collected in the following order:
-/// <ol>
-///    <li>All inline stylesheets (in registration order)</li>
-///    <li>The active named stylesheet</li>
-/// </ol>
+///
+/// 1. All inline stylesheets (in registration order)
+/// 1. The active named stylesheet
+///
 /// Later rules override earlier ones following standard CSS cascade rules,
 /// so the active named stylesheet can override inline styles.
 ///
-/// <h2>Usage Example</h2>
-/// <pre>
+/// ## Usage Example
+/// ```java
 /// StyleEngine engine = StyleEngine.create();
 ///
 /// // Add base styles (always applied)
@@ -64,7 +59,7 @@ import java.util.function.Supplier;
 ///
 /// // Switch themes at runtime
 /// engine.setActiveStylesheet("light");
-/// </pre>
+/// ```
 public final class StyleEngine {
 
     private final Map<String, StylesheetEntry> namedStylesheets;
@@ -112,7 +107,7 @@ public final class StyleEngine {
     }
 
     /// Loads a named stylesheet from the classpath.
-    /// <p>
+    ///
     /// Named stylesheets can be switched at runtime using {@link #setActiveStylesheet(String)}.
     ///
     /// @param name              the stylesheet name (e.g., "dark", "light")
@@ -190,7 +185,7 @@ public final class StyleEngine {
     // --- Stylesheet Switching ---
 
     /// Sets the active named stylesheet.
-    /// <p>
+    ///
     /// This enables live theme switching - the UI will use the new
     /// stylesheet on the next render cycle.
     ///
@@ -223,7 +218,7 @@ public final class StyleEngine {
     }
 
     /// Reloads a named stylesheet from its original source.
-    /// <p>
+    ///
     /// Useful for hot-reload during development.
     ///
     /// @param name the stylesheet name
@@ -273,7 +268,7 @@ public final class StyleEngine {
     }
 
     /// Parses a CSS color value string into a Color.
-    /// <p>
+    ///
     /// Supports named colors (e.g., "red", "blue"), hex colors (e.g., "#ff0000"),
     /// and RGB notation (e.g., "rgb(255,0,0)"), as well as CSS variables.
     ///

@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //JAVA 17+
 //REPOS mavenCentral,gradle=https://repo.gradle.org/gradle/libs-releases
 //DEPS org.gradle:gradle-tooling-api:9.2.1
@@ -27,7 +27,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /// Utility script to run TamboUI demos in a consistent way on Windows, Linux and macOS.
-/// <p>
+///
 /// Uses the Gradle Tooling API to discover and run demo projects.
 @Command(
     name = "tambouiDemos",

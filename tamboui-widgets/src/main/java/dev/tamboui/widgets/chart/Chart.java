@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /// A chart widget for plotting datasets in a cartesian coordinate system.
-/// <p>
+///
 /// Supports scatter plots, line charts, and bar charts with configurable
 /// axes, legends, and styling.
 ///
-/// <pre>{@code
+/// ```java
 /// Chart chart = Chart.builder()
 ///      .datasets(
 ///          Dataset.builder()
@@ -44,7 +44,8 @@ import java.util.stream.Collectors;
 ///          .build())
 ///      .block(Block.bordered().title(Title.from("My Chart")))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Dataset
 /// @see Axis

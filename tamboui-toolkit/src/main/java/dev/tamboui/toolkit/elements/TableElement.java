@@ -25,9 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A DSL wrapper for the Table widget.
-/// <p>
+///
 /// Displays data in rows and columns.
-/// <pre>{@code
+/// ```java
 /// table()
 ///      .header("Name", "Age", "City")
 ///      .row("Alice", "30", "NYC")
@@ -36,7 +36,8 @@ import java.util.List;
 ///      .state(tableState)
 ///      .title("Users")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class TableElement extends StyledElement<TableElement> {
 
     private static final Style DEFAULT_HIGHLIGHT_STYLE = Style.EMPTY.reversed();

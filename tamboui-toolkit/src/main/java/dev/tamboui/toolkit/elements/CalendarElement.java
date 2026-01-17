@@ -22,16 +22,17 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 /// A DSL wrapper for the Monthly calendar widget.
-/// <p>
+///
 /// Displays a calendar grid for a month.
-/// <pre>{@code
+/// ```java
 /// calendar(LocalDate.now())
 ///      .showMonthHeader()
 ///      .showWeekdaysHeader()
 ///      .highlightToday(Color.RED)
 ///      .title("Calendar")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class CalendarElement extends StyledElement<CalendarElement> {
 
     private LocalDate displayDate = LocalDate.now();

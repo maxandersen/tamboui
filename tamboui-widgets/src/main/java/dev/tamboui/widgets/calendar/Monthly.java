@@ -17,11 +17,11 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 /// A calendar widget displaying a single month.
-/// <p>
+///
 /// Renders a calendar grid for the month containing the display date,
 /// with customizable styling for headers, weekdays, and individual dates.
 ///
-/// <pre>{@code
+/// ```java
 /// CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold());
 ///
 /// Monthly calendar = Monthly.of(LocalDate.now(), events)
@@ -29,7 +29,8 @@ import java.util.Locale;
 ///      .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN))
 ///      .showSurrounding(Style.EMPTY.dim())
 ///      .block(Block.bordered());
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see DateStyler
 /// @see CalendarEventStore
@@ -89,7 +90,7 @@ public final class Monthly implements Widget {
     }
 
     /// Returns a new calendar with surrounding days shown.
-    /// <p>
+    ///
     /// Surrounding days are days from the previous/next month that
     /// appear in the calendar grid.
     public Monthly showSurrounding(Style style) {

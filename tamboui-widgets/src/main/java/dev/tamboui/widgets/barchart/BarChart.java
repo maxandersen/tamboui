@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// A bar chart widget for displaying grouped data.
-/// <p>
+///
 /// Supports both vertical (default) and horizontal bar orientations,
 /// with customizable bar widths, gaps, and styling.
 ///
-/// <pre>{@code
+/// ```java
 /// // Simple bar chart with values
 /// BarChart chart = BarChart.builder()
 ///      .data(BarGroup.of(10, 20, 30, 40))
@@ -44,26 +44,27 @@ import java.util.List;
 ///      .barStyle(Style.EMPTY.fg(Color.CYAN))
 ///      .block(Block.bordered().title(Title.from("Sales")))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Bar
 /// @see BarGroup
 public final class BarChart implements Widget {
 
     /// Property key for the default bar color.
-    /// <p>
+    ///
     /// CSS property name: {@code bar-color}
     public static final PropertyKey<Color> BAR_COLOR =
             PropertyKey.of("bar-color", ColorConverter.INSTANCE);
 
     /// Property key for the value label color.
-    /// <p>
+    ///
     /// CSS property name: {@code value-color}
     public static final PropertyKey<Color> VALUE_COLOR =
             PropertyKey.of("value-color", ColorConverter.INSTANCE);
 
     /// Property key for the bar label color.
-    /// <p>
+    ///
     /// CSS property name: {@code label-color}
     public static final PropertyKey<Color> LABEL_COLOR =
             PropertyKey.of("label-color", ColorConverter.INSTANCE);
@@ -621,7 +622,7 @@ public final class BarChart implements Widget {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code background}, {@code bar-color},
         /// {@code value-color}, and {@code label-color} will be resolved
         /// if not set programmatically.
@@ -634,7 +635,7 @@ public final class BarChart implements Widget {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -645,7 +646,7 @@ public final class BarChart implements Widget {
         }
 
         /// Sets the default bar color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the bar color
@@ -656,7 +657,7 @@ public final class BarChart implements Widget {
         }
 
         /// Sets the value label color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the value color
@@ -667,7 +668,7 @@ public final class BarChart implements Widget {
         }
 
         /// Sets the bar label color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the label color

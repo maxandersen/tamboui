@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 /*
@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.Random;
 
 /// Demo TUI application showcasing the Chart widget.
-/// <p>
+///
 /// Demonstrates line charts, scatter plots, and bar charts
 /// with animated data updates.
 public class ChartDemo {

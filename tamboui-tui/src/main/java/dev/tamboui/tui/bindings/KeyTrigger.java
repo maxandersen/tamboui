@@ -10,14 +10,14 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
 
 /// An {@link InputTrigger} that matches {@link KeyEvent}s.
-/// <p>
-/// Key triggers can match:
-/// <ul>
-///    <li>A specific {@link KeyCode} (e.g., UP, ENTER)</li>
-///    <li>A character with optional modifiers (e.g., 'k', Ctrl+'u')</li>
-/// </ul>
 ///
-/// <pre>{@code
+/// Key triggers can match:
+///
+/// - A specific {@link KeyCode} (e.g., UP, ENTER)
+/// - A character with optional modifiers (e.g., 'k', Ctrl+'u')
+///
+///
+/// ```java
 /// // Match the UP arrow key
 /// KeyTrigger.key(KeyCode.UP)
 ///
@@ -35,7 +35,8 @@ import dev.tamboui.tui.event.KeyModifiers;
 ///
 /// // Match Shift+Tab
 /// KeyTrigger.key(KeyCode.TAB, false, false, true)
-/// }</pre>
+/// }
+/// ```
 public final class KeyTrigger implements InputTrigger {
 
     private final KeyCode keyCode;
@@ -115,14 +116,14 @@ public final class KeyTrigger implements InputTrigger {
     }
 
     /// Returns true if this trigger matches the given key event.
-    /// <p>
+    ///
     /// Matching rules:
-    /// <ul>
-    ///    <li>Key code must match</li>
-    ///    <li>Ctrl and Alt modifiers must match exactly</li>
-    ///    <li>Shift is only checked if explicitly required by the trigger</li>
-    ///    <li>For character triggers, the character must match (respecting ignoreCase)</li>
-    /// </ul>
+    ///
+    /// - Key code must match
+    /// - Ctrl and Alt modifiers must match exactly
+    /// - Shift is only checked if explicitly required by the trigger
+    /// - For character triggers, the character must match (respecting ignoreCase)
+    ///
     ///
     /// @param event the key event to match against
     /// @return true if this trigger matches the event

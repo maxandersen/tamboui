@@ -25,14 +25,14 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.util.Arrays;
 
 /// Demonstrates the InlineDisplay class for NPM/Gradle-style progress UX.
-/// <p>
+///
 /// This demo shows:
-/// <ul>
-///    <li>Basic inline display with widgets</li>
-///    <li>Release and continue pattern (multiple phases)</li>
-///    <li>println() scrolling above status area</li>
-///    <li>clearOnClose() for transient displays</li>
-/// </ul>
+///
+/// - Basic inline display with widgets
+/// - Release and continue pattern (multiple phases)
+/// - println() scrolling above status area
+/// - clearOnClose() for transient displays
+///
 public class InlineProgressDemo {
 
     private static final String[] SPINNER = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};

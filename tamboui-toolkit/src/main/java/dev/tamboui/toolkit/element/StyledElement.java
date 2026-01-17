@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
 
 /// Abstract base for elements that support styling and event handling.
 /// Provides a fluent API for setting colors, modifiers, and event handlers.
-/// <p>
+///
 /// Implements {@link Styleable} to support CSS-based styling.
 ///
 /// @param <T> the concrete element type for method chaining
@@ -194,13 +194,13 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     // ═══════════════════════════════════════════════════════════════
 
     /// Renders this element. This is a template method that:
-    /// <ol>
-    ///    <li>Resolves the effective CSS + inline style</li>
-    ///    <li>Pushes the style and CSS resolver onto the context's stacks</li>
-    ///    <li>Calls {@link #renderContent} for subclass-specific rendering</li>
-    ///    <li>Pops the style and resolver when done</li>
-    /// </ol>
-    /// <p>
+    ///
+    /// 1. Resolves the effective CSS + inline style
+    /// 1. Pushes the style and CSS resolver onto the context's stacks
+    /// 1. Calls {@link #renderContent} for subclass-specific rendering
+    /// 1. Pops the style and resolver when done
+    ///
+    ///
     /// Subclasses must implement {@link #renderContent} instead of overriding this method.
     /// The current style is available via {@link RenderContext#currentStyle()}.
     /// CSS properties not in Style (e.g., border-type) can be accessed from parent
@@ -235,7 +235,7 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     }
 
     /// Renders the content of this element.
-    /// <p>
+    ///
     /// Subclasses implement this method to perform their specific rendering.
     /// The current style (CSS + inline, merged with parent styles) is available
     /// via {@link RenderContext#currentStyle()}.
@@ -284,21 +284,20 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     // Focusable
 
     /// Makes this element focusable, allowing it to participate in TAB navigation.
-    /// <p>
+    ///
     /// When an element is focusable:
-    /// <ul>
-    ///    <li>It is included in the focus chain for TAB/Shift+TAB navigation</li>
-    ///    <li>It receives keyboard events via {@link #handleKeyEvent(KeyEvent, boolean)} when focused</li>
-    ///    <li>An ID is required for focus management - if not set via {@link #id(String)},
-    ///        one will be auto-generated at render time</li>
-    /// </ul>
-    /// <p>
+    ///
+    /// - It is included in the focus chain for TAB/Shift+TAB navigation
+    /// - It receives keyboard events via {@link #handleKeyEvent(KeyEvent, boolean)} when focused
+    /// - An ID is required for focus management - if not set via {@link #id(String)}, one will be auto-generated at render time
+    ///
+    ///
     /// Note: {@code focusable()} and {@link #onKeyEvent(KeyEventHandler)} are orthogonal:
-    /// <ul>
-    ///    <li>Use {@code focusable()} when the element should participate in TAB navigation</li>
-    ///    <li>Use {@code onKeyEvent()} to handle keyboard events (works regardless of focusability)</li>
-    ///    <li>Use both when you want TAB navigation AND custom key handling</li>
-    /// </ul>
+    ///
+    /// - Use {@code focusable()} when the element should participate in TAB navigation
+    /// - Use {@code onKeyEvent()} to handle keyboard events (works regardless of focusability)
+    /// - Use both when you want TAB navigation AND custom key handling
+    ///
     ///
     /// @return this element for chaining
     public T focusable() {
@@ -324,7 +323,7 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     // ID for focus management
 
     /// Sets the element's ID for focus management and CSS targeting.
-    /// <p>
+    ///
     /// The ID is immutable once set and cannot be changed. If an ID is needed
     /// but not explicitly provided, calling {@link #focusable()} will auto-generate one.
     ///
@@ -411,20 +410,20 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     // Event handlers
 
     /// Sets a key event handler for this element.
-    /// <p>
+    ///
     /// The handler receives keyboard events when:
-    /// <ul>
-    ///    <li>This element is focused (receives events directly)</li>
-    ///    <li>A focused descendant doesn't handle the event (bubbles up)</li>
-    /// </ul>
-    /// <p>
-    /// <strong>Relationship with {@link #focusable()}:</strong>
-    /// <ul>
-    ///    <li>{@code onKeyEvent()} registers a handler but does NOT make the element focusable</li>
-    ///    <li>{@code focusable()} adds the element to TAB navigation but does NOT add a handler</li>
-    ///    <li>Use both together when you want TAB navigation AND custom key handling</li>
-    ///    <li>Use only {@code onKeyEvent()} for handling keys from focused children or global shortcuts</li>
-    /// </ul>
+    ///
+    /// - This element is focused (receives events directly)
+    /// - A focused descendant doesn't handle the event (bubbles up)
+    ///
+    ///
+    /// **Relationship with {@link #focusable()}:**
+    ///
+    /// - {@code onKeyEvent()} registers a handler but does NOT make the element focusable
+    /// - {@code focusable()} adds the element to TAB navigation but does NOT add a handler
+    /// - Use both together when you want TAB navigation AND custom key handling
+    /// - Use only {@code onKeyEvent()} for handling keys from focused children or global shortcuts
+    ///
     ///
     /// @param handler the key event handler
     /// @return this element for chaining
@@ -435,7 +434,7 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     }
 
     /// Sets an action handler for this element.
-    /// <p>
+    ///
     /// This is a convenience method that dispatches both key and mouse events
     /// to the action handler. Key events are dispatched when this element is focused,
     /// mouse events when clicking on the element.

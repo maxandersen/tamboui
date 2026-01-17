@@ -11,15 +11,15 @@ import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
 
 /// An {@link InputTrigger} that matches {@link MouseEvent}s.
-/// <p>
-/// Mouse triggers can match combinations of:
-/// <ul>
-///    <li>Event kind (PRESS, RELEASE, SCROLL_UP, SCROLL_DOWN, etc.)</li>
-///    <li>Button (LEFT, RIGHT, MIDDLE)</li>
-///    <li>Keyboard modifiers (Ctrl, Alt, Shift held during mouse action)</li>
-/// </ul>
 ///
-/// <pre>{@code
+/// Mouse triggers can match combinations of:
+///
+/// - Event kind (PRESS, RELEASE, SCROLL_UP, SCROLL_DOWN, etc.)
+/// - Button (LEFT, RIGHT, MIDDLE)
+/// - Keyboard modifiers (Ctrl, Alt, Shift held during mouse action)
+///
+///
+/// ```java
 /// // Match left click
 /// MouseTrigger.click()
 ///
@@ -34,7 +34,8 @@ import dev.tamboui.tui.event.MouseEventKind;
 ///
 /// // Custom: Alt+right click
 /// MouseTrigger.press(MouseButton.RIGHT, false, true, false)
-/// }</pre>
+/// }
+/// ```
 public final class MouseTrigger implements InputTrigger {
 
     private final MouseEventKind kind;

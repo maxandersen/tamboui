@@ -11,14 +11,15 @@ import dev.tamboui.widgets.canvas.Shape;
 import java.util.Optional;
 
 /// A rectangle defined by position and size.
-/// <p>
+///
 /// The rectangle is positioned from its bottom-left corner in
 /// canvas coordinate space (mathematical coordinates).
 ///
-/// <pre>{@code
+/// ```java
 /// // Rectangle at (10, 20) with width 30 and height 15
 /// context.draw(new Rectangle(10, 20, 30, 15, Color.BLUE));
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Shape
 public final class Rectangle implements Shape {

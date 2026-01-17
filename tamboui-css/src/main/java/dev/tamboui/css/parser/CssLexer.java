@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// Lexer for Textual-style CSS.
-/// <p>
+///
 /// Tokenizes CSS input into a stream of tokens for the parser.
 /// Supports standard CSS syntax plus Textual extensions like variables ($name).
 public final class CssLexer {
@@ -29,7 +29,7 @@ public final class CssLexer {
     }
 
     /// Tokenizes the entire input and returns a list of tokens.
-    /// <p>
+    ///
     /// Whitespace tokens are included in the output. The list always
     /// ends with an EOF token.
     ///

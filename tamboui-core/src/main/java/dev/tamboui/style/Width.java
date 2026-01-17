@@ -7,14 +7,14 @@ package dev.tamboui.style;
 import java.util.Objects;
 
 /// Represents the width of an element.
-/// <p>
+///
 /// Supports the following values:
-/// <ul>
-///    <li>{@code fill} - element fills the available container width</li>
-///    <li>{@code fit} - element width fits its content</li>
-///    <li>Percentage values like {@code 50%} or {@code 0.5}</li>
-///    <li>Fixed character counts like {@code 20}</li>
-/// </ul>
+///
+/// - {@code fill} - element fills the available container width
+/// - {@code fit} - element width fits its content
+/// - Percentage values like {@code 50%} or {@code 0.5}
+/// - Fixed character counts like {@code 20}
+///
 public final class Width {
 
     /// Width that fills the available container space.

@@ -19,7 +19,7 @@ import dev.tamboui.widgets.text.Overflow;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 /// A simple text element that displays styled text.
-/// <p>
+///
 /// CSS properties {@code text-overflow} and {@code text-align} are automatically
 /// resolved through the underlying {@link Paragraph} widget.
 public final class TextElement extends StyledElement<TextElement> {
@@ -100,15 +100,13 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     /// Returns the layout constraint for this text element.
-    /// <p>
+    ///
     /// If no explicit constraint is set, a sensible default is calculated based on
     /// the content and overflow mode:
-    /// <ul>
-    ///    <li>For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses {@code min(lineCount)}
-    ///        to ensure at least minimum height while allowing growth for wrapped content.</li>
-    ///    <li>For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to let
-    ///        the container decide (typically using {@code fill()}).</li>
-    /// </ul>
+    ///
+    /// - For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses {@code min(lineCount)} to ensure at least minimum height while allowing growth for wrapped content.
+    /// - For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to let the container decide (typically using {@code fill()}).
+    ///
     ///
     /// @return the constraint for this element
     @Override
@@ -151,7 +149,7 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     /// Calculates the height needed for this text when rendered with wrapping at the given width.
-    /// <p>
+    ///
     /// For non-wrapping modes, returns the natural line count.
     /// For wrapping modes, calculates how many lines will be produced after wrapping.
     ///

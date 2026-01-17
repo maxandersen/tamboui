@@ -23,7 +23,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 /// A block is a container widget with optional borders and titles.
-/// <p>
+///
 /// Supports style-aware properties: {@code border-type}, {@code border-color},
 /// {@code background}, and {@code color}.
 public final class Block implements Widget {
@@ -519,7 +519,7 @@ public final class Block implements Widget {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code border-type} and {@code border-color}
         /// will fall back to resolved values if not set programmatically.
         ///
@@ -546,7 +546,7 @@ public final class Block implements Widget {
         }
 
         /// Sets the merge strategy for borders.
-        /// <p>
+        ///
         /// When blocks are rendered with overlapping borders, this strategy determines
         /// how the borders are merged. See {@link MergeStrategy} for details.
         ///

@@ -110,7 +110,7 @@ public interface Backend extends AutoCloseable {
     }
 
     /// Writes raw bytes directly to the terminal output.
-    /// <p>
+    ///
     /// This is used for native image protocols (Sixel, Kitty, iTerm2) that
     /// require sending escape sequences with binary data.
     ///
@@ -122,7 +122,7 @@ public interface Backend extends AutoCloseable {
     }
 
     /// Writes a raw string directly to the terminal output.
-    /// <p>
+    ///
     /// This is a convenience method for protocols that work with ASCII escape sequences.
     ///
     /// @param data the string to write

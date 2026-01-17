@@ -5,7 +5,7 @@
 package dev.tamboui.tui.event;
 
 /// Represents keyboard key codes for special keys.
-/// <p>
+///
 /// Regular printable characters use {@link #CHAR} and the character
 /// can be retrieved from {@link KeyEvent#character()}.
 public enum KeyCode {

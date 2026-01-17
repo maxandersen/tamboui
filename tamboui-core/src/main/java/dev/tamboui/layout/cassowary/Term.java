@@ -8,10 +8,12 @@ import dev.tamboui.layout.Fraction;
 
 /// A term in a linear expression, representing a coefficient multiplied by a variable.
 ///
-/// <p>Terms are the building blocks of linear expressions. A term consists of
+///
+/// Terms are the building blocks of linear expressions. A term consists of
 /// a variable and a coefficient, representing the product {@code coefficient * variable}.
 ///
-/// <p>This implementation uses {@link Fraction} for exact arithmetic,
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
 /// avoiding the cumulative rounding errors that occur with floating-point.
 public final class Term {
 

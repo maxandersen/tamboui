@@ -6,19 +6,22 @@ package dev.tamboui.layout;
 
 /// An immutable exact rational number represented as a fraction.
 ///
-/// <p>Fractions avoid the cumulative rounding errors that occur with floating-point
+///
+/// Fractions avoid the cumulative rounding errors that occur with floating-point
 /// arithmetic in constraint solving. All arithmetic operations return exact results
 /// by maintaining numerator and denominator as long integers.
 ///
-/// <p>Fractions are always stored in normalized form: the denominator is positive,
+///
+/// Fractions are always stored in normalized form: the denominator is positive,
 /// and the numerator and denominator share no common factors other than 1.
 ///
-/// <p>Example usage:
-/// <pre>
+///
+/// Example usage:
+/// ```java
 /// Fraction a = Fraction.of(1, 3);
 /// Fraction b = Fraction.of(1, 6);
 /// Fraction sum = a.add(b);  // 1/2
-/// </pre>
+/// ```
 public final class Fraction implements Comparable<Fraction> {
 
     /// The fraction representing zero (0/1).
@@ -40,7 +43,8 @@ public final class Fraction implements Comparable<Fraction> {
 
     /// Creates a fraction from a numerator and denominator.
     ///
-    /// <p>The fraction is automatically normalized (reduced to lowest terms,
+    ///
+    /// The fraction is automatically normalized (reduced to lowest terms,
     /// with a positive denominator).
     ///
     /// @param numerator   the numerator
@@ -76,7 +80,8 @@ public final class Fraction implements Comparable<Fraction> {
 
     /// Creates a fraction from a double value.
     ///
-    /// <p>This attempts to find a reasonable fraction approximation of the double.
+    ///
+    /// This attempts to find a reasonable fraction approximation of the double.
     /// For exact integer values, an exact fraction is returned. For other values,
     /// a continued fraction algorithm is used to find a close approximation.
     ///

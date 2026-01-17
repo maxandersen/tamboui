@@ -103,7 +103,7 @@ public final class Margin {
     }
 
     /// Returns the inner area after applying this margin.
-    /// <p>
+    ///
     /// The returned rect is inset by the margin values on each side.
     /// If the margin would result in negative dimensions, returns an empty rect.
     ///

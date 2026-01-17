@@ -7,7 +7,7 @@ package dev.tamboui.toolkit.event;
 import dev.tamboui.tui.event.Event;
 
 /// Handler for global events that are processed before element-specific handlers.
-/// <p>
+///
 /// Global handlers can intercept events before they reach elements, allowing
 /// for application-wide keyboard shortcuts or action handling.
 ///

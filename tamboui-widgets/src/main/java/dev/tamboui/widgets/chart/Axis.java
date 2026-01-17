@@ -15,17 +15,18 @@ import java.util.List;
 import java.util.Optional;
 
 /// An axis configuration for a {@link Chart}.
-/// <p>
+///
 /// Defines the title, bounds, labels, and styling for an axis.
 ///
-/// <pre>{@code
+/// ```java
 /// Axis xAxis = Axis.builder()
 ///      .title("Time (s)")
 ///      .bounds(0, 100)
 ///      .labels("0", "25", "50", "75", "100")
 ///      .style(Style.EMPTY.fg(Color.CYAN))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class Axis {
 
     private final Line title;

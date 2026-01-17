@@ -5,7 +5,7 @@
 package dev.tamboui.layout;
 
 /// Represents the spacing between segments in a layout.
-/// <p>
+///
 /// Can represent either positive spacing (space between segments) or negative spacing
 /// (overlap between segments).
 public abstract class Spacing {

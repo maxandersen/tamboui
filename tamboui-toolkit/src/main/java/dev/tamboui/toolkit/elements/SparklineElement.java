@@ -19,14 +19,15 @@ import dev.tamboui.widgets.sparkline.Sparkline;
 import java.util.Collection;
 
 /// A DSL wrapper for the Sparkline widget.
-/// <p>
+///
 /// Displays data trends in a compact form using bar characters.
-/// <pre>{@code
+/// ```java
 /// sparkline(1, 2, 3, 4, 5, 4, 3, 2, 1)
 ///      .color(Color.CYAN)
 ///      .title("CPU Usage")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class SparklineElement extends StyledElement<SparklineElement> {
 
     private long[] data = new long[0];

@@ -13,15 +13,15 @@ import dev.tamboui.css.property.PropertyRegistry;
 import java.util.*;
 
 /// Resolves CSS cascade and specificity to produce final computed styles.
-/// <p>
+///
 /// The cascade algorithm:
-/// <ol>
-///    <li>Find all rules whose selectors match the element</li>
-///    <li>Sort by specificity (higher wins)</li>
-///    <li>For equal specificity, later rules win (source order)</li>
-///    <li>!important declarations override all non-important</li>
-///    <li>Merge all matching declarations into a final style</li>
-/// </ol>
+///
+/// 1. Find all rules whose selectors match the element
+/// 1. Sort by specificity (higher wins)
+/// 1. For equal specificity, later rules win (source order)
+/// 1. !important declarations override all non-important
+/// 1. Merge all matching declarations into a final style
+///
 public final class CascadeResolver {
 
     private final PropertyRegistry propertyRegistry;

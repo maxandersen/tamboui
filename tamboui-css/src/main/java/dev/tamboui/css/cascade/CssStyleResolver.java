@@ -26,17 +26,18 @@ import java.util.Optional;
 import java.util.Set;
 
 /// Represents the computed style for an element after CSS cascade resolution.
-/// <p>
+///
 /// Implements {@link StylePropertyResolver} to allow typed property access using
 /// {@link PropertyKey}s. Properties can be retrieved either through the legacy
 /// typed getters (e.g., {@link #foreground()}) or through the generic
 /// {@link #get(PropertyKey)} method.
-/// <p>
+///
 /// Example usage with PropertyKey:
-/// <pre>{@code
+/// ```java
 /// CssStyleResolver style = cascadeResolver.resolve(element, rules);
 /// Color borderColor = style.get(StandardPropertyKeys.BORDER_COLOR).orElse(Color.WHITE);
-/// }</pre>
+/// }
+/// ```
 public final class CssStyleResolver implements StylePropertyResolver {
 
     private final Color foreground;
@@ -99,7 +100,7 @@ public final class CssStyleResolver implements StylePropertyResolver {
     // ═══════════════════════════════════════════════════════════════
 
     /// Retrieves a typed property value using the given property key.
-    /// <p>
+    ///
     /// Standard properties (color, background, border-color, text-align, border-type)
     /// are retrieved from dedicated fields. Other properties are looked up in
     /// {@link #additionalProperties} and converted using the key's converter.
@@ -258,7 +259,7 @@ public final class CssStyleResolver implements StylePropertyResolver {
     }
 
     /// Converts this resolved style to a TamboUI Style object.
-    /// <p>
+    ///
     /// The {@link Width} property is stored as a Style extension and can be
     /// retrieved via {@code style.extension(Width.class, Width.FILL)}.
     ///
@@ -296,12 +297,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
 
     /// Creates a new resolver that uses this resolver's properties but falls back
     /// to the given resolver for CSS-inheritable properties not set in this resolver.
-    /// <p>
+    ///
     /// Per CSS semantics, only certain properties inherit from parent to child:
-    /// <ul>
-    ///    <li>Inheritable: color (foreground), text-style (modifiers), border-type</li>
-    ///    <li>Non-inheritable: spacing, flex, direction, margin, padding, alignment, width, background</li>
-    /// </ul>
+    ///
+    /// - Inheritable: color (foreground), text-style (modifiers), border-type
+    /// - Non-inheritable: spacing, flex, direction, margin, padding, alignment, width, background
+    ///
     ///
     /// @param fallback the fallback resolver for missing inheritable properties
     /// @return a new resolver with fallback behavior for inheritable properties only

@@ -16,12 +16,14 @@ import java.util.EnumSet;
 /// This class provides methods to convert TamboUI styles to ANSI escape sequences
 /// that can be used for direct terminal output without requiring the full TUI system.
 ///
-/// <p>Example usage:
-/// <pre>{@code
+///
+/// Example usage:
+/// ```java
 /// Style style = Style.create().fg(Color.GREEN).bold();
 /// String ansi = AnsiStringBuilder.styleToAnsi(style);
 /// System.out.print(ansi + "Hello, World!" + AnsiStringBuilder.RESET);
-/// }</pre>
+/// }
+/// ```
 public final class AnsiStringBuilder {
 
     /// The escape character.
@@ -122,7 +124,7 @@ public final class AnsiStringBuilder {
     ///
     /// @param color the color to convert
     /// @return the ANSI code string (without CSI prefix or 'm' suffix),
-    ///          or empty string if the color type doesn't support underline coloring
+    /// or empty string if the color type doesn't support underline coloring
     public static String underlineColorToAnsi(Color color) {
         if (color instanceof Color.Indexed) {
             int idx = ((Color.Indexed) color).index();
@@ -135,7 +137,7 @@ public final class AnsiStringBuilder {
     }
 
     /// Generates an OSC8 hyperlink escape sequence to start a hyperlink.
-    /// <p>
+    ///
     /// OSC8 format: {@code \033]8;id=<id>;<url>\033\\}
     /// If no ID is provided, the format is: {@code \033]8;;<url>\033\\}
     ///
@@ -154,7 +156,7 @@ public final class AnsiStringBuilder {
     }
 
     /// Generates an OSC8 escape sequence to end a hyperlink.
-    /// <p>
+    ///
     /// Format: {@code \033]8;;\033\\}
     ///
     /// @return the OSC8 escape sequence to end the hyperlink
@@ -163,7 +165,7 @@ public final class AnsiStringBuilder {
     }
 
     /// Escapes special characters in OSC parameter values.
-    /// <p>
+    ///
     /// According to the OSC8 specification, semicolons and backslashes need to be escaped.
     ///
     /// @param param the parameter value to escape

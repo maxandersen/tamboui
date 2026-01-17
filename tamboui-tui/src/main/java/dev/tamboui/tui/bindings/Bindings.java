@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Optional;
 
 /// Maps input events to semantic actions.
-/// <p>
+///
 /// Bindings support both keyboard and mouse events, allowing the same
 /// action to be triggered by either input type.
-/// <p>
+///
 /// Actions are identified by strings, with common actions defined as
 /// constants in {@link Actions}. Custom actions can use any string.
-/// <p>
+///
 /// Events (both {@code KeyEvent} and {@code MouseEvent}) carry their own bindings
 /// and provide convenience methods for action matching. The preferred API is to
 /// call {@code matches()} directly on the event:
 ///
-/// <pre>{@code
+/// ```java
 /// // Preferred: call matches() on the event
 /// if (event.matches(Actions.MOVE_UP)) {
 ///      state.moveUp();
@@ -38,7 +38,8 @@ import java.util.Optional;
 ///      .bind(KeyTrigger.ch('x'), Actions.QUIT)
 ///      .bind(MouseTrigger.rightClick(), "myAction")
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Actions
 /// @see BindingSets
@@ -53,7 +54,7 @@ public interface Bindings {
     boolean matches(Event event, String action);
 
     /// Returns the action that matches the event, if any.
-    /// <p>
+    ///
     /// If multiple actions could match, returns the first one found.
     ///
     /// @param event the input event
@@ -67,7 +68,7 @@ public interface Bindings {
     List<InputTrigger> triggersFor(String action);
 
     /// Returns a human-readable description of triggers for the action.
-    /// <p>
+    ///
     /// Useful for generating help screens.
     ///
     /// @param action the action
@@ -83,7 +84,7 @@ public interface Bindings {
     interface Builder {
 
         /// Binds a trigger to an action.
-        /// <p>
+        ///
         /// This adds to existing triggers for the action.
         ///
         /// @param trigger the input trigger

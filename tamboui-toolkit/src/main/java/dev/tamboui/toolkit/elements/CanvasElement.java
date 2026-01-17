@@ -21,9 +21,9 @@ import dev.tamboui.widgets.canvas.Marker;
 import java.util.function.Consumer;
 
 /// A DSL wrapper for the Canvas widget.
-/// <p>
+///
 /// Draws arbitrary shapes on a coordinate system.
-/// <pre>{@code
+/// ```java
 /// canvas()
 ///      .xBounds(-10, 10)
 ///      .yBounds(-10, 10)
@@ -33,7 +33,8 @@ import java.util.function.Consumer;
 ///      })
 ///      .title("Drawing")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class CanvasElement extends StyledElement<CanvasElement> {
 
     private double xMin = 0.0;

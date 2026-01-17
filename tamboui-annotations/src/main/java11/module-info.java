@@ -4,7 +4,7 @@
  */
 
 /// TamboUI annotations module.
-/// <p>
+///
 /// This module provides annotations for the TamboUI framework,
 /// such as {@code @OnAction} for declarative action handling.
 module dev.tamboui.annotations {

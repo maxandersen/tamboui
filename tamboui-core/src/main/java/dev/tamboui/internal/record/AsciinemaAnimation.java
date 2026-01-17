@@ -14,11 +14,12 @@ import java.util.List;
 /// Converts multiple Buffer frames into an Asciinema cast file.
 /// This is an internal API and not part of the public contract.
 ///
-/// <p>The asciicast v2 format is a newline-delimited JSON file where:
-/// <ul>
-///    <li>First line contains header (terminal size, timestamp, metadata)</li>
-///    <li>Following lines are events [time, "o", data]</li>
-/// </ul>
+///
+/// The asciicast v2 format is a newline-delimited JSON file where:
+///
+/// - First line contains header (terminal size, timestamp, metadata)
+/// - Following lines are events [time, "o", data]
+///
 ///
 /// @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
 final class AsciinemaAnimation {

@@ -23,7 +23,7 @@ import java.util.List;
 /// Captures System.out output by parsing ANSI escape sequences and maintaining
 /// a virtual terminal buffer. Used for recording inline demos that write directly
 /// to System.out rather than using Backend.draw().
-/// <p>
+///
 /// This is an internal API and not part of the public contract.
 public final class AnsiTerminalCapture extends OutputStream {
 

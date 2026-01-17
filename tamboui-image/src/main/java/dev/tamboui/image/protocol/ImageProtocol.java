@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /// Protocol for rendering images to a terminal.
-/// <p>
+///
 /// Implementations may render images using character-based approximations
 /// (half-blocks, Braille patterns) or native terminal protocols (Sixel, Kitty, iTerm2).
 public interface ImageProtocol {
 
     /// Renders the image to the given terminal area.
-    /// <p>
+    ///
     /// Character-based protocols write directly to the buffer.
     /// Native protocols write to the raw output stream.
     ///
@@ -31,7 +31,7 @@ public interface ImageProtocol {
     void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput) throws IOException;
 
     /// Returns true if this protocol requires raw byte output.
-    /// <p>
+    ///
     /// Character-based protocols (half-block, braille) return false and use the buffer.
     /// Native protocols (Sixel, Kitty, iTerm2) return true and use rawOutput.
     ///
@@ -39,13 +39,13 @@ public interface ImageProtocol {
     boolean requiresRawOutput();
 
     /// Returns the resolution multiplier for this protocol.
-    /// <p>
+    ///
     /// This indicates how many "virtual pixels" each terminal cell can represent:
-    /// <ul>
-    ///    <li>Half-block: 1x2 (1 column, 2 rows per cell)</li>
-    ///    <li>Braille: 2x4 (2 columns, 4 rows per cell)</li>
-    ///    <li>Native protocols: depends on cell pixel size</li>
-    /// </ul>
+    ///
+    /// - Half-block: 1x2 (1 column, 2 rows per cell)
+    /// - Braille: 2x4 (2 columns, 4 rows per cell)
+    /// - Native protocols: depends on cell pixel size
+    ///
     ///
     /// @return the resolution multiplier
     Resolution resolution();

@@ -13,12 +13,12 @@ import static dev.tamboui.toolkit.Toolkit.*;
 
 /// A custom component demonstrating @OnAction annotations for keyboard handling.
 /// Displays a task card with title, description, and progress bar.
-/// <p>
+///
 /// Uses the Component base class which automatically:
-/// <ul>
-///    <li>Registers @OnAction annotated methods for event handling</li>
-///    <li>Manages focus state via isFocused()</li>
-/// </ul>
+///
+/// - Registers @OnAction annotated methods for event handling
+/// - Manages focus state via isFocused()
+///
 public final class ProgressCard extends Component<ProgressCard> {
 
     /// Status of the task shown in the card.

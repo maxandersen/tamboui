@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 /*
@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.Random;
 
 /// Demo TUI application showcasing the Canvas widget.
-/// <p>
+///
 /// Demonstrates drawing shapes (lines, rectangles, circles, points)
 /// with different markers (braille, half-block, dot, block).
 public class CanvasDemo {

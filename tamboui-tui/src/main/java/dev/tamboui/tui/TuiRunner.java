@@ -49,11 +49,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /// Main entry point for running TUI applications.
-/// <p>
+///
 /// TuiRunner handles the terminal lifecycle (raw mode, alternate screen, cursor),
 /// event parsing, and the main event loop.
 ///
-/// <pre>{@code
+/// ```java
 /// try (var tui = TuiRunner.create()) {
 ///      tui.run(
 ///          (event, runner) -> {
@@ -66,7 +66,8 @@ import java.util.function.Consumer;
 ///          frame -> renderUI(frame)
 ///      );
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see TuiConfig
 /// @see EventHandler
@@ -184,7 +185,7 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /// Runs the main event loop with the given handler and renderer.
-    /// <p>
+    ///
     /// Exceptions thrown during rendering are caught and handled according to
     /// the configured {@link RenderErrorHandler}. By default, errors are displayed
     /// in the UI and the application waits for user dismissal before quitting.
@@ -489,11 +490,11 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /// Returns a new builder for constructing TuiRunner instances.
-    /// <p>
+    ///
     /// The builder provides a fluent API for configuring all aspects of the
     /// TUI application including bindings and auto-registration of action handlers.
     ///
-    /// <pre>{@code
+    /// ```java
     /// TuiRunner.builder()
     ///      .bindings(BindingSets.vim())
     ///      .eventHandler(app)
@@ -501,7 +502,8 @@ public final class TuiRunner implements AutoCloseable {
     ///      .autoBindingRegistration(true)
     ///      .build()
     ///      .run();
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @return a new builder
     public static Builder builder() {
@@ -509,7 +511,7 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /// Builder for {@link TuiRunner} instances.
-    /// <p>
+    ///
     /// Provides a fluent API for configuring the TUI application including
     /// bindings, event handlers, renderers, and auto-registration of annotated
     /// action handlers.
@@ -551,7 +553,7 @@ public final class TuiRunner implements AutoCloseable {
         }
 
         /// Enables or disables automatic registration of action handlers.
-        /// <p>
+        ///
         /// When enabled, methods annotated with {@code @OnAction} on the
         /// event handler object are automatically registered.
         ///
@@ -563,7 +565,7 @@ public final class TuiRunner implements AutoCloseable {
         }
 
         /// Enables automatic registration of action handlers.
-        /// <p>
+        ///
         /// Equivalent to {@code autoBindingRegistration(true)}.
         ///
         /// @return this builder
@@ -661,7 +663,7 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /// A fully configured TuiRunner ready to execute.
-    /// <p>
+    ///
     /// Created by {@link Builder#build()}, this class wraps a TuiRunner
     /// with its event handler, renderer, and optional action handler.
     public static final class ConfiguredRunner implements AutoCloseable {
@@ -679,7 +681,7 @@ public final class TuiRunner implements AutoCloseable {
         }
 
         /// Runs the TUI application.
-        /// <p>
+        ///
         /// If an action handler is configured, events are first dispatched
         /// to it before being passed to the event handler.
         ///

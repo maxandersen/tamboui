@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A DSL wrapper for the Chart widget.
-/// <p>
+///
 /// Plots datasets in a cartesian coordinate system.
-/// <pre>{@code
+/// ```java
 /// chart()
 ///      .dataset(Dataset.builder()
 ///          .name("Series 1")
@@ -36,7 +36,8 @@ import java.util.List;
 ///      .yAxis(Axis.builder().bounds(0, 5).build())
 ///      .title("My Chart")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class ChartElement extends StyledElement<ChartElement> {
 
     private final List<Dataset> datasets = new ArrayList<>();

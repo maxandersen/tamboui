@@ -11,12 +11,13 @@ import dev.tamboui.widgets.canvas.Shape;
 import java.util.Optional;
 
 /// A line segment between two points.
-/// <p>
+///
 /// Draws a line from (x1, y1) to (x2, y2) using Bresenham's algorithm.
 ///
-/// <pre>{@code
+/// ```java
 /// context.draw(new Line(0, 0, 10, 10, Color.RED));
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Shape
 public final class Line implements Shape {

@@ -20,12 +20,13 @@ import static dev.tamboui.toolkit.Toolkit.*;
 
 /// Demo application showcasing Flex layout modes with practical examples.
 ///
-/// <p>Controls:
-/// <ul>
-///    <li>1-4: Switch between examples</li>
-///    <li>Left/Right arrows: Cycle through Flex modes</li>
-///    <li>q: Quit</li>
-/// </ul>
+///
+/// Controls:
+///
+/// - 1-4: Switch between examples
+/// - Left/Right arrows: Cycle through Flex modes
+/// - q: Quit
+///
 public class FlexDemo {
 
     private static final Flex[] FLEX_MODES = {

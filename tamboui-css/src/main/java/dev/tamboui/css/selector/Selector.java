@@ -10,14 +10,14 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import java.util.List;
 
 /// Represents a CSS selector that matches elements.
-/// <p>
+///
 /// Selectors are used to determine which CSS rules apply to which elements.
 /// The specificity of a selector determines its priority when multiple
 /// rules match the same element.
 public interface Selector {
 
     /// Returns the specificity of this selector.
-    /// <p>
+    ///
     /// Specificity is used for cascade resolution: higher specificity wins.
     /// The value is computed as: (id * 100) + (class/pseudo * 10) + type
     ///

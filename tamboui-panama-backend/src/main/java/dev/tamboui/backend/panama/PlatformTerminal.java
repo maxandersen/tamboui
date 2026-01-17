@@ -10,13 +10,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /// Platform-independent terminal operations interface.
-/// <p>
+///
 /// This interface abstracts the low-level terminal operations that differ
 /// between Unix (Linux/macOS) and Windows platforms.
 public interface PlatformTerminal extends AutoCloseable {
 
     /// Enables raw mode on the terminal.
-    /// <p>
+    ///
     /// Raw mode disables line buffering, echo, and special character processing,
     /// allowing direct character-by-character input.
     ///
@@ -55,7 +55,7 @@ public interface PlatformTerminal extends AutoCloseable {
     void write(byte[] data) throws IOException;
 
     /// Writes a portion of a byte array to the terminal.
-    /// <p>
+    ///
     /// This method allows writing from a reusable buffer without
     /// creating intermediate byte array copies.
     ///

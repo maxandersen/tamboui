@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /// Factory for creating {@link Backend} instances using the {@link ServiceLoader} mechanism.
-/// <p>
+///
 /// This factory discovers {@link BackendProvider} implementations on the classpath
 /// and uses them to create backend instances. When multiple providers are available,
 /// they are tried in order until one successfully creates a backend.
-/// <p>
+///
 /// The provider order can be explicitly controlled via a comma-separated list
 /// (e.g., "panama,jline") in the system property or environment variable.
 ///
@@ -31,22 +31,22 @@ public final class BackendFactory {
     }
 
     /// Creates a new backend instance using the discovered provider.
-    /// <p>
+    ///
     /// This method discovers {@link BackendProvider} implementations on the classpath
     /// and selects one based on the following priority:
-    /// <ol>
-    ///    <li>System property {@code tamboui.backend} (if set)</li>
-    ///    <li>Environment variable {@code TAMBOUI_BACKEND} (if set)</li>
-    ///    <li>Auto-discovery via ServiceLoader</li>
-    /// </ol>
-    /// <p>
+    ///
+    /// 1. System property {@code tamboui.backend} (if set)
+    /// 1. Environment variable {@code TAMBOUI_BACKEND} (if set)
+    /// 1. Auto-discovery via ServiceLoader
+    ///
+    ///
     /// The provider can be specified by:
-    /// <ul>
-    ///    <li>Simple name (e.g., "jline", "panama") - matches the provider's {@link BackendProvider#name()}</li>
-    ///    <li>Fully qualified class name (e.g., "dev.tamboui.backend.jline.JLineBackendProvider")</li>
-    ///    <li>Comma-separated list (e.g., "panama,jline") - tries each in order until one succeeds</li>
-    /// </ul>
-    /// <p>
+    ///
+    /// - Simple name (e.g., "jline", "panama") - matches the provider's {@link BackendProvider#name()}
+    /// - Fully qualified class name (e.g., "dev.tamboui.backend.jline.JLineBackendProvider")
+    /// - Comma-separated list (e.g., "panama,jline") - tries each in order until one succeeds
+    ///
+    ///
     /// Providers are tried in order until one successfully creates a backend. If a provider
     /// fails (throws an exception), the next provider is attempted. This applies both to
     /// explicitly specified providers and auto-discovered ones.

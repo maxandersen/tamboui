@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-css:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
@@ -40,24 +40,24 @@ import java.util.Optional;
 import java.util.Set;
 
 /// CSS Demo showing how to use CSS styling WITHOUT the toolkit module.
-/// <p>
+///
 /// This demo demonstrates:
-/// <ul>
-///    <li>Using Backend/Terminal directly for the event loop</li>
-///    <li>Using widgets (Paragraph, Block, ListWidget) directly</li>
-///    <li>Loading and applying CSS with StyleEngine</li>
-///    <li>Creating Styleable implementations for elements</li>
-///    <li>Live theme switching</li>
-///    <li>CSS-aware widgets that resolve properties automatically</li>
-/// </ul>
-/// <p>
+///
+/// - Using Backend/Terminal directly for the event loop
+/// - Using widgets (Paragraph, Block, ListWidget) directly
+/// - Loading and applying CSS with StyleEngine
+/// - Creating Styleable implementations for elements
+/// - Live theme switching
+/// - CSS-aware widgets that resolve properties automatically
+///
+///
 /// Controls:
-/// <ul>
-///    <li>t - Toggle between dark and light themes</li>
-///    <li>Tab - Switch focus between panels</li>
-///    <li>Up/Down or j/k - Navigate the list</li>
-///    <li>q or Ctrl+C - Quit</li>
-/// </ul>
+///
+/// - t - Toggle between dark and light themes
+/// - Tab - Switch focus between panels
+/// - Up/Down or j/k - Navigate the list
+/// - q or Ctrl+C - Quit
+///
 public class CssNoToolkitDemo {
 
     private boolean running = true;

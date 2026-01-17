@@ -24,14 +24,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A DSL wrapper for the Tabs widget.
-/// <p>
+///
 /// Displays a horizontal set of tabs with one selected.
-/// <pre>{@code
+/// ```java
 /// tabs("Home", "Settings", "About")
 ///      .state(tabsState)
 ///      .highlightColor(Color.YELLOW)
 ///      .divider(" | ")
-/// }</pre>
+/// }
+/// ```
 public final class TabsElement extends StyledElement<TabsElement> {
 
     private static final Style DEFAULT_HIGHLIGHT_STYLE = Style.EMPTY.reversed();

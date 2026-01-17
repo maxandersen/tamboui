@@ -11,7 +11,7 @@ import dev.tamboui.tui.bindings.BindingSets;
 import java.io.IOException;
 
 /// Parses raw terminal input into typed {@link Event} objects.
-/// <p>
+///
 /// Handles escape sequences for arrow keys, function keys, navigation keys,
 /// and mouse events (SGR extended mode).
 public final class EventParser {

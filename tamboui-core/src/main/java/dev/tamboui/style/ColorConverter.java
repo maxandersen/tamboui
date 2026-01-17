@@ -11,23 +11,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /// Converts string color values to TamboUI Color objects.
-/// <p>
+///
 /// Supported formats:
-/// <ul>
-///    <li>Named colors: red, green, blue, etc.</li>
-///    <li>Hex colors: #RGB, #RRGGBB</li>
-///    <li>RGB function: rgb(r, g, b)</li>
-///    <li>Indexed colors: indexed(0-255)</li>
-/// </ul>
-/// <p>
+///
+/// - Named colors: red, green, blue, etc.
+/// - Hex colors: #RGB, #RRGGBB
+/// - RGB function: rgb(r, g, b)
+/// - Indexed colors: indexed(0-255)
+///
+///
 /// Example usage:
-/// <pre>{@code
+/// ```java
 /// // Standalone usage
 /// Optional<Color> color = ColorConverter.INSTANCE.convert("#FF0000");
 ///
 /// // With PropertyKey
 /// PropertyKey<Color> BORDER_COLOR = PropertyKey.of("border-color", ColorConverter.INSTANCE);
-/// }</pre>
+/// }
+/// ```
 public final class ColorConverter implements PropertyConverter<Color> {
 
     /// Singleton instance of the color converter.

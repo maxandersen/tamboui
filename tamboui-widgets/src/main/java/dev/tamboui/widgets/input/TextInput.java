@@ -23,13 +23,13 @@ import dev.tamboui.widgets.block.Block;
 public final class TextInput implements StatefulWidget<TextInputState> {
 
     /// Property key for the cursor color.
-    /// <p>
+    ///
     /// CSS property name: {@code cursor-color}
     public static final PropertyKey<Color> CURSOR_COLOR =
             PropertyKey.of("cursor-color", ColorConverter.INSTANCE);
 
     /// Property key for the placeholder text color.
-    /// <p>
+    ///
     /// CSS property name: {@code placeholder-color}
     public static final PropertyKey<Color> PLACEHOLDER_COLOR =
             PropertyKey.of("placeholder-color", ColorConverter.INSTANCE);
@@ -200,7 +200,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code color}, {@code background},
         /// {@code cursor-color}, and {@code placeholder-color} will be
         /// resolved if not set programmatically.
@@ -213,7 +213,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -224,7 +224,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
 
         /// Sets the foreground (text) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the foreground color
@@ -235,7 +235,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
 
         /// Sets the cursor color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the cursor color
@@ -246,7 +246,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
 
         /// Sets the placeholder text color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the placeholder color

@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// Demo TUI application showcasing the List widget.
-/// <p>
+///
 /// Demonstrates various List features:
 /// - Basic list with selection
 /// - Highlight styles and symbols

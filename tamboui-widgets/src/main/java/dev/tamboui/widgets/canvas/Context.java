@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// The drawing context for a {@link Canvas}.
-/// <p>
+///
 /// Maintains the painting state during canvas operations, including
 /// the grid of points, text labels, and layer management.
-/// <p>
+///
 /// Applications typically don't create Context instances directly.
 /// Instead, the Canvas widget creates and passes a Context to the
 /// paint callback.
@@ -91,7 +91,7 @@ public class Context {
     }
 
     /// Prints text at the specified canvas coordinates.
-    /// <p>
+    ///
     /// Text is rendered on top of shapes and is not affected by layering.
     ///
     /// @param x    the x coordinate in canvas space
@@ -120,7 +120,7 @@ public class Context {
     }
 
     /// Saves the current grid as a layer and resets for subsequent drawing.
-    /// <p>
+    ///
     /// Layers are composited from bottom to top when rendering.
     public void layer() {
         layers.add(grid);

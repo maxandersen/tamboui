@@ -4,7 +4,7 @@
  */
 
 /// TamboUI annotation processor module.
-/// <p>
+///
 /// This module provides annotation processors for the TamboUI framework,
 /// generating code for declarative action handling with {@code @OnAction}.
 module dev.tamboui.processor {

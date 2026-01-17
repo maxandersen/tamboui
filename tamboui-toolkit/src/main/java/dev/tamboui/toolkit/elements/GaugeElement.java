@@ -17,14 +17,15 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.gauge.Gauge;
 
 /// A DSL wrapper for the Gauge widget.
-/// <p>
+///
 /// Displays a progress bar filled according to the progress value.
-/// <pre>{@code
+/// ```java
 /// gauge(0.75)
 ///      .label("75% complete")
 ///      .gaugeColor(Color.GREEN)
 ///      .title("Progress")
-/// }</pre>
+/// }
+/// ```
 public final class GaugeElement extends StyledElement<GaugeElement> {
 
     private double ratio = 0.0;

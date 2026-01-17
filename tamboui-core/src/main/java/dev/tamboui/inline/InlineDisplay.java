@@ -19,21 +19,23 @@ import java.io.PrintWriter;
 import java.util.function.BiConsumer;
 
 /// Manages a fixed-height inline display area for Gradle/NPM-style progress UX.
-/// <p>
+///
 /// InlineDisplay reserves a number of lines at the current cursor position and
 /// allows rendering widgets to that area. Content can be printed above the display
 /// area using {@link #println(String)}, which scrolls output while the status area
 /// stays in place.
 ///
-/// <p>Unlike full TUI runners, InlineDisplay does NOT:
-/// <ul>
-///    <li>Enter alternate screen mode</li>
-///    <li>Hide the cursor</li>
-///    <li>Capture the entire terminal</li>
-/// </ul>
 ///
-/// <p>Example usage:
-/// <pre>{@code
+/// Unlike full TUI runners, InlineDisplay does NOT:
+///
+/// - Enter alternate screen mode
+/// - Hide the cursor
+/// - Capture the entire terminal
+///
+///
+///
+/// Example usage:
+/// ```java
 /// try (InlineDisplay display = InlineDisplay.create(3)) {
 ///      for (int i = 0; i <= 100; i += 10) {
 ///          display.render((area, buffer) -> {
@@ -43,7 +45,8 @@ import java.util.function.BiConsumer;
 ///          Thread.sleep(100);
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Buffer#toAnsiString()
 public final class InlineDisplay implements AutoCloseable {

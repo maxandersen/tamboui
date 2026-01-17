@@ -8,12 +8,12 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.tui.TuiConfig;
 
 /// Base class for DSL-based TUI applications.
-/// <p>
+///
 /// Extend this class to create a TUI application. State is managed
 /// through instance fields, and events are handled by elements via
 /// their {@code onKeyEvent()} and {@code onMouseEvent()} handlers.
 ///
-/// <pre>{@code
+/// ```java
 /// import static toolkit.dev.tamboui.Toolkit.*;
 ///
 /// public class CounterApp extends ToolkitApp {
@@ -45,7 +45,8 @@ import dev.tamboui.tui.TuiConfig;
 ///          new CounterApp().run();
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 public abstract class ToolkitApp {
 
     private ToolkitRunner runner;
@@ -60,7 +61,7 @@ public abstract class ToolkitApp {
 
     /// Renders the application UI.
     /// Called each frame to get the current state.
-    /// <p>
+    ///
     /// Add event handlers to elements using {@code onKeyEvent()} and
     /// {@code onMouseEvent()} methods.
     ///

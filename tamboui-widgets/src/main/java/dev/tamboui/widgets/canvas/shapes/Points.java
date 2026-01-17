@@ -10,10 +10,11 @@ import dev.tamboui.widgets.canvas.Shape;
 
 /// A collection of points (scatter plot).
 ///
-/// <pre>{@code
+/// ```java
 /// double[][] coords = {{10, 20}, {30, 40}, {50, 60}};
 /// context.draw(new Points(coords, Color.YELLOW));
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Shape
 public final class Points implements Shape {

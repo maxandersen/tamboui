@@ -7,18 +7,19 @@ package dev.tamboui.widgets.table;
 import java.util.List;
 
 /// State for a {@link Table} widget.
-/// <p>
+///
 /// Tracks the currently selected row and manages scrolling offset for tables
 /// that don't fit in the display area.
 ///
-/// <pre>{@code
+/// ```java
 /// TableState state = new TableState();
 /// state.select(0); // Select first row
 ///
 /// // In event handling:
 /// state.selectNext(table.rows().size());
 /// state.selectPrevious();
-/// }</pre>
+/// }
+/// ```
 public final class TableState {
 
     private Integer selected;

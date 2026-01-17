@@ -23,19 +23,19 @@ import dev.tamboui.widgets.block.Block;
 public final class TextArea implements StatefulWidget<TextAreaState> {
 
     /// Property key for the cursor color.
-    /// <p>
+    ///
     /// CSS property name: {@code cursor-color}
     public static final PropertyKey<Color> CURSOR_COLOR =
             PropertyKey.of("cursor-color", ColorConverter.INSTANCE);
 
     /// Property key for the placeholder text color.
-    /// <p>
+    ///
     /// CSS property name: {@code placeholder-color}
     public static final PropertyKey<Color> PLACEHOLDER_COLOR =
             PropertyKey.of("placeholder-color", ColorConverter.INSTANCE);
 
     /// Property key for the line number gutter color.
-    /// <p>
+    ///
     /// CSS property name: {@code line-number-color}
     public static final PropertyKey<Color> LINE_NUMBER_COLOR =
             PropertyKey.of("line-number-color", ColorConverter.INSTANCE);
@@ -300,7 +300,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code color}, {@code background},
         /// {@code cursor-color}, {@code placeholder-color}, and {@code line-number-color}
         /// will be resolved if not set programmatically.
@@ -313,7 +313,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -324,7 +324,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
 
         /// Sets the foreground (text) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the foreground color
@@ -335,7 +335,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
 
         /// Sets the cursor color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the cursor color
@@ -346,7 +346,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
 
         /// Sets the placeholder text color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the placeholder color
@@ -357,7 +357,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
 
         /// Sets the line number gutter color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the line number color

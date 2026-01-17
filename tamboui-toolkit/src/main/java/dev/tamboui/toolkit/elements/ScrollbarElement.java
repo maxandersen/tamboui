@@ -15,14 +15,15 @@ import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 
 /// A DSL wrapper for the Scrollbar widget.
-/// <p>
+///
 /// Displays a scrollbar for scroll position indication.
-/// <pre>{@code
+/// ```java
 /// scrollbar()
 ///      .vertical()
 ///      .state(scrollbarState)
 ///      .thumbColor(Color.YELLOW)
-/// }</pre>
+/// }
+/// ```
 public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     private ScrollbarOrientation orientation = ScrollbarOrientation.VERTICAL_RIGHT;

@@ -7,7 +7,7 @@ package dev.tamboui.tui;
 import dev.tamboui.tui.event.Event;
 
 /// Functional interface for handling TUI events.
-/// <p>
+///
 /// The event handler is called for each event received by the application.
 /// Return {@code true} to trigger a redraw, or {@code false} to skip redrawing.
 ///

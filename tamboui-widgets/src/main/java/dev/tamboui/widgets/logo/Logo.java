@@ -12,24 +12,27 @@ import dev.tamboui.widget.Widget;
 
 /// A widget that renders the Tamboui logo.
 ///
-/// <p>The Tamboui logo takes up two lines of text. This may be used in an application's help or about screen to show that
+///
+/// The Tamboui logo takes up two lines of text. This may be used in an application's help or about screen to show that
 /// it is powered by Tamboui.
 ///
-/// <h2>Examples</h2>
+/// ## Examples
 ///
-/// <h3>Tiny (default, 2 lines)</h3>
+/// ### Tiny (default, 2 lines)
 ///
-/// <pre>{@code
+/// ```java
 /// Logo logo = Logo.tiny();
 /// frame.renderWidget(logo, area);
-/// }</pre>
+/// }
+/// ```
 ///
-/// <p>Renders:
 ///
-/// <pre>
+/// Renders:
+///
+/// ```java
 /// ▜▘▗▀▖▛▜▜ ▙▄▖▗▀▖▌ ▌ ▜▘
 /// ▐ ▐▀▌▌▐▐ ▙▄▘▝▄▘▝▄▘ ▟▖
-/// </pre>
+/// ```
 ///
 public final class Logo implements Widget {
 
@@ -93,10 +96,10 @@ public final class Logo implements Widget {
     public enum Size {
         /// A tiny logo (2 lines).
         ///
-        /// <pre>
+        /// ```java
         /// ▜▘▗▀▖▛▜▜ ▙▄▖▗▀▖▌ ▌ ▜▘
         /// ▐ ▐▀▌▌▐▐ ▙▄▘▝▄▘▝▄▘ ▟▖
-        /// </pre>
+        /// ```
         TINY {
             @Override
             String getText() {

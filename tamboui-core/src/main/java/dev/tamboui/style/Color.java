@@ -231,7 +231,7 @@ public interface Color {
     }
 
     /// Converts this color to RGB.
-    /// <p>
+    ///
     /// ANSI and indexed colors are converted using standard terminal color palettes.
     /// Reset colors default to white.
     ///
@@ -277,13 +277,13 @@ public interface Color {
     }
 
     /// Converts a 256-color indexed value to RGB.
-    /// <p>
+    ///
     /// The 256-color palette is:
-    /// <ul>
-    ///    <li>0-15: Standard ANSI colors</li>
-    ///    <li>16-231: 6x6x6 color cube</li>
-    ///    <li>232-255: Grayscale ramp</li>
-    /// </ul>
+    ///
+    /// - 0-15: Standard ANSI colors
+    /// - 16-231: 6x6x6 color cube
+    /// - 232-255: Grayscale ramp
+    ///
     ///
     /// @param index the palette index (0-255)
     /// @return the RGB representation

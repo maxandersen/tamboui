@@ -24,12 +24,12 @@ import java.util.EnumSet;
 import java.util.Objects;
 
 /// Terminal backend implementation using Panama FFI.
-/// <p>
+///
 /// This backend provides direct native access to terminal operations
 /// without requiring external dependencies like JLine. It uses the
 /// Java Foreign Function and Memory API (Panama FFI) to call native
 /// platform functions directly.
-/// <p>
+///
 /// Supports Unix-like systems (Linux and macOS) and Windows.
 public class PanamaBackend implements Backend {
 
@@ -41,7 +41,7 @@ public class PanamaBackend implements Backend {
     private boolean mouseEnabled;
 
     /// Creates a new Panama backend.
-    /// <p>
+    ///
     /// Automatically detects the platform and creates the appropriate
     /// terminal implementation.
     ///
@@ -328,7 +328,7 @@ public class PanamaBackend implements Backend {
     }
 
     /// Returns the underlying Unix terminal for advanced operations.
-    /// <p>
+    ///
     /// This method is only available when running on Unix-like systems.
     ///
     /// @return the Unix terminal instance, or null if running on Windows
@@ -340,7 +340,7 @@ public class PanamaBackend implements Backend {
     }
 
     /// Returns the underlying Windows terminal for advanced operations.
-    /// <p>
+    ///
     /// This method is only available when running on Windows.
     ///
     /// @return the Windows terminal instance, or null if running on Unix

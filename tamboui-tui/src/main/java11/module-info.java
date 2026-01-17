@@ -4,7 +4,7 @@
  */
 
 /// High-level TUI application framework for TamboUI.
-/// <p>
+///
 /// This module provides the TuiRunner and event handling infrastructure
 /// for building interactive terminal applications.
 module dev.tamboui.tui {

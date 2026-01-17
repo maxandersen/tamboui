@@ -10,10 +10,11 @@ import dev.tamboui.widgets.canvas.Shape;
 
 /// A circle defined by center and radius.
 ///
-/// <pre>{@code
+/// ```java
 /// // Circle centered at (50, 50) with radius 20
 /// context.draw(new Circle(50, 50, 20, Color.GREEN));
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Shape
 public final class Circle implements Shape {

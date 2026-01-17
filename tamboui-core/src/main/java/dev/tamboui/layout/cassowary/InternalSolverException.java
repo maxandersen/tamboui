@@ -6,7 +6,8 @@ package dev.tamboui.layout.cassowary;
 
 /// Thrown when an internal solver error occurs.
 ///
-/// <p>This exception indicates a bug in the solver implementation
+///
+/// This exception indicates a bug in the solver implementation
 /// and should not occur during normal operation.
 public final class InternalSolverException extends SolverException {
 

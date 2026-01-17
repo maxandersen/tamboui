@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.Objects;
 
 /// A pseudo-class selector that matches elements in a particular state.
-/// <p>
+///
 /// Example: {@code :focus { ... }} matches focused elements.
-/// <p>
+///
 /// Supported pseudo-classes:
-/// <ul>
-///    <li>{@code :focus} - element has keyboard focus</li>
-///    <li>{@code :hover} - mouse is over element</li>
-///    <li>{@code :disabled} - element is disabled</li>
-///    <li>{@code :active} - element is being activated (clicked)</li>
-///    <li>{@code :first-child} - element is first child of parent</li>
-///    <li>{@code :last-child} - element is last child of parent</li>
-/// </ul>
+///
+/// - {@code :focus} - element has keyboard focus
+/// - {@code :hover} - mouse is over element
+/// - {@code :disabled} - element is disabled
+/// - {@code :active} - element is being activated (clicked)
+/// - {@code :first-child} - element is first child of parent
+/// - {@code :last-child} - element is last child of parent
+///
 public final class PseudoClassSelector implements Selector {
 
     private final String pseudoClass;

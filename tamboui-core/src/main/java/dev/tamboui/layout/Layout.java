@@ -15,12 +15,14 @@ import java.util.List;
 /// A layout defines how to split a rectangular area into smaller areas
 /// based on constraints.
 ///
-/// <p>The layout uses a Cassowary constraint solver to compute sizes based on
+///
+/// The layout uses a Cassowary constraint solver to compute sizes based on
 /// the provided constraints, then positions the resulting rectangles according
 /// to the {@link Flex} mode.
 ///
-/// <p>Example usage:
-/// <pre>
+///
+/// Example usage:
+/// ```java
 /// Layout layout = Layout.horizontal()
 ///      .constraints(
 ///          Constraint.length(20),
@@ -30,7 +32,7 @@ import java.util.List;
 ///      .flex(Flex.CENTER);
 ///
 /// List&lt;Rect&gt; areas = layout.split(new Rect(0, 0, 100, 50));
-/// </pre>
+/// ```
 ///
 /// @see Constraint
 /// @see Flex
@@ -144,7 +146,8 @@ public final class Layout {
 
     /// Split the given area according to this layout's constraints.
     ///
-    /// <p>The method uses the Cassowary constraint solver to compute optimal sizes
+    ///
+    /// The method uses the Cassowary constraint solver to compute optimal sizes
     /// based on the provided constraints, then positions the resulting rectangles
     /// according to the {@link Flex} mode.
     ///
@@ -198,12 +201,13 @@ public final class Layout {
 
     /// Computes the gaps for flex positioning.
     ///
-    /// <p>Returns an array where:
-    /// <ul>
-    ///    <li>gaps[0] is the gap before the first element</li>
-    ///    <li>gaps[1..n-1] are the gaps between elements (added to spacing)</li>
-    ///    <li>gaps[n] is the gap after the last element (not used in positioning)</li>
-    /// </ul>
+    ///
+    /// Returns an array where:
+    ///
+    /// - gaps[0] is the gap before the first element
+    /// - gaps[1..n-1] are the gaps between elements (added to spacing)
+    /// - gaps[n] is the gap after the last element (not used in positioning)
+    ///
     ///
     /// @param count          number of elements
     /// @param remainingSpace space available for distribution

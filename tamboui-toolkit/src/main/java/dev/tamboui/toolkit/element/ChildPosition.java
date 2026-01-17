@@ -5,19 +5,20 @@
 package dev.tamboui.toolkit.element;
 
 /// Represents the position of a child element within its parent.
-/// <p>
+///
 /// This is used with {@link RenderContext#childStyle(String, ChildPosition)} to enable
 /// CSS pseudo-class matching based on position, such as {@code :first-child},
 /// {@code :last-child}, and {@code :nth-child(even/odd)}.
-/// <p>
+///
 /// Example usage:
-/// <pre>{@code
+/// ```java
 /// for (int i = 0; i < rows.size(); i++) {
 ///      ChildPosition pos = ChildPosition.of(i, rows.size());
 ///      Style rowStyle = context.childStyle("row", pos);
 ///      // CSS can now match :first-child, :last-child, :nth-child(even), etc.
 /// }
-/// }</pre>
+/// }
+/// ```
 public final class ChildPosition {
 
     private final int index;

@@ -9,17 +9,17 @@ import dev.tamboui.style.Modifier;
 import java.util.*;
 
 /// Converts CSS text-style values to TamboUI Modifier sets.
-/// <p>
+///
 /// Supported values:
-/// <ul>
-///    <li>bold</li>
-///    <li>dim</li>
-///    <li>italic</li>
-///    <li>underlined / underline</li>
-///    <li>reversed / reverse</li>
-///    <li>crossed-out / strikethrough</li>
-///    <li>hidden</li>
-/// </ul>
+///
+/// - bold
+/// - dim
+/// - italic
+/// - underlined / underline
+/// - reversed / reverse
+/// - crossed-out / strikethrough
+/// - hidden
+///
 /// Multiple values can be space-separated: "bold italic underlined"
 public final class ModifierConverter implements PropertyConverter<Set<Modifier>> {
 

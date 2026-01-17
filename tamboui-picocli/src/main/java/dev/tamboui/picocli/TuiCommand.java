@@ -11,11 +11,11 @@ import picocli.CommandLine.Mixin;
 import java.util.concurrent.Callable;
 
 /// Base class for PicoCLI commands that run TUI applications.
-/// <p>
+///
 /// Extend this class to create a TUI application with CLI argument parsing.
 /// The class handles terminal setup and teardown automatically.
 ///
-/// <pre>{@code
+/// ```java
 /// @Command(name = "myapp", description = "My TUI Application")
 /// public class MyApp extends TuiCommand {
 ///
@@ -36,7 +36,8 @@ import java.util.concurrent.Callable;
 ///          System.exit(new CommandLine(new MyApp()).execute(args));
 ///      }
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see TuiMixin
 /// @see TuiRunner
@@ -46,7 +47,7 @@ public abstract class TuiCommand implements Callable<Integer> {
     private final TuiMixin tuiOptions = new TuiMixin();
 
     /// Runs the TUI application.
-    /// <p>
+    ///
     /// Override this method to implement your TUI logic. The TuiRunner
     /// is already created and configured based on CLI options.
     ///
@@ -55,7 +56,7 @@ public abstract class TuiCommand implements Callable<Integer> {
     protected abstract void runTui(TuiRunner runner) throws Exception;
 
     /// Creates the TuiConfig for this command.
-    /// <p>
+    ///
     /// Override this method to customize the configuration beyond what
     /// the CLI options provide.
     ///
@@ -78,7 +79,7 @@ public abstract class TuiCommand implements Callable<Integer> {
     }
 
     /// Returns the TUI options mixin.
-    /// <p>
+    ///
     /// This can be used to access the parsed TUI-related CLI options.
     ///
     /// @return the TUI options

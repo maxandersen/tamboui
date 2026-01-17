@@ -13,13 +13,14 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.widgets.gauge.LineGauge;
 
 /// A DSL wrapper for the LineGauge widget.
-/// <p>
+///
 /// A compact single-line progress indicator.
-/// <pre>{@code
+/// ```java
 /// lineGauge(0.75)
 ///      .label("Progress: ")
 ///      .filledColor(Color.GREEN)
-/// }</pre>
+/// }
+/// ```
 public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     private double ratio = 0.0;

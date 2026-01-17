@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 /// A dataset to be plotted in a {@link Chart}.
-/// <p>
+///
 /// Contains data points (x, y coordinates) and rendering configuration.
 ///
-/// <pre>{@code
+/// ```java
 /// Dataset dataset = Dataset.builder()
 ///      .name("Temperature")
 ///      .data(new double[][] {{0, 20}, {1, 22}, {2, 25}, {3, 23}})
@@ -23,7 +23,8 @@ import java.util.Optional;
 ///      .marker(Dataset.Marker.BRAILLE)
 ///      .style(Style.EMPTY.fg(Color.RED))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class Dataset {
 
     /// Marker symbols for data points.

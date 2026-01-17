@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A row in a {@link Table}.
-/// <p>
+///
 /// A row is a collection of {@link Cell}s with optional styling and height configuration.
 ///
-/// <pre>{@code
+/// ```java
 /// // Simple row
 /// Row.from(Cell.from("Name"), Cell.from("Age"))
 ///
@@ -27,7 +27,8 @@ import java.util.List;
 ///
 /// // Row with custom height
 /// Row.from("Tall", "Row").height(3)
-/// }</pre>
+/// }
+/// ```
 public final class Row {
 
     private final List<Cell> cells;

@@ -10,11 +10,11 @@ import dev.tamboui.layout.Rect;
 import java.io.OutputStream;
 
 /// Interface for widgets that can render using raw terminal output.
-/// <p>
+///
 /// Widgets implementing this interface can use native terminal protocols
 /// (such as Sixel, Kitty, or iTerm2) that require sending escape sequences
 /// directly to the terminal output stream.
-/// <p>
+///
 /// When a widget implements both {@link Widget} and {@code RawOutputCapable},
 /// the frame will call {@link #render(Rect, Buffer, OutputStream)} instead of
 /// the standard {@link Widget#render(Rect, Buffer)} method.
@@ -27,6 +27,6 @@ public interface RawOutputCapable {
     /// @param area      the area to render within
     /// @param buffer    the buffer for character-based rendering
     /// @param rawOutput the output stream for native protocol escape sequences,
-    ///                   may be {@code null} if raw output is not available
+    /// may be {@code null} if raw output is not available
     void render(Rect area, Buffer buffer, OutputStream rawOutput);
 }

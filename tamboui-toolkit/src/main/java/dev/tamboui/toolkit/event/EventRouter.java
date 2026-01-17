@@ -19,15 +19,15 @@ import java.util.IdentityHashMap;
 import java.util.List;
 
 /// Routes events to elements based on focus and position.
-/// <p>
+///
 /// Events are routed as follows:
-/// <ul>
-///    <li>Key events go to the focused element</li>
-///    <li>Mouse events go to the element at the mouse position</li>
-///    <li>Tab/Shift+Tab navigate focus</li>
-///    <li>Drag events are tracked and routed to the dragged element</li>
-/// </ul>
-/// <p>
+///
+/// - Key events go to the focused element
+/// - Mouse events go to the element at the mouse position
+/// - Tab/Shift+Tab navigate focus
+/// - Drag events are tracked and routed to the dragged element
+///
+///
 /// Events can be consumed by handlers to stop propagation.
 public final class EventRouter {
 
@@ -55,7 +55,7 @@ public final class EventRouter {
     }
 
     /// Adds an action handler as a global event handler.
-    /// <p>
+    ///
     /// This is a convenience method that wraps the action handler.
     /// Events are dispatched to the action handler before reaching elements.
     ///
@@ -94,7 +94,7 @@ public final class EventRouter {
     }
 
     /// Routes an event to the appropriate element(s).
-    /// <p>
+    ///
     /// For key events, the focused element is given first chance to handle the event.
     /// This allows text inputs to consume character keys before global handlers see them.
     /// Global handlers are called after element routing if the event wasn't handled.

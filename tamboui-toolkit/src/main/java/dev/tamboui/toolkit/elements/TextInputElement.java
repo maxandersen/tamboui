@@ -23,15 +23,16 @@ import dev.tamboui.widgets.input.TextInputState;
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
 /// A DSL wrapper for the TextInput widget.
-/// <p>
+///
 /// A single-line text input field. This element is always focusable to receive
 /// keyboard input for text editing.
-/// <pre>{@code
+/// ```java
 /// textInput(inputState)
 ///      .placeholder("Enter name...")
 ///      .title("Name")
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class TextInputElement extends StyledElement<TextInputElement> {
 
     private TextInputState state;
@@ -130,7 +131,7 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     }
 
     /// Handles a key event for text input.
-    /// <p>
+    ///
     /// Handles: character input, backspace, delete, left/right arrows, home/end.
     /// Only processes events when focused.
     ///

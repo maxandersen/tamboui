@@ -7,7 +7,7 @@ package dev.tamboui.css.model;
 import java.util.*;
 
 /// Represents a parsed CSS stylesheet.
-/// <p>
+///
 /// Contains CSS variables and rules that can be applied to elements.
 public final class Stylesheet {
 
@@ -67,7 +67,7 @@ public final class Stylesheet {
     }
 
     /// Merges another stylesheet into this one.
-    /// <p>
+    ///
     /// Variables from the other stylesheet override this one's variables.
     /// Rules from the other stylesheet are appended after this one's rules.
     ///

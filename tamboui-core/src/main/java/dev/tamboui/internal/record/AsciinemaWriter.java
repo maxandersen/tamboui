@@ -11,11 +11,12 @@ import java.util.Locale;
 /// Writes Asciinema v2 cast format (newline-delimited JSON).
 /// This is an internal API and not part of the public contract.
 ///
-/// <p>The asciicast v2 format consists of:
-/// <ul>
-///    <li>Line 1: JSON header with version, width, height, and optional metadata</li>
-///    <li>Following lines: Event arrays [time, event_type, data]</li>
-/// </ul>
+///
+/// The asciicast v2 format consists of:
+///
+/// - Line 1: JSON header with version, width, height, and optional metadata
+/// - Following lines: Event arrays [time, event_type, data]
+///
 ///
 /// @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
 final class AsciinemaWriter {

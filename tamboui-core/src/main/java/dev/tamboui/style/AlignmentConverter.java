@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 
 /// Converts string values to {@link Alignment} enum values.
-/// <p>
+///
 /// Supported values (case-insensitive):
-/// <ul>
-///    <li>{@code left} - left alignment</li>
-///    <li>{@code center} - center alignment</li>
-///    <li>{@code right} - right alignment</li>
-/// </ul>
+///
+/// - {@code left} - left alignment
+/// - {@code center} - center alignment
+/// - {@code right} - right alignment
+///
 public final class AlignmentConverter implements PropertyConverter<Alignment> {
 
     /// Singleton instance of the alignment converter.

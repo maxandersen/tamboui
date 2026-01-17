@@ -20,15 +20,16 @@ import dev.tamboui.widgets.input.TextArea;
 import dev.tamboui.widgets.input.TextAreaState;
 
 /// A DSL wrapper for the TextArea widget.
-/// <p>
+///
 /// A multi-line text input field with scrolling support.
-/// <pre>{@code
+/// ```java
 /// textArea(textState)
 ///      .placeholder("Enter text...")
 ///      .title("Description")
 ///      .showLineNumbers()
 ///      .rounded()
-/// }</pre>
+/// }
+/// ```
 public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     private TextAreaState state;
@@ -151,7 +152,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     }
 
     /// Handles a key event for text area input.
-    /// <p>
+    ///
     /// Note: The {@code focused} parameter is informational only.
     /// If the event reached this element, it should be processed.
     @Override

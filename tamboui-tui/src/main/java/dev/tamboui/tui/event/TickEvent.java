@@ -9,7 +9,7 @@ import dev.tamboui.tui.TuiConfig;
 import java.time.Duration;
 
 /// Represents an animation timer tick event.
-/// <p>
+///
 /// Tick events are generated at regular intervals when animation mode is enabled
 /// via {@link TuiConfig#tickRate()}.
 public final class TickEvent implements Event {

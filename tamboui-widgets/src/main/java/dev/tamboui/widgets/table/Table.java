@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /// A table widget for displaying data in rows and columns.
-/// <p>
+///
 /// The table supports optional header and footer rows, column width constraints,
 /// row selection with highlighting, and scrolling for large datasets.
 ///
-/// <pre>{@code
+/// ```java
 /// Table table = Table.builder()
 ///      .header(Row.from("Name", "Age", "City").style(Style.EMPTY.bold()))
 ///      .rows(List.of(
@@ -51,11 +51,12 @@ import java.util.function.BiFunction;
 ///      .build();
 ///
 /// frame.renderStatefulWidget(table, area, tableState);
-/// }</pre>
+/// }
+/// ```
 public final class Table implements StatefulWidget<TableState> {
 
     /// Property key for the row highlight (selection) color.
-    /// <p>
+    ///
     /// CSS property name: {@code highlight-color}
     public static final PropertyKey<Color> HIGHLIGHT_COLOR =
             PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
@@ -346,7 +347,7 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         /// Sets the column width constraints.
-        /// <p>
+        ///
         /// This is required - columns will have 0 width without constraints.
         public Builder widths(List<Constraint> widths) {
             this.widths = new ArrayList<>(widths);
@@ -408,7 +409,7 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code background} and {@code highlight-color}
         /// will be resolved if not set programmatically.
         ///
@@ -420,7 +421,7 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         /// Sets the background color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the background color
@@ -431,7 +432,7 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         /// Sets the row highlight (selection) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the highlight color
@@ -442,7 +443,7 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         /// Sets a function to resolve styles for each row based on position.
-        /// <p>
+        ///
         /// The function receives the row index (0-based) and total row count,
         /// and returns a Style to apply to that row. This enables positional
         /// styling like alternating row colors.

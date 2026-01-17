@@ -10,10 +10,10 @@ import dev.tamboui.text.Line;
 import java.util.Optional;
 
 /// A single bar in a {@link BarChart}.
-/// <p>
+///
 /// Each bar has a value, optional label, and optional styling.
 ///
-/// <pre>{@code
+/// ```java
 /// // Simple bar with just a value
 /// Bar bar = Bar.of(75);
 ///
@@ -27,7 +27,8 @@ import java.util.Optional;
 ///      .textValue("75%")
 ///      .style(Style.EMPTY.fg(Color.GREEN))
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 public final class Bar {
 
     private final long value;

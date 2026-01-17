@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /// A counter component demonstrating @OnAction annotations.
-/// <p>
+///
 /// No manual event wiring needed - the Component base class automatically
 /// discovers and registers @OnAction methods.
 public class CounterComponent extends Component<CounterComponent> {

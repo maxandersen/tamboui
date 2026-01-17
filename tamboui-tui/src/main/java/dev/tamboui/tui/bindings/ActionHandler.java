@@ -18,12 +18,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /// Dispatches events to registered action handlers.
-/// <p>
+///
 /// ActionHandler wraps a {@link Bindings} instance and allows registering
 /// callbacks for specific actions. When an event is dispatched, it is matched
 /// against the bindings and the corresponding handlers are invoked.
 ///
-/// <pre>{@code
+/// ```java
 /// ActionHandler handler = new ActionHandler(BindingSets.vim())
 ///      .on(Actions.QUIT, e -> runner.quit())
 ///      .on("save", this::save)
@@ -33,7 +33,8 @@ import java.util.function.Consumer;
 /// if (handler.dispatch(event)) {
 ///      return EventResult.HANDLED;
 /// }
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see Bindings
 public final class ActionHandler {
@@ -49,7 +50,7 @@ public final class ActionHandler {
     }
 
     /// Registers a handler for the specified action.
-    /// <p>
+    ///
     /// Multiple handlers can be registered for the same action; they will
     /// be invoked in registration order when the action is triggered.
     ///
@@ -62,10 +63,10 @@ public final class ActionHandler {
     }
 
     /// Registers a handler for the specified action that also receives the action name.
-    /// <p>
+    ///
     /// This is useful when the same handler is registered for multiple actions
     /// and needs to know which action triggered it.
-    /// <p>
+    ///
     /// Multiple handlers can be registered for the same action; they will
     /// be invoked in registration order when the action is triggered.
     ///
@@ -87,7 +88,7 @@ public final class ActionHandler {
     }
 
     /// Sets the bindings used for matching events to actions.
-    /// <p>
+    ///
     /// This allows changing the key bindings at runtime without
     /// re-registering handlers.
     ///
@@ -104,14 +105,14 @@ public final class ActionHandler {
     }
 
     /// Dispatches an event to registered handlers.
-    /// <p>
+    ///
     /// The event is matched against the bindings. If a matching action is found
     /// and handlers are registered for that action, all handlers are invoked
     /// in registration order.
     ///
     /// @param event the event to dispatch
     /// @return true if the event was handled (action found with registered handlers),
-    ///          false otherwise
+    /// false otherwise
     public boolean dispatch(Event event) {
         Optional<String> action = bindings.actionFor(event);
         if (action.isPresent()) {
@@ -137,7 +138,7 @@ public final class ActionHandler {
     }
 
     /// Discovers and registers action handlers from the target object.
-    /// <p>
+    ///
     /// First attempts to find generated {@link ActionHandlerRegistrar} implementations
     /// via ServiceLoader. If no registrar is found for the target's exact class,
     /// falls back to reflection-based discovery of {@code @OnAction} annotated methods.

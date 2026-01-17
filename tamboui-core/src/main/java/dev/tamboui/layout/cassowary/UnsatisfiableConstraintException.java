@@ -6,7 +6,8 @@ package dev.tamboui.layout.cassowary;
 
 /// Thrown when a required constraint cannot be satisfied.
 ///
-/// <p>This exception indicates that the constraint system is inconsistent.
+///
+/// This exception indicates that the constraint system is inconsistent.
 /// The conflicting constraint cannot be added without violating other
 /// required constraints.
 public final class UnsatisfiableConstraintException extends SolverException {

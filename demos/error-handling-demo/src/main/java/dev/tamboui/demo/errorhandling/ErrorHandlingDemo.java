@@ -21,7 +21,7 @@ import java.time.Duration;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /// Demo application showcasing TamboUI's error handling features.
-/// <p>
+///
 /// This demo demonstrates fault-tolerant rendering where individual
 /// widgets that fail to render are replaced with error placeholders
 /// while the rest of the UI continues to work normally.

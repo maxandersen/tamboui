@@ -10,7 +10,7 @@ import dev.tamboui.tui.event.KeyEvent;
 
 /// Handles keyboard events and dispatches to the FileManager.
 /// Translates key presses into controller commands.
-/// <p>
+///
 /// Note: Input dialogs (mkdir, goto) are handled by DialogElement's modal behavior.
 /// This handler only deals with confirmation dialogs and browser navigation.
 public class FileManagerKeyHandler {

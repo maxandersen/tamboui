@@ -8,22 +8,23 @@ import java.util.Objects;
 import java.util.Optional;
 
 /// Represents a hyperlink that can be attached to a Style.
-/// <p>
+///
 /// Hyperlinks use the OSC8 protocol (https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda) to create
 /// clickable links in terminal emulators that support it.
-/// <p>
+///
 /// The hyperlink consists of:
-/// <ul>
-///    <li>A URL - the target of the link (required)</li>
-///    <li>An optional ID - used to group multiple cells into a single link</li>
-/// </ul>
-/// <p>
+///
+/// - A URL - the target of the link (required)
+/// - An optional ID - used to group multiple cells into a single link
+///
+///
 /// Example usage:
-/// <pre>{@code
+/// ```java
 /// Style style = Style.create().hyperlink("https://example.com");
 /// // Or with an ID to group multiple cells:
 /// Style style = Style.create().hyperlink("https://example.com", "link1");
-/// }</pre>
+/// }
+/// ```
 public final class Hyperlink {
 
     private final String url;

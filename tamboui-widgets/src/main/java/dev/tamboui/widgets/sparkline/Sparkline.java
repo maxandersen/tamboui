@@ -18,12 +18,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /// A sparkline widget for displaying data trends in a compact form.
-/// <p>
+///
 /// Sparklines are small, word-sized graphics that show data trends.
 /// Each data point is rendered as a bar using Unicode block characters
 /// with varying heights based on the value.
 ///
-/// <pre>{@code
+/// ```java
 /// // Simple sparkline with data
 /// Sparkline sparkline = Sparkline.builder()
 ///      .data(1, 2, 3, 4, 5, 4, 3, 2, 1)
@@ -37,7 +37,8 @@ import java.util.List;
 ///      .block(Block.bordered().title(Title.from("CPU Usage")))
 ///      .barSet(Sparkline.BarSet.THREE_LEVELS)
 ///      .build();
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see RenderDirection
 /// @see BarSet
@@ -52,19 +53,19 @@ public final class Sparkline implements Widget {
     }
 
     /// Symbol set for rendering bar heights.
-    /// <p>
+    ///
     /// Contains Unicode block characters for different fill levels:
-    /// <ul>
-    ///    <li><b>empty</b> - symbol for zero/empty value</li>
-    ///    <li><b>oneEighth</b> - symbol for 1/8 fill</li>
-    ///    <li><b>oneQuarter</b> - symbol for 1/4 fill</li>
-    ///    <li><b>threeEighths</b> - symbol for 3/8 fill</li>
-    ///    <li><b>half</b> - symbol for 1/2 fill</li>
-    ///    <li><b>fiveEighths</b> - symbol for 5/8 fill</li>
-    ///    <li><b>threeQuarters</b> - symbol for 3/4 fill</li>
-    ///    <li><b>sevenEighths</b> - symbol for 7/8 fill</li>
-    ///    <li><b>full</b> - symbol for full fill</li>
-    /// </ul>
+    ///
+    /// - **empty** - symbol for zero/empty value
+    /// - **oneEighth** - symbol for 1/8 fill
+    /// - **oneQuarter** - symbol for 1/4 fill
+    /// - **threeEighths** - symbol for 3/8 fill
+    /// - **half** - symbol for 1/2 fill
+    /// - **fiveEighths** - symbol for 5/8 fill
+    /// - **threeQuarters** - symbol for 3/4 fill
+    /// - **sevenEighths** - symbol for 7/8 fill
+    /// - **full** - symbol for full fill
+    ///
     public static final class BarSet {
         private final String empty;
         private final String oneEighth;
@@ -364,7 +365,7 @@ public final class Sparkline implements Widget {
         }
 
         /// Sets the maximum value for scaling.
-        /// <p>
+        ///
         /// If not set, the maximum value in the data is used.
         public Builder max(long max) {
             this.max = max;
@@ -402,7 +403,7 @@ public final class Sparkline implements Widget {
         }
 
         /// Sets the property resolver for style-aware properties.
-        /// <p>
+        ///
         /// When set, properties like {@code color} will be resolved
         /// if not set programmatically.
         ///
@@ -414,7 +415,7 @@ public final class Sparkline implements Widget {
         }
 
         /// Sets the foreground (bar) color programmatically.
-        /// <p>
+        ///
         /// This takes precedence over values from the style resolver.
         ///
         /// @param color the foreground color

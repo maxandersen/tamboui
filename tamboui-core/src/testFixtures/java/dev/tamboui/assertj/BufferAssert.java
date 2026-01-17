@@ -11,7 +11,7 @@ import dev.tamboui.style.Style;
 import org.assertj.core.api.AbstractAssert;
 
 /// AssertJ custom assertion for {@link Buffer}.
-/// <p>
+///
 /// Provides buffer-specific assertions with detailed diff output similar to ratatui.rs.
 public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
 
@@ -20,7 +20,7 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
     }
 
     /// Asserts that the actual buffer is equal to the expected buffer.
-    /// <p>
+    ///
     /// If the buffers differ, a detailed diff is shown in the error message,
     /// displaying both buffers side-by-side with their content formatted as strings.
     ///
@@ -192,13 +192,14 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
     }
 
     /// Returns a cell assertion for the cell at the given position.
-    /// <p>
+    ///
     /// Allows fluent assertions on a specific cell:
-    /// <pre>{@code
+    /// ```java
     /// assertThat(buffer).at(2, 0)
     ///      .hasSymbol("|")
     ///      .hasBackground(Color.BLUE);
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param x the x coordinate
     /// @param y the y coordinate

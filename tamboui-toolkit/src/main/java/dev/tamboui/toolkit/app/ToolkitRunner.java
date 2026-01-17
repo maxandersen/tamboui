@@ -29,12 +29,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /// Runner for DSL applications with automatic event routing.
-/// <p>
+///
 /// Events are routed to elements based on focus and position.
 /// Elements handle their own events via handlers set with {@code onKeyEvent()}
 /// and {@code onMouseEvent()}.
 ///
-/// <pre>{@code
+/// ```java
 /// import static toolkit.dev.tamboui.Toolkit.*;
 ///
 /// try (var runner = ToolkitRunner.create()) {
@@ -56,7 +56,8 @@ import java.util.function.Supplier;
 ///          })
 ///      );
 /// }
-/// }</pre>
+/// }
+/// ```
 public final class ToolkitRunner implements AutoCloseable {
 
     private static final PrintStream NULL_OUTPUT = new PrintStream(new OutputStream() {
@@ -113,10 +114,10 @@ public final class ToolkitRunner implements AutoCloseable {
 
     /// Runs the application with the given element supplier.
     /// The supplier is called each frame to get the current UI state.
-    /// <p>
+    ///
     /// Events are routed to elements based on their handlers.
     /// Press 'q' or Ctrl+C to quit (when no element consumes the event).
-    /// <p>
+    ///
     /// If fault-tolerant rendering is enabled (via builder), individual element
     /// render failures are caught and replaced with error placeholders, allowing
     /// the rest of the UI to continue rendering.
@@ -189,16 +190,17 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /// Schedules an action to run after a delay.
-    /// <p>
+    ///
     /// The action runs on a background thread. If the action modifies shared state,
     /// ensure proper synchronization. The UI will automatically redraw on the next
     /// tick event after the action completes.
     ///
-    /// <pre>{@code
+    /// ```java
     /// runner.schedule(() -> {
     ///      message = "Delayed message!";
     /// }, Duration.ofSeconds(2));
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param action the action to run
     /// @param delay the delay before running
@@ -209,19 +211,20 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /// Schedules an action to run repeatedly at a fixed interval.
-    /// <p>
+    ///
     /// The action runs on a background thread. If the action modifies shared state,
     /// ensure proper synchronization. The UI will automatically redraw on each
     /// tick event.
     ///
-    /// <pre>{@code
+    /// ```java
     /// var repeating = runner.scheduleRepeating(() -> {
     ///      counter++;
     /// }, Duration.ofMillis(100));
     ///
     /// // Later, to stop:
     /// repeating.cancel();
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @param action the action to run
     /// @param interval the interval between runs
@@ -233,7 +236,7 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /// Schedules an action to run repeatedly with a fixed delay between runs.
-    /// <p>
+    ///
     /// Unlike {@link #scheduleRepeating}, this waits for each execution to complete
     /// before scheduling the next one. This is useful when the action's duration
     /// is unpredictable and you want consistent spacing between runs.
@@ -256,7 +259,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /// Cancels the scheduled action.
-        /// <p>
+        ///
         /// If the action is currently running, it will complete but won't
         /// run again (for repeating actions).
         public void cancel() {
@@ -269,7 +272,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /// Returns whether this action has completed.
-        /// <p>
+        ///
         /// For repeating actions, this only returns true if the action
         /// was cancelled or encountered an error.
         public boolean isDone() {
@@ -288,7 +291,7 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /// Sets the style engine for CSS styling.
-    /// <p>
+    ///
     /// When set, elements will have their CSS styles resolved during rendering.
     ///
     /// @param styleEngine the style engine to use, or null to disable CSS styling
@@ -310,11 +313,11 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /// Creates a builder for configuring a ToolkitRunner.
-    /// <p>
+    ///
     /// The builder provides a fluent API for configuring bindings,
     /// style engine, and automatic registration of action handlers.
     ///
-    /// <pre>{@code
+    /// ```java
     /// try (var runner = ToolkitRunner.builder()
     ///          .bindings(BindingSets.vim())
     ///          .app(this)
@@ -323,7 +326,8 @@ public final class ToolkitRunner implements AutoCloseable {
     ///
     ///      runner.run(() -> ...);
     /// }
-    /// }</pre>
+    /// }
+    /// ```
     ///
     /// @return a new builder
     public static Builder builder() {
@@ -331,7 +335,7 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /// Builder for {@link ToolkitRunner} instances.
-    /// <p>
+    ///
     /// Provides a fluent API for configuring the toolkit application including
     /// bindings, style engine, and auto-registration of annotated action handlers.
     public static final class Builder {
@@ -347,7 +351,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /// Sets the application object containing {@code @OnAction} annotated methods.
-        /// <p>
+        ///
         /// This object will be used for automatic action handler registration
         /// when {@link #withAutoBindingRegistration()} is called.
         ///
@@ -386,7 +390,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /// Enables automatic registration of action handlers.
-        /// <p>
+        ///
         /// Discovers and registers handlers for methods annotated with
         /// {@code @OnAction} on the application object set via {@link #app(Object)}.
         ///
@@ -397,7 +401,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /// Enables or disables fault-tolerant rendering.
-        /// <p>
+        ///
         /// When enabled, individual element render failures are caught and
         /// replaced with error placeholders, allowing the rest of the UI to
         /// continue rendering. When disabled (default), render exceptions
@@ -411,7 +415,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /// Sets the output stream for error logging.
-        /// <p>
+        ///
         /// Defaults to a null output stream that discards all output.
         /// In fault-tolerant mode, errors are displayed via placeholders
         /// rather than logged to avoid flooding the terminal.

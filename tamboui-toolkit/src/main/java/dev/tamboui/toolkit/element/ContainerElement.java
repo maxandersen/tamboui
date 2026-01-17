@@ -14,16 +14,16 @@ import java.util.Arrays;
 import java.util.List;
 
 /// Base class for container elements that hold children and forward events to them.
-/// <p>
+///
 /// When a container receives an event it doesn't handle itself, it forwards the event
 /// to its children. This enables interactive elements (lists, text inputs) inside
 /// containers to receive events when their parent container is focused.
-/// <p>
+///
 /// Subclasses should:
-/// <ul>
-///    <li>Use {@link #children} to store child elements</li>
-///    <li>Override {@link #renderContent} for layout-specific rendering</li>
-/// </ul>
+///
+/// - Use {@link #children} to store child elements
+/// - Override {@link #renderContent} for layout-specific rendering
+///
 ///
 /// @param <T> the concrete container type for method chaining
 public abstract class ContainerElement<T extends ContainerElement<T>> extends StyledElement<T> {
@@ -56,7 +56,7 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
     }
 
     /// Handles key events by first trying custom handlers, then forwarding to children.
-    /// <p>
+    ///
     /// Children receive events with {@code focused=true} since they are within
     /// the focused container's subtree.
     ///
@@ -82,7 +82,7 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
     }
 
     /// Handles mouse events by first trying custom handlers, then forwarding to children.
-    /// <p>
+    ///
     /// Only forwards to children whose rendered area contains the mouse position,
     /// ensuring that mouse events are routed to the correct child in multi-panel layouts.
     ///

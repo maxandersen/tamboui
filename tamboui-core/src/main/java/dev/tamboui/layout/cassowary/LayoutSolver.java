@@ -12,14 +12,17 @@ import java.util.List;
 
 /// Bridge between TamboUI layout constraints and the Cassowary solver.
 ///
-/// <p>This class translates TamboUI's constraint types and Flex modes into
+///
+/// This class translates TamboUI's constraint types and Flex modes into
 /// Cassowary constraints and solves them using the simplex method.
 ///
-/// <p>The solver creates variables for each segment's position and size,
+///
+/// The solver creates variables for each segment's position and size,
 /// then adds constraints based on the TamboUI constraint types and the
 /// selected Flex distribution mode.
 ///
-/// <p>This implementation uses {@link Fraction} for exact arithmetic,
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
 /// avoiding the cumulative rounding errors that occur with floating-point.
 ///
 /// @see Solver
@@ -233,12 +236,14 @@ public final class LayoutSolver {
 
     /// Converts Fraction sizes to integers using the largest remainder method.
     ///
-    /// <p>This method is necessary because simple rounding (Math.round on each value)
+    ///
+    /// This method is necessary because simple rounding (Math.round on each value)
     /// can produce totals that don't match the available space. For example, with
     /// constraints [1/3, 2/3] of 100, naive rounding gives [33, 67] = 100, but
     /// [0.333..., 0.666...] might round to [33, 66] = 99, losing a pixel.
     ///
-    /// <p>The largest remainder method (also known as Hamilton's method) ensures fair
+    ///
+    /// The largest remainder method (also known as Hamilton's method) ensures fair
     /// distribution: floor all values, then give +1 to those with the largest remainders.
     ///
     /// @param fractionSizes the exact Fraction sizes from the solver

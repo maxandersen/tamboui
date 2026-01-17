@@ -17,12 +17,12 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 
 /// A widget for displaying images in the terminal.
-/// <p>
+///
 /// The Image widget automatically detects terminal capabilities and uses the best
 /// available rendering method: native protocols (Kitty, iTerm2, Sixel) when supported,
 /// or character-based fallbacks (half-blocks, Braille) for universal compatibility.
 ///
-/// <pre>{@code
+/// ```java
 /// Image image = Image.builder()
 ///      .data(ImageData.fromPath(Path.of("photo.png")))
 ///      .scaling(ImageScaling.FIT)
@@ -30,7 +30,8 @@ import java.nio.file.Path;
 ///      .build();
 ///
 /// frame.renderWidget(image, area);
-/// }</pre>
+/// }
+/// ```
 ///
 /// @see ImageData
 /// @see ImageScaling
@@ -90,7 +91,7 @@ public final class Image implements Widget, RawOutputCapable {
     }
 
     /// Renders the image to the given area with optional raw output support.
-    /// <p>
+    ///
     /// For native protocols (Sixel, Kitty, iTerm2), the rawOutput stream must be provided.
     /// If rawOutput is null and the protocol requires it, the image will not be rendered.
     ///
@@ -238,7 +239,7 @@ public final class Image implements Widget, RawOutputCapable {
         }
 
         /// Sets a specific protocol for rendering.
-        /// <p>
+        ///
         /// By default, the best available protocol is auto-detected.
         ///
         /// @param protocol the protocol to use

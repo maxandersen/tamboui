@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -31,16 +31,16 @@ import dev.tamboui.widgets.wavetext.WaveTextState;
 import java.io.IOException;
 
 /// Demo TUI application showcasing the WaveText widget.
-/// <p>
+///
 /// Demonstrates various configuration options:
-/// <ul>
-///    <li>Default mode (dark shadow on bright text)</li>
-///    <li>Inverted mode (bright peak on dim text)</li>
-///    <li>Different speeds</li>
-///    <li>Different peak widths</li>
-///    <li>Multiple peaks</li>
-///    <li>Loop vs oscillate modes</li>
-/// </ul>
+///
+/// - Default mode (dark shadow on bright text)
+/// - Inverted mode (bright peak on dim text)
+/// - Different speeds
+/// - Different peak widths
+/// - Multiple peaks
+/// - Loop vs oscillate modes
+///
 public class WaveTextDemo {
 
     private static final Color CYAN = Color.rgb(0, 180, 216);

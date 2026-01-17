@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -32,7 +32,7 @@ import dev.tamboui.widgets.text.Overflow;
 import java.io.IOException;
 
 /// Demo TUI application showcasing the Paragraph widget.
-/// <p>
+///
 /// Demonstrates various Paragraph features:
 /// - Text alignment (left, center, right)
 /// - Text wrapping (word, character)

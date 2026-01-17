@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 /// Default implementation of {@link Bindings} using a HashMap of actions to triggers.
-/// <p>
+///
 /// Instances are immutable; use {@link #toBuilder()} to create modified versions.
 public final class DefaultBindings implements Bindings {
 

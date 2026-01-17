@@ -8,17 +8,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 /// A typed key for a style property, bundling the property name with its converter.
-/// <p>
+///
 /// PropertyKeys are typically defined as constants in widgets or style utility classes:
-/// <pre>{@code
+/// ```java
 /// public static final PropertyKey<Color> BORDER_COLOR =
 ///      PropertyKey.of("border-color", ColorConverter.INSTANCE);
-/// }</pre>
-/// <p>
+/// }
+/// ```
+///
 /// They can then be used with {@link StylePropertyResolver} to retrieve typed values:
-/// <pre>{@code
+/// ```java
 /// Color color = resolver.get(BORDER_COLOR).orElse(Color.WHITE);
-/// }</pre>
+/// }
+/// ```
 ///
 /// @param <T> the type of value this property key represents
 public final class PropertyKey<T> {

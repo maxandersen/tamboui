@@ -51,7 +51,7 @@ public final class TuiConfig {
     }
 
     /// Returns the default configuration.
-    /// <p>
+    ///
     /// By default, tick events are generated every 100ms to ensure periodic UI refresh.
     /// Use {@link Builder#noTick()} to disable automatic ticking.
     public static TuiConfig defaults() {
@@ -139,7 +139,7 @@ public final class TuiConfig {
     }
 
     /// Returns the output stream for error logging.
-    /// <p>
+    ///
     /// This stream is used to log fatal errors when the TUI has captured
     /// standard streams and stack traces would otherwise be invisible.
     ///
@@ -274,7 +274,7 @@ public final class TuiConfig {
         }
 
         /// Disables automatic tick events.
-        /// <p>
+        ///
         /// Use this for purely event-driven UIs that only need to refresh on user input.
         ///
         /// @return this builder
@@ -284,15 +284,15 @@ public final class TuiConfig {
         }
 
         /// Sets the bindings for semantic action matching.
-        /// <p>
+        ///
         /// Use predefined binding sets from {@link BindingSets}:
-        /// <ul>
-        ///    <li>{@link BindingSets#standard()} - Arrow keys only (default)</li>
-        ///    <li>{@link BindingSets#vim()} - Vim-style navigation (hjkl)</li>
-        ///    <li>{@link BindingSets#emacs()} - Emacs-style navigation (Ctrl+n/p/f/b)</li>
-        ///    <li>{@link BindingSets#intellij()} - IntelliJ IDEA-style</li>
-        ///    <li>{@link BindingSets#vscode()} - VS Code-style</li>
-        /// </ul>
+        ///
+        /// - {@link BindingSets#standard()} - Arrow keys only (default)
+        /// - {@link BindingSets#vim()} - Vim-style navigation (hjkl)
+        /// - {@link BindingSets#emacs()} - Emacs-style navigation (Ctrl+n/p/f/b)
+        /// - {@link BindingSets#intellij()} - IntelliJ IDEA-style
+        /// - {@link BindingSets#vscode()} - VS Code-style
+        ///
         ///
         /// @param bindings the bindings to use
         /// @return this builder
@@ -302,7 +302,7 @@ public final class TuiConfig {
         }
 
         /// Sets the error handler for render errors.
-        /// <p>
+        ///
         /// The handler is invoked when an exception occurs during rendering.
         /// Use factory methods from {@link RenderErrorHandlers} for common behaviors.
         ///
@@ -315,7 +315,7 @@ public final class TuiConfig {
         }
 
         /// Sets the output stream for error logging.
-        /// <p>
+        ///
         /// This stream is used to log fatal errors when the TUI has captured
         /// standard streams. Defaults to {@code System.err}.
         ///

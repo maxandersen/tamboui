@@ -15,27 +15,28 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /// Detects and caches terminal image capabilities.
-/// <p>
+///
 /// Detection is performed using environment variables to identify the terminal emulator.
 /// This approach is fast (no I/O) and works in most cases.
 ///
-/// <pre>{@code
+/// ```java
 /// TerminalImageCapabilities caps = TerminalImageCapabilities.detect();
 /// ImageProtocol protocol = caps.bestProtocol();
-/// }</pre>
+/// }
+/// ```
 ///
-/// <h2>Terminal Detection</h2>
+/// ## Terminal Detection
 /// <table>
-///    <caption>Environment variable to protocol mapping</caption>
-///    <tr><th>Environment</th><th>Protocol</th></tr>
-///    <tr><td>KITTY_WINDOW_ID</td><td>Kitty</td></tr>
-///    <tr><td>TERM=xterm-kitty</td><td>Kitty</td></tr>
-///    <tr><td>TERM=xterm-ghostty</td><td>Kitty</td></tr>
-///    <tr><td>WEZTERM_PANE</td><td>Kitty</td></tr>
-///    <tr><td>ITERM_SESSION_ID</td><td>iTerm2</td></tr>
-///    <tr><td>TERM=rio</td><td>iTerm2, Sixel</td></tr>
-///    <tr><td>KONSOLE_VERSION</td><td>Sixel</td></tr>
-///    <tr><td>TERM contains mlterm</td><td>Sixel</td></tr>
+/// <caption>Environment variable to protocol mapping</caption>
+/// <tr><th>Environment</th><th>Protocol</th></tr>
+/// <tr><td>KITTY_WINDOW_ID</td><td>Kitty</td></tr>
+/// <tr><td>TERM=xterm-kitty</td><td>Kitty</td></tr>
+/// <tr><td>TERM=xterm-ghostty</td><td>Kitty</td></tr>
+/// <tr><td>WEZTERM_PANE</td><td>Kitty</td></tr>
+/// <tr><td>ITERM_SESSION_ID</td><td>iTerm2</td></tr>
+/// <tr><td>TERM=rio</td><td>iTerm2, Sixel</td></tr>
+/// <tr><td>KONSOLE_VERSION</td><td>Sixel</td></tr>
+/// <tr><td>TERM contains mlterm</td><td>Sixel</td></tr>
 /// </table>
 public final class TerminalImageCapabilities {
 
@@ -50,7 +51,7 @@ public final class TerminalImageCapabilities {
     }
 
     /// Detects terminal capabilities from the current environment.
-    /// <p>
+    ///
     /// The result is cached for subsequent calls.
     ///
     /// @return the detected capabilities
@@ -66,7 +67,7 @@ public final class TerminalImageCapabilities {
     }
 
     /// Forces re-detection of terminal capabilities.
-    /// <p>
+    ///
     /// Useful when the terminal environment may have changed.
     ///
     /// @return the newly detected capabilities
@@ -78,7 +79,7 @@ public final class TerminalImageCapabilities {
     }
 
     /// Creates capabilities with explicitly specified support.
-    /// <p>
+    ///
     /// Useful for testing or when environment detection is unreliable.
     ///
     /// @param supportedProtocols the set of supported protocols

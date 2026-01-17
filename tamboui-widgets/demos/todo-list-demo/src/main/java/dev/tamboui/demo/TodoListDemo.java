@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /// Demo TUI application showcasing a Todo List with selectable items.
-/// <p>
+///
 /// Demonstrates:
 /// - Todo items with status (Todo/Completed)
 /// - List widget with selection and navigation

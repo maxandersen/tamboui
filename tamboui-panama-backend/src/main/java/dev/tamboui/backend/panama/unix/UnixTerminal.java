@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
 /// Unix terminal operations using Panama FFI.
-/// <p>
+///
 /// This class provides higher-level terminal operations built on top of
 /// the low-level libc bindings in {@link LibC}.
 public final class UnixTerminal implements PlatformTerminal {
@@ -115,7 +115,7 @@ public final class UnixTerminal implements PlatformTerminal {
     }
 
     /// Detects the terminal charset from environment variables.
-    /// <p>
+    ///
     /// Checks LC_ALL, LC_CTYPE, and LANG in order of precedence.
     /// Falls back to UTF-8 if no encoding is detected or if the
     /// detected encoding is not supported.
@@ -173,7 +173,7 @@ public final class UnixTerminal implements PlatformTerminal {
     }
 
     /// Enables raw mode on the terminal.
-    /// <p>
+    ///
     /// Raw mode disables line buffering, echo, and signal processing,
     /// allowing direct character-by-character input.
     ///
@@ -255,7 +255,7 @@ public final class UnixTerminal implements PlatformTerminal {
     }
 
     /// Reads a single character from the terminal with timeout.
-    /// <p>
+    ///
     /// This method also checks for and dispatches pending resize events,
     /// ensuring resize handlers are called from the main event loop context
     /// rather than from signal handler context.
@@ -300,7 +300,7 @@ public final class UnixTerminal implements PlatformTerminal {
     }
 
     /// Writes a portion of a byte array to the terminal.
-    /// <p>
+    ///
     /// This method uses a reusable buffer to avoid per-call memory allocation.
     /// For large writes exceeding the buffer size, data is written in chunks.
     ///
@@ -357,11 +357,11 @@ public final class UnixTerminal implements PlatformTerminal {
     }
 
     /// Registers a handler to be called when the terminal is resized.
-    /// <p>
+    ///
     /// On Unix systems, this installs a SIGWINCH signal handler using Panama FFI.
     /// The signal handler sets a flag which is checked from the main event loop
     /// (via {@link #read(int)}), ensuring the handler is called from a safe context.
-    /// <p>
+    ///
     /// Only one handler can be registered at a time; subsequent calls
     /// will replace the previous handler.
     ///
@@ -413,7 +413,7 @@ public final class UnixTerminal implements PlatformTerminal {
     }
 
     /// Checks if a resize event is pending and dispatches it.
-    /// <p>
+    ///
     /// This should be called from the main event loop, not from signal context.
     private void checkResizePending() {
         Runnable handler = null;
