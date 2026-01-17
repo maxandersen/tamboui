@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
 
 /// Converts JavaDoc block comments to `///` Markdown line comments.
 ///
-/// It also converts common HTML tags in documentation to Markdown equivalents.
+/// It also converts common lowercase HTML tags in documentation to Markdown equivalents,
+/// preserving Java type parameters like {@code <T>} and {@code <B>}.
 ///
 /// Usage:
 ///
@@ -35,25 +36,25 @@ public final class ConvertJavadocs {
     private static final Set<String> DEFAULT_EXCLUDED_DIRS =
             new HashSet<>(Arrays.asList("build", ".gradle", "out"));
     private static final Pattern HEADING_PATTERN =
-            Pattern.compile("^<h([1-6])>(.*?)</h\\1>$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^<h([1-6])>(.*?)</h\\1>$");
     private static final Pattern PRE_START_PATTERN =
-            Pattern.compile("^<pre>\\s*(\\{@code)?\\s*$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^<pre>\\s*(\\{@code)?\\s*$");
     private static final Pattern LI_PATTERN =
-            Pattern.compile("<li>(.*?)</li>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("<li>(.*?)</li>");
     private static final Pattern BR_PATTERN =
-            Pattern.compile("<br\\s*/?>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("<br\\s*/?>");
     private static final Pattern P_OPEN_PATTERN =
-            Pattern.compile("<p>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("<p>");
     private static final Pattern P_CLOSE_PATTERN =
-            Pattern.compile("</p>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("</p>");
     private static final Pattern UL_OPEN_PATTERN =
-            Pattern.compile("<ul>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("<ul>");
     private static final Pattern UL_CLOSE_PATTERN =
-            Pattern.compile("</ul>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("</ul>");
     private static final Pattern OL_OPEN_PATTERN =
-            Pattern.compile("<ol>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("<ol>");
     private static final Pattern OL_CLOSE_PATTERN =
-            Pattern.compile("</ol>", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("</ol>");
 
     private static final String USAGE = String.join(
             "\n",
@@ -294,7 +295,7 @@ public final class ConvertJavadocs {
             }
 
             if (inFence) {
-                int endIndex = content.toLowerCase(Locale.ROOT).indexOf("</pre>");
+                int endIndex = content.indexOf("</pre>");
                 if (endIndex >= 0) {
                     String before = content.substring(0, endIndex);
                     if (!before.isEmpty()) {
@@ -332,15 +333,15 @@ public final class ConvertJavadocs {
                 continue;
             }
 
-            int inlinePre = lineTrimmed.toLowerCase(Locale.ROOT).indexOf("<pre>");
+            int inlinePre = lineTrimmed.indexOf("<pre>");
             if (inlinePre >= 0) {
                 output.add(docLine(indent, lineTrimmed.contains("{@code") ? "```java" : "```"));
                 inFence = true;
                 continue;
             }
 
-            if (lineTrimmed.toLowerCase(Locale.ROOT).contains("</pre>")) {
-                String before = lineTrimmed.replaceAll("(?i)</pre>", "").trim();
+            if (lineTrimmed.contains("</pre>")) {
+                String before = lineTrimmed.replace("</pre>", "").trim();
                 if (!before.isEmpty()) {
                     output.add(docLine(indent, before));
                 }
@@ -407,14 +408,14 @@ public final class ConvertJavadocs {
 
     private static String applyInline(String text) {
         String result = text;
-        result = result.replaceAll("(?i)<strong>", "**");
-        result = result.replaceAll("(?i)</strong>", "**");
-        result = result.replaceAll("(?i)<b>", "**");
-        result = result.replaceAll("(?i)</b>", "**");
-        result = result.replaceAll("(?i)<em>", "*");
-        result = result.replaceAll("(?i)</em>", "*");
-        result = result.replaceAll("(?i)<code>", "`");
-        result = result.replaceAll("(?i)</code>", "`");
+        result = result.replace("<strong>", "**");
+        result = result.replace("</strong>", "**");
+        result = result.replace("<b>", "**");
+        result = result.replace("</b>", "**");
+        result = result.replace("<em>", "*");
+        result = result.replace("</em>", "*");
+        result = result.replace("<code>", "`");
+        result = result.replace("</code>", "`");
         return result;
     }
 
