@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-image:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 //FILES c2023-tsuchinshan-atlas.jpg=../../../../resources/c2023-tsuchinshan-atlas.jpg
@@ -46,17 +46,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 
-/**
- * Demo TUI application showcasing image rendering capabilities.
- * <p>
- * Demonstrates:
- * <ul>
- *   <li>Terminal capability detection</li>
- *   <li>Image rendering with half-block and Braille protocols</li>
- *   <li>Scaling modes (FIT, FILL, STRETCH, NONE)</li>
- *   <li>Protocol switching via keyboard</li>
- * </ul>
- */
+/// Demo TUI application showcasing image rendering capabilities.
+///
+/// Demonstrates:
+///
+/// - Terminal capability detection
+/// - Image rendering with half-block and Braille protocols
+/// - Scaling modes (FIT, FILL, STRETCH, NONE)
+/// - Protocol switching via keyboard
+///
 public class ImageDemo {
 
     private static final String BUNDLED_IMAGE = "/c2023-tsuchinshan-atlas.jpg";
@@ -123,9 +121,7 @@ public class ImageDemo {
         }
     }
 
-    /**
-     * Returns true if the current protocol is supported by the terminal.
-     */
+    /// Returns true if the current protocol is supported by the terminal.
     private boolean isCurrentProtocolSupported() {
         return capabilities.supports(currentProtocol.protocolType());
     }

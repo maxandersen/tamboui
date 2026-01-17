@@ -29,19 +29,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/**
- * Default implementation of RenderContext with internal framework methods.
- * <p>
- * <strong>INTERNAL USE ONLY</strong> - This class is used internally by the toolkit framework.
- * User code and element implementations should only interact with the {@link RenderContext} interface.
- * <p>
- * <strong>CODE SMELL WARNING:</strong> If you find yourself casting {@code RenderContext} to
- * {@code DefaultRenderContext} in your code, this is a design problem. The only legitimate
- * user of this class's internal methods is {@link StyledElement#render}.
- * <p>
- * Methods like {@link #withElement}, {@link #registerElement}, and stack manipulation
- * are framework internals that should never be called directly from element implementations.
- */
+/// Default implementation of RenderContext with internal framework methods.
+///
+/// **INTERNAL USE ONLY** - This class is used internally by the toolkit framework.
+/// User code and element implementations should only interact with the {@link RenderContext} interface.
+///
+/// **CODE SMELL WARNING:** If you find yourself casting {@code RenderContext} to
+/// {@code DefaultRenderContext} in your code, this is a design problem. The only legitimate
+/// user of this class's internal methods is {@link StyledElement#render}.
+///
+/// Methods like {@link #withElement}, {@link #registerElement}, and stack manipulation
+/// are framework internals that should never be called directly from element implementations.
 public final class DefaultRenderContext implements RenderContext {
 
     private static final Logger LOGGER = Logger.getLogger(DefaultRenderContext.class.getName());
@@ -60,65 +58,51 @@ public final class DefaultRenderContext implements RenderContext {
         this.eventRouter = eventRouter;
     }
 
-    /**
-     * Creates an empty context for simple rendering without focus management.
-     */
+    /// Creates an empty context for simple rendering without focus management.
     public static DefaultRenderContext createEmpty() {
         FocusManager fm = new FocusManager();
         return new DefaultRenderContext(fm, new EventRouter(fm));
     }
 
-    /**
-     * Sets the style engine for CSS resolution.
-     *
-     * @param styleEngine the style engine, or null to disable CSS
-     */
+    /// Sets the style engine for CSS resolution.
+    ///
+    /// @param styleEngine the style engine, or null to disable CSS
     public void setStyleEngine(StyleEngine styleEngine) {
         this.styleEngine = styleEngine;
     }
 
-    /**
-     * Returns the style engine, if configured.
-     */
+    /// Returns the style engine, if configured.
     public Optional<StyleEngine> styleEngine() {
         return Optional.ofNullable(styleEngine);
     }
 
-    /**
-     * Sets the bindings used for action matching.
-     *
-     * @param bindings the bindings to use
-     */
+    /// Sets the bindings used for action matching.
+    ///
+    /// @param bindings the bindings to use
     public void setBindings(Bindings bindings) {
         this.bindings = bindings != null ? bindings : BindingSets.defaults();
     }
 
-    /**
-     * Returns the current bindings.
-     *
-     * @return the bindings
-     */
+    /// Returns the current bindings.
+    ///
+    /// @return the bindings
     public Bindings bindings() {
         return bindings;
     }
 
-    /**
-     * Enables or disables fault-tolerant rendering.
-     * <p>
-     * When enabled, exceptions thrown during child rendering are caught
-     * and an error placeholder is displayed instead.
-     *
-     * @param faultTolerant true to enable fault-tolerant rendering
-     */
+    /// Enables or disables fault-tolerant rendering.
+    ///
+    /// When enabled, exceptions thrown during child rendering are caught
+    /// and an error placeholder is displayed instead.
+    ///
+    /// @param faultTolerant true to enable fault-tolerant rendering
     public void setFaultTolerant(boolean faultTolerant) {
         this.faultTolerant = faultTolerant;
     }
 
-    /**
-     * Returns whether fault-tolerant rendering is enabled.
-     *
-     * @return true if fault-tolerant rendering is enabled
-     */
+    /// Returns whether fault-tolerant rendering is enabled.
+    ///
+    /// @return true if fault-tolerant rendering is enabled
     public boolean isFaultTolerant() {
         return faultTolerant;
     }
@@ -181,9 +165,7 @@ public final class DefaultRenderContext implements RenderContext {
         return resolved.hasProperties() ? Optional.of(resolved) : Optional.empty();
     }
 
-    /**
-     * A simple Styleable for resolving CSS styles by type and classes.
-     */
+    /// A simple Styleable for resolving CSS styles by type and classes.
     private static final class VirtualStyleable implements Styleable {
         private final String type;
         private final Set<String> classes;
@@ -277,9 +259,7 @@ public final class DefaultRenderContext implements RenderContext {
         return childStyle(childName, mergedState);
     }
 
-    /**
-     * A virtual Styleable representing a child element.
-     */
+    /// A virtual Styleable representing a child element.
     private static final class VirtualChild implements Styleable {
         private final String type;
         private final Styleable parent;
@@ -333,33 +313,27 @@ public final class DefaultRenderContext implements RenderContext {
     // Internal API (for framework use only)
     // ═══════════════════════════════════════════════════════════════
 
-    /**
-     * Returns the focus manager.
-     * <p>
-     * Internal use only.
-     */
+    /// Returns the focus manager.
+    ///
+    /// Internal use only.
     public FocusManager focusManager() {
         return focusManager;
     }
 
-    /**
-     * Returns the event router.
-     * <p>
-     * Internal use only.
-     */
+    /// Returns the event router.
+    ///
+    /// Internal use only.
     public EventRouter eventRouter() {
         return eventRouter;
     }
 
-    /**
-     * Registers an element for event routing and focus management.
-     * Called by container elements after rendering children.
-     * <p>
-     * Internal use only.
-     *
-     * @param element the element to register
-     * @param area the rendered area
-     */
+    /// Registers an element for event routing and focus management.
+    /// Called by container elements after rendering children.
+    ///
+    /// Internal use only.
+    ///
+    /// @param element the element to register
+    /// @param area the rendered area
     public void registerElement(Element element, Rect area) {
         eventRouter.registerElement(element, area);
         if (element.isFocusable()) {
@@ -374,37 +348,33 @@ public final class DefaultRenderContext implements RenderContext {
         }
     }
 
-    /**
-     * Executes an action with an element and style pushed onto their stacks.
-     * <p>
-     * The style is merged with the current style. Both the element and merged style
-     * are available via {@link #currentElement()} and {@link #currentStyle()}.
-     * This enables {@link #childStyle(String)} to work without passing the parent.
-     * <p>
-     * Internal use only - called by StyledElement.render().
-     *
-     * @param element the element being rendered
-     * @param style the element's resolved style
-     * @param action the action to execute
-     */
+    /// Executes an action with an element and style pushed onto their stacks.
+    ///
+    /// The style is merged with the current style. Both the element and merged style
+    /// are available via {@link #currentElement()} and {@link #currentStyle()}.
+    /// This enables {@link #childStyle(String)} to work without passing the parent.
+    ///
+    /// Internal use only - called by StyledElement.render().
+    ///
+    /// @param element the element being rendered
+    /// @param style the element's resolved style
+    /// @param action the action to execute
     public void withElement(Styleable element, Style style, Runnable action) {
         withElement(element, style, null, action);
     }
 
-    /**
-     * Executes an action with an element, style, and CSS resolver pushed onto their stacks.
-     * <p>
-     * The style is merged with the current style. The element, merged style, and resolver
-     * are available via {@link #currentElement()}, {@link #currentStyle()}, and
-     * {@link #currentResolver()}.
-     * <p>
-     * Internal use only - called by StyledElement.render().
-     *
-     * @param element the element being rendered
-     * @param style the element's resolved style
-     * @param resolver the element's CSS resolver (may be null)
-     * @param action the action to execute
-     */
+    /// Executes an action with an element, style, and CSS resolver pushed onto their stacks.
+    ///
+    /// The style is merged with the current style. The element, merged style, and resolver
+    /// are available via {@link #currentElement()}, {@link #currentStyle()}, and
+    /// {@link #currentResolver()}.
+    ///
+    /// Internal use only - called by StyledElement.render().
+    ///
+    /// @param element the element being rendered
+    /// @param style the element's resolved style
+    /// @param resolver the element's CSS resolver (may be null)
+    /// @param action the action to execute
     public void withElement(Styleable element, Style style, CssStyleResolver resolver, Runnable action) {
         Style merged = currentStyle().patch(style);
         styleStack.push(merged);
@@ -423,19 +393,15 @@ public final class DefaultRenderContext implements RenderContext {
         }
     }
 
-    /**
-     * Returns the current element being rendered, if any.
-     */
+    /// Returns the current element being rendered, if any.
     public Optional<Styleable> currentElement() {
         return elementStack.isEmpty() ? Optional.empty() : Optional.of(elementStack.peek());
     }
 
-    /**
-     * Returns the current CSS resolver from the resolver stack, if any.
-     * <p>
-     * This allows child elements to access CSS properties from their parent elements
-     * that are not part of the Style cascade (e.g., border-type).
-     */
+    /// Returns the current CSS resolver from the resolver stack, if any.
+    ///
+    /// This allows child elements to access CSS properties from their parent elements
+    /// that are not part of the Style cascade (e.g., border-type).
     public Optional<CssStyleResolver> currentResolver() {
         return resolverStack.isEmpty() ? Optional.empty() : Optional.of(resolverStack.peek());
     }

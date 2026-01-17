@@ -23,10 +23,8 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Comprehensive integration tests for CSS styling.
- * Tests EVERY element type with expected colors, backgrounds, borders, and modifiers.
- */
+/// Comprehensive integration tests for CSS styling.
+/// Tests EVERY element type with expected colors, backgrounds, borders, and modifiers.
 class CssDemoIntegrationTest {
 
     private StyleEngine styleEngine;

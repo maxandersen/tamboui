@@ -9,16 +9,12 @@ import dev.tamboui.css.cascade.PseudoClassState;
 
 import java.util.List;
 
-/**
- * A universal selector that matches all elements.
- * <p>
- * Example: {@code * { ... }} matches every element.
- */
+/// A universal selector that matches all elements.
+///
+/// Example: {@code * { ... }} matches every element.
 public final class UniversalSelector implements Selector {
 
-    /**
-     * Singleton instance since the selector is stateless.
-     */
+    /// Singleton instance since the selector is stateless.
     public static final UniversalSelector INSTANCE = new UniversalSelector();
 
     private UniversalSelector() {

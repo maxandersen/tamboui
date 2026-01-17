@@ -6,9 +6,7 @@ package dev.tamboui.widgets.block;
 
 import java.util.EnumSet;
 
-/**
- * Which borders to draw on a block.
- */
+/// Which borders to draw on a block.
 public enum Borders {
     TOP,
     RIGHT,

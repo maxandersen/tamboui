@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 /*
@@ -30,9 +30,7 @@ import dev.tamboui.widgets.tabs.TabsState;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing the Tabs widget.
- */
+/// Demo TUI application showcasing the Tabs widget.
 public class TabsDemo {
 
     private static final String[] TAB_NAMES = {"Home", "Settings", "Profile", "Help"};

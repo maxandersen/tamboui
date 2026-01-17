@@ -18,17 +18,16 @@ import dev.tamboui.widgets.sparkline.Sparkline;
 
 import java.util.Collection;
 
-/**
- * A DSL wrapper for the Sparkline widget.
- * <p>
- * Displays data trends in a compact form using bar characters.
- * <pre>{@code
- * sparkline(1, 2, 3, 4, 5, 4, 3, 2, 1)
- *     .color(Color.CYAN)
- *     .title("CPU Usage")
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the Sparkline widget.
+///
+/// Displays data trends in a compact form using bar characters.
+/// ```java
+/// sparkline(1, 2, 3, 4, 5, 4, 3, 2, 1)
+///      .color(Color.CYAN)
+///      .title("CPU Usage")
+///      .rounded()
+/// }
+/// ```
 public final class SparklineElement extends StyledElement<SparklineElement> {
 
     private long[] data = new long[0];
@@ -61,17 +60,13 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
         }
     }
 
-    /**
-     * Sets the data values.
-     */
+    /// Sets the data values.
     public SparklineElement data(long... data) {
         this.data = data != null ? data.clone() : new long[0];
         return this;
     }
 
-    /**
-     * Sets the data values from integers.
-     */
+    /// Sets the data values from integers.
     public SparklineElement data(int... data) {
         if (data != null) {
             this.data = new long[data.length];
@@ -82,9 +77,7 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
         return this;
     }
 
-    /**
-     * Sets the data values from a collection.
-     */
+    /// Sets the data values from a collection.
     public SparklineElement data(Collection<? extends Number> data) {
         if (data != null) {
             this.data = data.stream().mapToLong(Number::longValue).toArray();
@@ -92,80 +85,60 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
         return this;
     }
 
-    /**
-     * Sets the maximum value for scaling.
-     */
+    /// Sets the maximum value for scaling.
     public SparklineElement max(long max) {
         this.max = max;
         return this;
     }
 
-    /**
-     * Uses auto-scaling based on data maximum.
-     */
+    /// Uses auto-scaling based on data maximum.
     public SparklineElement autoMax() {
         this.max = null;
         return this;
     }
 
-    /**
-     * Sets the sparkline color.
-     */
+    /// Sets the sparkline color.
     public SparklineElement color(Color color) {
         return fg(color);
     }
 
-    /**
-     * Uses three-level bar set (coarser display).
-     */
+    /// Uses three-level bar set (coarser display).
     public SparklineElement threeLevels() {
         this.barSet = Sparkline.BarSet.THREE_LEVELS;
         return this;
     }
 
-    /**
-     * Sets the bar character set.
-     */
+    /// Sets the bar character set.
     public SparklineElement barSet(Sparkline.BarSet barSet) {
         this.barSet = barSet;
         return this;
     }
 
-    /**
-     * Renders data from right to left.
-     */
+    /// Renders data from right to left.
     public SparklineElement rightToLeft() {
         this.direction = Sparkline.RenderDirection.RIGHT_TO_LEFT;
         return this;
     }
 
-    /**
-     * Sets the render direction.
-     */
+    /// Sets the render direction.
     public SparklineElement direction(Sparkline.RenderDirection direction) {
         this.direction = direction;
         return this;
     }
 
-    /**
-     * Sets the title.
-     */
+    /// Sets the title.
     public SparklineElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public SparklineElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public SparklineElement borderColor(Color color) {
         this.borderColor = color;
         return this;

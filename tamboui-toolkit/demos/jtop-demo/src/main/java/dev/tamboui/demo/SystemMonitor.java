@@ -36,15 +36,11 @@ import dev.tamboui.widgets.chart.Chart;
 import dev.tamboui.widgets.chart.Dataset;
 import dev.tamboui.widgets.chart.GraphType;
 
-/**
- * UI component that displays system metrics.
- * Delegates system monitoring to {@link SystemMetrics}.
- */
+/// UI component that displays system metrics.
+/// Delegates system monitoring to {@link SystemMetrics}.
 final class SystemMonitor implements Element {
 
-    /**
-     * CPU display mode.
-     */
+    /// CPU display mode.
     enum CpuViewMode {
         BARS,      // Show bars for each CPU
         SPARKLINES, // Show sparklines for all CPUs

@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -34,17 +34,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing the List widget.
- * <p>
- * Demonstrates various List features:
- * - Basic list with selection
- * - Highlight styles and symbols
- * - Multiline list items
- * - Styled list items
- * - Block integration
- * - Navigation
- */
+/// Demo TUI application showcasing the List widget.
+///
+/// Demonstrates various List features:
+/// - Basic list with selection
+/// - Highlight styles and symbols
+/// - Multiline list items
+/// - Styled list items
+/// - Block integration
+/// - Navigation
 public class ListDemo {
 
     private enum FocusedList {
@@ -258,9 +256,7 @@ public class ListDemo {
         renderMultilineList(frame, rows.get(1));
     }
 
-    /**
-     * Render a basic list with selection.
-     */
+    /// Render a basic list with selection.
     private void renderBasicList(Frame frame, Rect area) {
         List<ListItem> items = getItems().stream()
             .map(ListItem::from)
@@ -276,9 +272,7 @@ public class ListDemo {
         frame.renderStatefulWidget(list, area, basicListState);
     }
 
-    /**
-     * Render a list with multiline items and custom styling.
-     */
+    /// Render a list with multiline items and custom styling.
     private void renderMultilineList(Frame frame, Rect area) {
         List<ListItem> items = getMultilineItems();
 

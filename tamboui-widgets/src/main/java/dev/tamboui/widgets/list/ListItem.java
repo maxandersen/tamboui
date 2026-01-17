@@ -8,9 +8,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Text;
 
-/**
- * An item in a list widget.
- */
+/// An item in a list widget.
 public final class ListItem {
 
     private final Text content;

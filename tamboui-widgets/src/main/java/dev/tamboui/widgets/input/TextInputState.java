@@ -4,9 +4,7 @@
  */
 package dev.tamboui.widgets.input;
 
-/**
- * State for a TextInput widget, tracking the input text and cursor position.
- */
+/// State for a TextInput widget, tracking the input text and cursor position.
 public final class TextInputState {
 
     private StringBuilder text;

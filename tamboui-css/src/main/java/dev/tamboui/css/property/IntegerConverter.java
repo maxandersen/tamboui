@@ -7,11 +7,9 @@ package dev.tamboui.css.property;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS integer values.
- * <p>
- * Supports plain integer values like "0", "5", "10".
- */
+/// Converts CSS integer values.
+///
+/// Supports plain integer values like "0", "5", "10".
 public final class IntegerConverter implements PropertyConverter<Integer> {
 
     @Override

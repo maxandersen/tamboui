@@ -10,11 +10,9 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A class selector that matches elements by their CSS class.
- * <p>
- * Example: {@code .primary { ... }} matches elements with class="primary".
- */
+/// A class selector that matches elements by their CSS class.
+///
+/// Example: {@code .primary { ... }} matches elements with class="primary".
 public final class ClassSelector implements Selector {
 
     private final String className;

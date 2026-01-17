@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -36,12 +36,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing the Scrollbar widget.
- * <p>
- * Demonstrates scrollbars with different orientations, styles,
- * and integration with a scrollable list.
- */
+/// Demo TUI application showcasing the Scrollbar widget.
+///
+/// Demonstrates scrollbars with different orientations, styles,
+/// and integration with a scrollable list.
 public class ScrollbarDemo {
 
     private static final int ITEM_COUNT = 100;

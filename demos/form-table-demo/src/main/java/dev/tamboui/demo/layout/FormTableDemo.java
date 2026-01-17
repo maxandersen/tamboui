@@ -22,9 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo application showcasing flex layouts for forms and tables.
- */
+/// Demo application showcasing flex layouts for forms and tables.
 public final class FormTableDemo {
 
     private static final String[] TAB_NAMES = { "1:Form", "2:Table" };

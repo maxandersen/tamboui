@@ -17,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for TableElement.
- */
+/// Tests for TableElement.
 class TableElementTest {
 
     @Test

@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
 //DEPS dev.tamboui:tamboui-jline:LATEST
 
@@ -26,16 +26,14 @@ import dev.tamboui.widgets.input.TextInputState;
 
 import java.io.IOException;
 
-/**
- * Demo TUI application showcasing input form with focus management.
- * <p>
- * Demonstrates:
- * - Multiple text input fields
- * - Focus management with Tab navigation
- * - Custom number input field (Age)
- * - Cursor positioning for focused field
- * - Form submission and cancellation
- */
+/// Demo TUI application showcasing input form with focus management.
+///
+/// Demonstrates:
+/// - Multiple text input fields
+/// - Focus management with Tab navigation
+/// - Custom number input field (Age)
+/// - Cursor positioning for focused field
+/// - Form submission and cancellation
 public class InputFormDemo {
 
     private enum Focus {

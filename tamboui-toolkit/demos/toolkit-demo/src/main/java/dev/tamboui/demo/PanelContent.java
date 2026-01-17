@@ -9,9 +9,7 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.style.Color;
 import dev.tamboui.tui.event.KeyEvent;
 
-/**
- * Base class for panel content implementations.
- */
+/// Base class for panel content implementations.
 abstract class PanelContent {
     private final String title;
     private final int width;

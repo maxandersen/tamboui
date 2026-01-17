@@ -4,9 +4,7 @@
  */
 package dev.tamboui.demo;
 
-/**
- * Container for a floating panel with position and content.
- */
+/// Container for a floating panel with position and content.
 final class FloatingPanel {
     final int id;
     final PanelContent content;

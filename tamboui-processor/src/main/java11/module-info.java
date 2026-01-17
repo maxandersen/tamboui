@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-/**
- * TamboUI annotation processor module.
- * <p>
- * This module provides annotation processors for the TamboUI framework,
- * generating code for declarative action handling with {@code @OnAction}.
- */
+/// TamboUI annotation processor module.
+///
+/// This module provides annotation processors for the TamboUI framework,
+/// generating code for declarative action handling with {@code @OnAction}.
 module dev.tamboui.processor {
     requires dev.tamboui.annotations;
     requires dev.tamboui.tui;
