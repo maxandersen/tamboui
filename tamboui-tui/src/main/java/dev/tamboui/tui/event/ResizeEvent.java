@@ -4,12 +4,10 @@
  */
 package dev.tamboui.tui.event;
 
-/**
- * Represents a terminal window resize event.
- * <p>
- * This event is triggered when the terminal window size changes,
- * typically due to the user resizing the terminal window.
- */
+/// Represents a terminal window resize event.
+/// <p>
+/// This event is triggered when the terminal window size changes,
+/// typically due to the user resizing the terminal window.
 public final class ResizeEvent implements Event {
 
     private final int width;
@@ -20,9 +18,7 @@ public final class ResizeEvent implements Event {
         this.height = height;
     }
 
-    /**
-     * Creates a resize event with the given dimensions.
-     */
+    /// Creates a resize event with the given dimensions.
     public static ResizeEvent of(int width, int height) {
         return new ResizeEvent(width, height);
     }

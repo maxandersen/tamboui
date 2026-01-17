@@ -4,9 +4,7 @@
  */
 package dev.tamboui.layout;
 
-/**
- * A position in 2D space, representing x and y coordinates.
- */
+/// A position in 2D space, representing x and y coordinates.
 public final class Position {
 
     public static final Position ORIGIN = new Position(0, 0);
@@ -14,38 +12,30 @@ public final class Position {
     private final int x;
     private final int y;
 
-    /**
-     * Creates a position.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     */
+    /// Creates a position.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    /**
-     * Returns the x coordinate.
-     */
+    /// Returns the x coordinate.
     public int x() {
         return x;
     }
 
-    /**
-     * Returns the y coordinate.
-     */
+    /// Returns the y coordinate.
     public int y() {
         return y;
     }
 
-    /**
-     * Returns a new position offset from this one.
-     *
-     * @param dx delta x
-     * @param dy delta y
-     * @return the offset position
-     */
+    /// Returns a new position offset from this one.
+    ///
+    /// @param dx delta x
+    /// @param dy delta y
+    /// @return the offset position
     public Position offset(int dx, int dy) {
         return new Position(x + dx, y + dy);
     }

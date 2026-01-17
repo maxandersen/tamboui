@@ -30,19 +30,17 @@ import dev.tamboui.widgets.wavetext.WaveTextState;
 
 import java.io.IOException;
 
-/**
- * Demo TUI application showcasing the WaveText widget.
- * <p>
- * Demonstrates various configuration options:
- * <ul>
- *   <li>Default mode (dark shadow on bright text)</li>
- *   <li>Inverted mode (bright peak on dim text)</li>
- *   <li>Different speeds</li>
- *   <li>Different peak widths</li>
- *   <li>Multiple peaks</li>
- *   <li>Loop vs oscillate modes</li>
- * </ul>
- */
+/// Demo TUI application showcasing the WaveText widget.
+/// <p>
+/// Demonstrates various configuration options:
+/// <ul>
+///    <li>Default mode (dark shadow on bright text)</li>
+///    <li>Inverted mode (bright peak on dim text)</li>
+///    <li>Different speeds</li>
+///    <li>Different peak widths</li>
+///    <li>Multiple peaks</li>
+///    <li>Loop vs oscillate modes</li>
+/// </ul>
 public class WaveTextDemo {
 
     private static final Color CYAN = Color.rgb(0, 180, 216);
@@ -65,21 +63,17 @@ public class WaveTextDemo {
     private final WaveTextState multiPeakState = new WaveTextState();
     private final WaveTextState oscillateState = new WaveTextState();
 
-    /**
-     * Entry point for the demo.
-     *
-     * @param args command line arguments (not used)
-     * @throws Exception if an error occurs
-     */
+    /// Entry point for the demo.
+    ///
+    /// @param args command line arguments (not used)
+    /// @throws Exception if an error occurs
     public static void main(String[] args) throws Exception {
         new WaveTextDemo().run();
     }
 
-    /**
-     * Runs the demo application.
-     *
-     * @throws Exception if an error occurs
-     */
+    /// Runs the demo application.
+    ///
+    /// @throws Exception if an error occurs
     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();

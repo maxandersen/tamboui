@@ -15,30 +15,26 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-/**
- * Renders images using the Kitty Graphics Protocol.
- * <p>
- * The Kitty protocol is a modern graphics protocol that supports PNG images
- * directly, compression, transparency, and pixel-level positioning.
- * <p>
- * Supported by: Kitty, WezTerm, Ghostty, Konsole (recent versions).
- *
- * <h2>Protocol Format</h2>
- * <pre>
- * ESC _ G [control-data] ; [payload] ESC \
- * </pre>
- *
- * @see <a href="https://sw.kovidgoyal.net/kitty/graphics-protocol/">Kitty Graphics Protocol</a>
- */
+/// Renders images using the Kitty Graphics Protocol.
+/// <p>
+/// The Kitty protocol is a modern graphics protocol that supports PNG images
+/// directly, compression, transparency, and pixel-level positioning.
+/// <p>
+/// Supported by: Kitty, WezTerm, Ghostty, Konsole (recent versions).
+///
+/// <h2>Protocol Format</h2>
+/// <pre>
+/// ESC _ G [control-data] ; [payload] ESC \
+/// </pre>
+///
+/// @see <a href="https://sw.kovidgoyal.net/kitty/graphics-protocol/">Kitty Graphics Protocol</a>
 public final class KittyProtocol implements ImageProtocol {
 
     private static final String APC = "\033_G";  // Application Program Command + 'G' for graphics
     private static final String ST = "\033\\";    // String Terminator
     private static final int CHUNK_SIZE = 4096;   // Maximum chunk size for transmission
 
-    /**
-     * Creates a new Kitty protocol instance.
-     */
+    /// Creates a new Kitty protocol instance.
     public KittyProtocol() {
     }
 
@@ -88,11 +84,9 @@ public final class KittyProtocol implements ImageProtocol {
         return TerminalImageProtocol.KITTY;
     }
 
-    /**
-     * Sends image data using chunked transmission.
-     * <p>
-     * For large images, the data must be split into chunks of at most 4096 bytes.
-     */
+    /// Sends image data using chunked transmission.
+    /// <p>
+    /// For large images, the data must be split into chunks of at most 4096 bytes.
     private void sendChunked(OutputStream out, String base64Data, int cols, int rows) throws IOException {
         int offset = 0;
         int length = base64Data.length();
@@ -129,11 +123,9 @@ public final class KittyProtocol implements ImageProtocol {
         }
     }
 
-    /**
-     * Sends an image using the simpler single-chunk method.
-     * <p>
-     * This is used for small images that fit in a single transmission.
-     */
+    /// Sends an image using the simpler single-chunk method.
+    /// <p>
+    /// This is used for small images that fit in a single transmission.
     @SuppressWarnings("unused")
     private void sendSimple(OutputStream out, String base64Data, int cols, int rows) throws IOException {
         // a=T: action = transmit and display

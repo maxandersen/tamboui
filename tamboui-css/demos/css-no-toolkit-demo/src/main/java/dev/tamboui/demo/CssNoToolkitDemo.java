@@ -39,27 +39,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * CSS Demo showing how to use CSS styling WITHOUT the toolkit module.
- * <p>
- * This demo demonstrates:
- * <ul>
- *   <li>Using Backend/Terminal directly for the event loop</li>
- *   <li>Using widgets (Paragraph, Block, ListWidget) directly</li>
- *   <li>Loading and applying CSS with StyleEngine</li>
- *   <li>Creating Styleable implementations for elements</li>
- *   <li>Live theme switching</li>
- *   <li>CSS-aware widgets that resolve properties automatically</li>
- * </ul>
- * <p>
- * Controls:
- * <ul>
- *   <li>t - Toggle between dark and light themes</li>
- *   <li>Tab - Switch focus between panels</li>
- *   <li>Up/Down or j/k - Navigate the list</li>
- *   <li>q or Ctrl+C - Quit</li>
- * </ul>
- */
+/// CSS Demo showing how to use CSS styling WITHOUT the toolkit module.
+/// <p>
+/// This demo demonstrates:
+/// <ul>
+///    <li>Using Backend/Terminal directly for the event loop</li>
+///    <li>Using widgets (Paragraph, Block, ListWidget) directly</li>
+///    <li>Loading and applying CSS with StyleEngine</li>
+///    <li>Creating Styleable implementations for elements</li>
+///    <li>Live theme switching</li>
+///    <li>CSS-aware widgets that resolve properties automatically</li>
+/// </ul>
+/// <p>
+/// Controls:
+/// <ul>
+///    <li>t - Toggle between dark and light themes</li>
+///    <li>Tab - Switch focus between panels</li>
+///    <li>Up/Down or j/k - Navigate the list</li>
+///    <li>q or Ctrl+C - Quit</li>
+/// </ul>
 public class CssNoToolkitDemo {
 
     private boolean running = true;
@@ -400,9 +398,7 @@ public class CssNoToolkitDemo {
         styleEngine.setActiveStylesheet(currentTheme);
     }
 
-    /**
-     * Simple implementation of Styleable for CSS resolution.
-     */
+    /// Simple implementation of Styleable for CSS resolution.
     private static final class SimpleStyleable implements Styleable {
         private final String type;
         private final String id;

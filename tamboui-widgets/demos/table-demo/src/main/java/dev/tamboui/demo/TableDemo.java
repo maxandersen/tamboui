@@ -34,9 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing the Table widget.
- */
+/// Demo TUI application showcasing the Table widget.
 public class TableDemo {
 
     private static final List<String[]> DATA = List.of(

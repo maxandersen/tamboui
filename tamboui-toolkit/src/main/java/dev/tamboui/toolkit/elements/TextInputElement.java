@@ -22,18 +22,16 @@ import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
-/**
- * A DSL wrapper for the TextInput widget.
- * <p>
- * A single-line text input field. This element is always focusable to receive
- * keyboard input for text editing.
- * <pre>{@code
- * textInput(inputState)
- *     .placeholder("Enter name...")
- *     .title("Name")
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the TextInput widget.
+/// <p>
+/// A single-line text input field. This element is always focusable to receive
+/// keyboard input for text editing.
+/// <pre>{@code
+/// textInput(inputState)
+///      .placeholder("Enter name...")
+///      .title("Name")
+///      .rounded()
+/// }</pre>
 public final class TextInputElement extends StyledElement<TextInputElement> {
 
     private TextInputState state;
@@ -61,27 +59,21 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         }
     }
 
-    /**
-     * TextInputElement is always focusable to receive keyboard input.
-     *
-     * @return always returns true
-     */
+    /// TextInputElement is always focusable to receive keyboard input.
+    ///
+    /// @return always returns true
     @Override
     public boolean isFocusable() {
         return true;
     }
 
-    /**
-     * Sets the text input state.
-     */
+    /// Sets the text input state.
     public TextInputElement state(TextInputState state) {
         this.state = state != null ? state : new TextInputState();
         return this;
     }
 
-    /**
-     * Sets the initial text.
-     */
+    /// Sets the initial text.
     public TextInputElement text(String text) {
         if (state != null && text != null) {
             state.setText(text);
@@ -89,80 +81,62 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         return this;
     }
 
-    /**
-     * Sets the placeholder text.
-     */
+    /// Sets the placeholder text.
     public TextInputElement placeholder(String placeholder) {
         this.placeholder = placeholder != null ? placeholder : "";
         return this;
     }
 
-    /**
-     * Sets the placeholder style.
-     */
+    /// Sets the placeholder style.
     public TextInputElement placeholderStyle(Style style) {
         this.placeholderStyle = style;
         return this;
     }
 
-    /**
-     * Sets the placeholder color.
-     */
+    /// Sets the placeholder color.
     public TextInputElement placeholderColor(Color color) {
         this.placeholderStyle = Style.EMPTY.fg(color);
         return this;
     }
 
-    /**
-     * Sets the cursor style.
-     */
+    /// Sets the cursor style.
     public TextInputElement cursorStyle(Style style) {
         this.cursorStyle = style;
         return this;
     }
 
-    /**
-     * Sets whether to show the cursor.
-     */
+    /// Sets whether to show the cursor.
     public TextInputElement showCursor(boolean show) {
         this.showCursor = show;
         return this;
     }
 
-    /**
-     * Sets the title for the border.
-     */
+    /// Sets the title for the border.
     public TextInputElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public TextInputElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public TextInputElement borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
 
-    /**
-     * Handles a key event for text input.
-     * <p>
-     * Handles: character input, backspace, delete, left/right arrows, home/end.
-     * Only processes events when focused.
-     *
-     * @param event the key event
-     * @param focused whether this element is currently focused
-     * @return HANDLED if the event was processed, UNHANDLED otherwise
-     */
+    /// Handles a key event for text input.
+    /// <p>
+    /// Handles: character input, backspace, delete, left/right arrows, home/end.
+    /// Only processes events when focused.
+    ///
+    /// @param event the key event
+    /// @param focused whether this element is currently focused
+    /// @return HANDLED if the event was processed, UNHANDLED otherwise
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (!focused) {

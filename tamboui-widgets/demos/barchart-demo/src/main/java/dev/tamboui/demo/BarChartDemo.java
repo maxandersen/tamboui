@@ -33,9 +33,7 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.io.IOException;
 import java.util.Random;
 
-/**
- * Demo TUI application showcasing the BarChart widget.
- */
+/// Demo TUI application showcasing the BarChart widget.
 public class BarChartDemo {
 
     private boolean running = true;

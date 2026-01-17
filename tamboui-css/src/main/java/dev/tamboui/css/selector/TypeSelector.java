@@ -10,14 +10,12 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A type selector that matches elements by their type name.
- * <p>
- * Example: {@code Panel { ... }} matches all Panel elements.
- * <p>
- * Type selectors also match subclasses. For example, if {@code MyPanel extends Panel},
- * the selector {@code Panel { ... }} will match both Panel and MyPanel elements.
- */
+/// A type selector that matches elements by their type name.
+/// <p>
+/// Example: {@code Panel { ... }} matches all Panel elements.
+/// <p>
+/// Type selectors also match subclasses. For example, if {@code MyPanel extends Panel},
+/// the selector {@code Panel { ... }} will match both Panel and MyPanel elements.
 public final class TypeSelector implements Selector {
 
     private final String typeName;

@@ -19,18 +19,16 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.input.TextArea;
 import dev.tamboui.widgets.input.TextAreaState;
 
-/**
- * A DSL wrapper for the TextArea widget.
- * <p>
- * A multi-line text input field with scrolling support.
- * <pre>{@code
- * textArea(textState)
- *     .placeholder("Enter text...")
- *     .title("Description")
- *     .showLineNumbers()
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the TextArea widget.
+/// <p>
+/// A multi-line text input field with scrolling support.
+/// <pre>{@code
+/// textArea(textState)
+///      .placeholder("Enter text...")
+///      .title("Description")
+///      .showLineNumbers()
+///      .rounded()
+/// }</pre>
 public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     private TextAreaState state;
@@ -54,24 +52,18 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         this.state = state != null ? state : new TextAreaState();
     }
 
-    /**
-     * Sets the text area state.
-     */
+    /// Sets the text area state.
     public TextAreaElement state(TextAreaState state) {
         this.state = state != null ? state : new TextAreaState();
         return this;
     }
 
-    /**
-     * Returns the current state.
-     */
+    /// Returns the current state.
     public TextAreaState getState() {
         return state;
     }
 
-    /**
-     * Sets the initial text.
-     */
+    /// Sets the initial text.
     public TextAreaElement text(String text) {
         if (state != null && text != null) {
             state.setText(text);
@@ -79,99 +71,75 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return this;
     }
 
-    /**
-     * Sets the placeholder text.
-     */
+    /// Sets the placeholder text.
     public TextAreaElement placeholder(String placeholder) {
         this.placeholder = placeholder != null ? placeholder : "";
         return this;
     }
 
-    /**
-     * Sets the placeholder style.
-     */
+    /// Sets the placeholder style.
     public TextAreaElement placeholderStyle(Style style) {
         this.placeholderStyle = style;
         return this;
     }
 
-    /**
-     * Sets the placeholder color.
-     */
+    /// Sets the placeholder color.
     public TextAreaElement placeholderColor(Color color) {
         this.placeholderStyle = Style.EMPTY.fg(color);
         return this;
     }
 
-    /**
-     * Sets the cursor style.
-     */
+    /// Sets the cursor style.
     public TextAreaElement cursorStyle(Style style) {
         this.cursorStyle = style;
         return this;
     }
 
-    /**
-     * Sets whether to show the cursor.
-     */
+    /// Sets whether to show the cursor.
     public TextAreaElement showCursor(boolean show) {
         this.showCursor = show;
         return this;
     }
 
-    /**
-     * Enables line number display.
-     */
+    /// Enables line number display.
     public TextAreaElement showLineNumbers() {
         this.showLineNumbers = true;
         return this;
     }
 
-    /**
-     * Sets the line number style.
-     */
+    /// Sets the line number style.
     public TextAreaElement lineNumberStyle(Style style) {
         this.lineNumberStyle = style;
         return this;
     }
 
-    /**
-     * Sets the title for the border.
-     */
+    /// Sets the title for the border.
     public TextAreaElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public TextAreaElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public TextAreaElement borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
 
-    /**
-     * Sets the border color to use when focused.
-     * If not set, no special focused border styling is applied
-     * (CSS :focused pseudo-class can be used instead).
-     */
+    /// Sets the border color to use when focused.
+    /// If not set, no special focused border styling is applied
+    /// (CSS :focused pseudo-class can be used instead).
     public TextAreaElement focusedBorderColor(Color color) {
         this.focusedBorderColor = color;
         return this;
     }
 
-    /**
-     * Sets a listener for text changes.
-     */
+    /// Sets a listener for text changes.
     public TextAreaElement onTextChange(TextChangeListener listener) {
         this.changeListener = listener;
         return this;
@@ -182,12 +150,10 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return true;
     }
 
-    /**
-     * Handles a key event for text area input.
-     * <p>
-     * Note: The {@code focused} parameter is informational only.
-     * If the event reached this element, it should be processed.
-     */
+    /// Handles a key event for text area input.
+    /// <p>
+    /// Note: The {@code focused} parameter is informational only.
+    /// If the event reached this element, it should be processed.
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Text input requires focus - only handle events when focused
@@ -202,9 +168,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
     }
 
-    /**
-     * Handles common key events for text area input.
-     */
+    /// Handles common key events for text area input.
     private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event) {
         switch (event.code()) {
             case BACKSPACE:
@@ -296,9 +260,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         }
     }
 
-    /**
-     * Listener for text changes in the text area.
-     */
+    /// Listener for text changes in the text area.
     @FunctionalInterface
     public interface TextChangeListener {
         void onTextChange(String newText);

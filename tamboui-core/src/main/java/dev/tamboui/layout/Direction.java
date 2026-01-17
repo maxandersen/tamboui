@@ -4,9 +4,7 @@
  */
 package dev.tamboui.layout;
 
-/**
- * Layout direction for arranging elements.
- */
+/// Layout direction for arranging elements.
 public enum Direction {
     HORIZONTAL,
     VERTICAL

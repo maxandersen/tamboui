@@ -17,9 +17,7 @@ import java.util.Arrays;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for SparklineElement.
- */
+/// Tests for SparklineElement.
 class SparklineElementTest {
 
     @Test

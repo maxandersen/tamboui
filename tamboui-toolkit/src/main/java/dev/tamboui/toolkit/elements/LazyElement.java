@@ -17,16 +17,14 @@ import dev.tamboui.tui.event.MouseEvent;
 
 import java.util.function.Supplier;
 
-/**
- * An element that lazily evaluates its content on each render.
- * <p>
- * This allows state to be captured in the supplier closure,
- * enabling encapsulated component-local state:
- * <pre>{@code
- * int count = 0;
- * panel("Counter", () -> text("Count: " + count))
- * }</pre>
- */
+/// An element that lazily evaluates its content on each render.
+/// <p>
+/// This allows state to be captured in the supplier closure,
+/// enabling encapsulated component-local state:
+/// <pre>{@code
+/// int count = 0;
+/// panel("Counter", () -> text("Count: " + count))
+/// }</pre>
 public final class LazyElement implements Element {
 
     private final Supplier<? extends Element> supplier;

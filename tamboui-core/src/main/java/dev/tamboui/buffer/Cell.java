@@ -7,9 +7,7 @@ package dev.tamboui.buffer;
 import dev.tamboui.style.Style;
 import dev.tamboui.symbols.merge.MergeStrategy;
 
-/**
- * A single cell in the terminal buffer.
- */
+/// A single cell in the terminal buffer.
 public final class Cell {
 
     public static final Cell EMPTY = new Cell(" ", Style.EMPTY);
@@ -46,14 +44,12 @@ public final class Cell {
         return new Cell(this.symbol, this.style.patch(patch));
     }
 
-    /**
-     * Merges this cell's symbol with another symbol using the given merge strategy.
-     * Returns a new cell with the merged symbol.
-     *
-     * @param otherSymbol the symbol to merge with
-     * @param strategy the merge strategy to use
-     * @return a new cell with the merged symbol
-     */
+    /// Merges this cell's symbol with another symbol using the given merge strategy.
+    /// Returns a new cell with the merged symbol.
+    ///
+    /// @param otherSymbol the symbol to merge with
+    /// @param strategy the merge strategy to use
+    /// @return a new cell with the merged symbol
     public Cell mergeSymbol(String otherSymbol, MergeStrategy strategy) {
         String merged = strategy.merge(this.symbol, otherSymbol);
         return new Cell(merged, this.style);

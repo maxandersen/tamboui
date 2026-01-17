@@ -4,9 +4,7 @@
  */
 package dev.tamboui.layout;
 
-/**
- * Alignment for text and widget content.
- */
+/// Alignment for text and widget content.
 public enum Alignment {
     LEFT,
     CENTER,

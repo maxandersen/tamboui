@@ -19,9 +19,7 @@ import java.util.Arrays;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for ListElement.
- */
+/// Tests for ListElement.
 class ListElementTest {
 
     @Test

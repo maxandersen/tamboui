@@ -10,24 +10,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts string values to {@link Overflow} enum values.
- * <p>
- * Supported values:
- * <ul>
- *   <li>{@code clip} - silent truncation at boundary</li>
- *   <li>{@code wrap}, {@code wrap-character} - wrap at character boundaries</li>
- *   <li>{@code wrap-word} - wrap at word boundaries</li>
- *   <li>{@code ellipsis} - truncate with "..." at end</li>
- *   <li>{@code ellipsis-start} - truncate with "..." at start</li>
- *   <li>{@code ellipsis-middle} - truncate with "..." in middle</li>
- * </ul>
- */
+/// Converts string values to {@link Overflow} enum values.
+/// <p>
+/// Supported values:
+/// <ul>
+///    <li>{@code clip} - silent truncation at boundary</li>
+///    <li>{@code wrap}, {@code wrap-character} - wrap at character boundaries</li>
+///    <li>{@code wrap-word} - wrap at word boundaries</li>
+///    <li>{@code ellipsis} - truncate with "..." at end</li>
+///    <li>{@code ellipsis-start} - truncate with "..." at start</li>
+///    <li>{@code ellipsis-middle} - truncate with "..." in middle</li>
+/// </ul>
 public final class OverflowConverter implements PropertyConverter<Overflow> {
 
-    /**
-     * Singleton instance of the overflow converter.
-     */
+    /// Singleton instance of the overflow converter.
     public static final OverflowConverter INSTANCE = new OverflowConverter();
 
     private static final Map<String, Overflow> VALUES = new HashMap<>();

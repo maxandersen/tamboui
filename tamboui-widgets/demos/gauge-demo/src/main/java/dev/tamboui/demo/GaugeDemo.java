@@ -31,9 +31,7 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing Gauge and LineGauge widgets.
- */
+/// Demo TUI application showcasing Gauge and LineGauge widgets.
 public class GaugeDemo {
 
     private boolean running = true;

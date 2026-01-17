@@ -1,12 +1,10 @@
 import dev.tamboui.backend.jline.JLineBackendProvider;
 import dev.tamboui.terminal.BackendProvider;
 
-/**
- * JLine 3 backend for TamboUI TUI library.
- * <p>
- * This module provides a terminal backend implementation using JLine 3,
- * enabling TamboUI applications to run in standard terminals.
- */
+/// JLine 3 backend for TamboUI TUI library.
+/// <p>
+/// This module provides a terminal backend implementation using JLine 3,
+/// enabling TamboUI applications to run in standard terminals.
 @SuppressWarnings({"requires-transitive-automatic", "requires-automatic"})
 module dev.tamboui.jline {
     requires transitive dev.tamboui.core;

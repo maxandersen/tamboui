@@ -25,9 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for TextAreaElement.
- */
+/// Tests for TextAreaElement.
 class TextAreaElementTest {
 
     @Nested

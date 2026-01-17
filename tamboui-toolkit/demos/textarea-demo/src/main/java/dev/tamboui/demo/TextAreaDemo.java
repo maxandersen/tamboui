@@ -21,29 +21,27 @@ import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo showcasing the TextArea multi-line text input widget.
- * <p>
- * Features demonstrated:
- * <ul>
- *   <li>Multi-line text editing</li>
- *   <li>Line numbers</li>
- *   <li>Placeholder text</li>
- *   <li>Text change listener</li>
- *   <li>Cursor navigation (arrows, home, end)</li>
- *   <li>Text modification (insert, delete, backspace, enter)</li>
- * </ul>
- * <p>
- * Controls:
- * <ul>
- *   <li>Tab - Switch focus between text areas</li>
- *   <li>Arrow keys - Move cursor</li>
- *   <li>Home/End - Move to start/end of line</li>
- *   <li>Enter - Insert new line</li>
- *   <li>Backspace/Delete - Remove characters</li>
- *   <li>Ctrl+C or q (when unfocused) - Quit</li>
- * </ul>
- */
+/// Demo showcasing the TextArea multi-line text input widget.
+/// <p>
+/// Features demonstrated:
+/// <ul>
+///    <li>Multi-line text editing</li>
+///    <li>Line numbers</li>
+///    <li>Placeholder text</li>
+///    <li>Text change listener</li>
+///    <li>Cursor navigation (arrows, home, end)</li>
+///    <li>Text modification (insert, delete, backspace, enter)</li>
+/// </ul>
+/// <p>
+/// Controls:
+/// <ul>
+///    <li>Tab - Switch focus between text areas</li>
+///    <li>Arrow keys - Move cursor</li>
+///    <li>Home/End - Move to start/end of line</li>
+///    <li>Enter - Insert new line</li>
+///    <li>Backspace/Delete - Remove characters</li>
+///    <li>Ctrl+C or q (when unfocused) - Quit</li>
+/// </ul>
 public class TextAreaDemo implements Element {
 
     private final TextAreaState mainEditorState;

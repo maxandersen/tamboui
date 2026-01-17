@@ -39,21 +39,19 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Ratatui-like flex demo (ported as closely as possible).
- *
- * <p>This is a TamboUI port of Ratatui's `examples/apps/flex` demo, aiming to match:
- * tabs, colors (Tailwind palette), borders, spacer rendering and interactions.
- *
- * <p>Controls:
- * <ul>
- *   <li>h/l or ←/→: Change tab</li>
- *   <li>j/k or ↓/↑: Scroll</li>
- *   <li>g/G or Home/End: Jump</li>
- *   <li>+/-: Change spacing</li>
- *   <li>q or Esc: Quit</li>
- * </ul>
- */
+/// Ratatui-like flex demo (ported as closely as possible).
+///
+/// <p>This is a TamboUI port of Ratatui's `examples/apps/flex` demo, aiming to match:
+/// tabs, colors (Tailwind palette), borders, spacer rendering and interactions.
+///
+/// <p>Controls:
+/// <ul>
+///    <li>h/l or ←/→: Change tab</li>
+///    <li>j/k or ↓/↑: Scroll</li>
+///    <li>g/G or Home/End: Jump</li>
+///    <li>+/-: Change spacing</li>
+///    <li>q or Esc: Quit</li>
+/// </ul>
 public final class RFlexDemo {
 
     // Tailwind palette values (match ratatui::style::palette::tailwind).

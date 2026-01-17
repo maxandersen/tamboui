@@ -26,19 +26,17 @@ import java.util.List;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * CSS Demo showcasing live theme switching.
- * <p>
- * Features demonstrated:
- * <ul>
- *   <li>Loading CSS stylesheets from resources</li>
- *   <li>Live theme switching with 't' key</li>
- *   <li>CSS classes on elements</li>
- *   <li>Pseudo-class states (:focus) - Tab to navigate, see border change</li>
- *   <li>List elements with selection highlighting</li>
- *   <li>Combining CSS with programmatic styles</li>
- * </ul>
- */
+/// CSS Demo showcasing live theme switching.
+/// <p>
+/// Features demonstrated:
+/// <ul>
+///    <li>Loading CSS stylesheets from resources</li>
+///    <li>Live theme switching with 't' key</li>
+///    <li>CSS classes on elements</li>
+///    <li>Pseudo-class states (:focus) - Tab to navigate, see border change</li>
+///    <li>List elements with selection highlighting</li>
+///    <li>Combining CSS with programmatic styles</li>
+/// </ul>
 public class CssDemo implements Element {
 
     private String currentTheme = "dark";

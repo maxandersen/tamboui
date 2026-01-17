@@ -72,8 +72,14 @@ repositories {
 
 ## Requirements
 
-- Java 8 or later, Java 17+ highly recommended
+- Runtime: Java 8 or later (Java 17+ highly recommended)
+- Build from source: JDK 22+ (JDK 23+ required to generate Javadoc from `///` Markdown comments)
 - Gradle 9.x
+
+Core library artifacts (such as `tamboui-core`, `tamboui-widgets`, and `tamboui-tui`)
+are compiled with `--release 8` and shipped as multi-release JARs with
+`module-info.class` for Java 11+. The `tamboui-panama-backend` module and demo
+applications target Java 22+.
 
 ## Quick Start
 

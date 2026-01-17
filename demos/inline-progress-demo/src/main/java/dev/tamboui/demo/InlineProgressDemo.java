@@ -24,17 +24,15 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 
 import java.util.Arrays;
 
-/**
- * Demonstrates the InlineDisplay class for NPM/Gradle-style progress UX.
- * <p>
- * This demo shows:
- * <ul>
- *   <li>Basic inline display with widgets</li>
- *   <li>Release and continue pattern (multiple phases)</li>
- *   <li>println() scrolling above status area</li>
- *   <li>clearOnClose() for transient displays</li>
- * </ul>
- */
+/// Demonstrates the InlineDisplay class for NPM/Gradle-style progress UX.
+/// <p>
+/// This demo shows:
+/// <ul>
+///    <li>Basic inline display with widgets</li>
+///    <li>Release and continue pattern (multiple phases)</li>
+///    <li>println() scrolling above status area</li>
+///    <li>clearOnClose() for transient displays</li>
+/// </ul>
 public class InlineProgressDemo {
 
     private static final String[] SPINNER = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
@@ -74,9 +72,7 @@ public class InlineProgressDemo {
         System.out.println("\n=== Demo Complete ===");
     }
 
-    /**
-     * Demonstrates Buffer.toAnsiString() for one-shot rendering.
-     */
+    /// Demonstrates Buffer.toAnsiString() for one-shot rendering.
     private static void demoToAnsiString() throws InterruptedException {
         System.out.println("--- Part 1: Buffer.toAnsiString() ---\n");
 
@@ -118,9 +114,7 @@ public class InlineProgressDemo {
         System.out.println();
     }
 
-    /**
-     * Demonstrates NPM-style package installation with InlineDisplay.
-     */
+    /// Demonstrates NPM-style package installation with InlineDisplay.
     private static void demoNpmInstall() throws Exception {
         System.out.println("--- Part 2: NPM-style Install ---\n");
         System.out.println("npm install\n");
@@ -238,9 +232,7 @@ public class InlineProgressDemo {
             .render(rows.get(3), buf);
     }
 
-    /**
-     * Demonstrates multi-phase installation with release and continue.
-     */
+    /// Demonstrates multi-phase installation with release and continue.
     private static void demoMultiPhase() throws Exception {
         System.out.println("--- Part 3: Multi-Phase (Release & Continue) ---\n");
         System.out.println("Starting installation...\n");
