@@ -9,9 +9,10 @@ package dev.tamboui.demo;
 
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.css.parser.CssParseException;
+import dev.tamboui.export.BufferSvgExporter;
+import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
@@ -25,7 +26,13 @@ import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextAreaState;
 
-import java.time.Duration;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +52,8 @@ import static dev.tamboui.toolkit.Toolkit.*;
 public class CustomComponentDemo implements Element {
 
     private boolean showHelp = false;
+    private boolean exportSvgRequested = false;
+    private String lastSvgExportMessage = null;
 
     private static final String DEFAULT_CSS = """
         /* Edit this CSS to style the cards! */
@@ -275,6 +284,7 @@ public class CustomComponentDemo implements Element {
                 text(" [Tab] Focus ").addClass("dim"),
                 text(" [+/-] Progress ").addClass("dim"),
                 text(" [h] Help ").addClass("dim"),
+                text(" [s] Save SVG ").addClass("dim"),
                 text(" [q] Quit ").addClass("dim")
             ).addClass("header-row")).addClass("header-panel"),
 
@@ -321,9 +331,17 @@ public class CustomComponentDemo implements Element {
                 text("Edit CSS ").addClass("title"),
                 text("to style ").addClass("dim"),
                 text("ProgressCard ").addClass("title"),
-                text("in real-time").addClass("dim")
+                text("in real-time").addClass("dim"),
+                spacer(),
+                lastSvgExportMessage != null ? text(lastSvgExportMessage).addClass("dim") : spacer(0)
             ).addClass("footer-row")).addClass("footer-panel")
         ).render(frame, area, context);
+
+        // Export SVG if requested (F2 was pressed)
+        if (exportSvgRequested) {
+            exportSvgRequested = false;
+            exportSvgSnapshot(frame.buffer());
+        }
 
         // Show help dialog if requested
         if (showHelp) {
@@ -381,6 +399,12 @@ public class CustomComponentDemo implements Element {
             return EventResult.HANDLED;
         }
 
+        if (event.isChar('s')) {
+            // Request export - will happen in next render cycle where we have access to frame
+            exportSvgRequested = true;
+            return EventResult.HANDLED;
+        }
+
         // Handle 'h' to show help dialog
         if (event.isChar('h')) {
             showHelp = true;
@@ -388,5 +412,32 @@ public class CustomComponentDemo implements Element {
         }
         // Tab and +/- are handled by the framework and individual components
         return EventResult.UNHANDLED;
+    }
+
+    private void exportSvgSnapshot(Buffer buffer) {
+        try {
+            // Copy the buffer to avoid mutation
+            Buffer snapshot = buffer.copy();
+
+            Path outDir = Paths.get("build", "svg");
+            Files.createDirectories(outDir);
+
+            String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")
+                .withZone(ZoneId.systemDefault())
+                .format(Instant.now());
+            Path outFile = outDir.resolve("snapshot-" + timestamp + ".svg");
+
+            String svg = BufferSvgExporter.exportSvg(
+                snapshot,
+                new BufferSvgExporter.Options()
+                    .title("TamboUI")
+                    .uniqueId("snapshot-" + timestamp)
+            );
+
+            Files.write(outFile, svg.getBytes(StandardCharsets.UTF_8));
+            lastSvgExportMessage = "Saved " + outFile.toString();
+        } catch (Exception e) {
+            lastSvgExportMessage = "SVG export failed: " + e.getMessage();
+        }
     }
 }
