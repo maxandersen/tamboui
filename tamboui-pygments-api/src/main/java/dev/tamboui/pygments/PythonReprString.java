@@ -10,12 +10,18 @@ package dev.tamboui.pygments;
  * This is a pragmatic decoder: it supports the common escape sequences used by repr()
  * for code token streams (\n, \t, \r, \\, \', \", hex, unicode, and octal).
  */
-final class PythonReprString {
+public final class PythonReprString {
 
     private PythonReprString() {
     }
 
-    static String decode(String repr) {
+    /**
+     * Decodes a Python repr() string to its actual value.
+     *
+     * @param repr the Python repr() output (e.g., {@code 'hello\n'})
+     * @return the decoded string value
+     */
+    public static String decode(String repr) {
         if (repr == null) {
             return "";
         }
@@ -141,4 +147,3 @@ final class PythonReprString {
         return v;
     }
 }
-

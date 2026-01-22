@@ -30,7 +30,7 @@ class RawTokenParserTest {
             + "Token.Text.Whitespace\t'\\n'\n"
             + "Token.Literal.Number\t'42'\n";
 
-        Text text = RawTokenParser.parse(raw, Pygments.DEFAULT_STYLE_RESOLVER);
+        Text text = RawTokenParser.parse(raw, TokenStyleResolver.defaultResolver());
         assertThat(text.rawContent()).contains("class A");
 
         Set<String> tags = collectTags(text);
@@ -43,7 +43,7 @@ class RawTokenParserTest {
             + "Token.Name\t'a'\n"
             + "Token.Text.Whitespace\t'\\n'\n";
 
-        Text text = RawTokenParser.parse(raw, Pygments.DEFAULT_STYLE_RESOLVER);
+        Text text = RawTokenParser.parse(raw, TokenStyleResolver.defaultResolver());
         assertThat(text.lines()).hasSize(1);
         assertThat(text.lines().get(0).rawContent()).isEqualTo("a");
     }
@@ -56,7 +56,7 @@ class RawTokenParserTest {
             + "Token.Text.Whitespace\t'\\\\n'\n"
             + "Token.Name\t'b'\n";
 
-        Text text = RawTokenParser.parse(raw, Pygments.DEFAULT_STYLE_RESOLVER);
+        Text text = RawTokenParser.parse(raw, TokenStyleResolver.defaultResolver());
         assertThat(text.lines()).hasSize(2);
         assertThat(text.lines().get(0).rawContent()).isEqualTo("a");
         assertThat(text.lines().get(1).rawContent()).isEqualTo("b");
@@ -73,4 +73,3 @@ class RawTokenParserTest {
         return out;
     }
 }
-

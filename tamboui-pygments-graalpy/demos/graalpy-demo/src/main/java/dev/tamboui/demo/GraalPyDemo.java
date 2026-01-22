@@ -1,5 +1,5 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-pygments:LATEST
+//DEPS dev.tamboui:tamboui-pygments-graalpy:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 /*
  * Copyright (c) 2025 TamboUI Contributors
@@ -10,7 +10,7 @@ package dev.tamboui.demo;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.pygments.Result;
 import dev.tamboui.pygments.SyntaxHighlighter;
-import dev.tamboui.pygments.SyntaxHighlighters;
+import dev.tamboui.pygments.graalpy.GraalPySyntaxHighlighter;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.Tags;
@@ -21,14 +21,12 @@ import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.RichTextAreaElement;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.BindingSets;
-import dev.tamboui.tui.event.KeyEvent;
-import java.time.Duration;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,127 +34,141 @@ import java.util.List;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * Demo showcasing syntax highlighting with Pygments via {@link SyntaxHighlighters}.
+ * Demo showcasing syntax highlighting with GraalPy (embedded Python).
+ * <p>
+ * This demo uses GraalPy to run Pygments directly in the JVM without
+ * requiring any external Python installation.
+ * <p>
+ * <b>Note:</b> Requires Java 21+. First highlight may be slow due to
+ * Python runtime initialization.
  */
-public final class PygmentsDemo implements Element {
+public final class GraalPyDemo implements Element {
 
     private static final List<Sample> SAMPLES = Arrays.asList(
         new Sample(
             "Java",
             "Hello.java",
-            ""
-                + "package dev.tamboui.demo;\n"
-                + "\n"
-                + "class Hello {\n"
-                + "  static String greet(String name) {\n"
-                + "    // Ternary operator example\n"
-                + "    return name == null ? \"Hello, world\" : \"Hello, \" + name;\n"
-                + "  }\n"
-                + "\n"
-                + "  public static void main(String[] args) {\n"
-                + "    System.out.println(greet(args.length > 0 ? args[0] : null));\n"
-                + "    int n = 42;\n"
-                + "  }\n"
-                + "}\n"
+            """
+                package dev.tamboui.demo;
+
+                class Hello {
+                  static String greet(String name) {
+                    // Ternary operator example
+                    return name == null ? "Hello, world" : "Hello, " + name;
+                  }
+
+                  public static void main(String[] args) {
+                    System.out.println(greet(args.length > 0 ? args[0] : null));
+                    int n = 42;
+                  }
+                }
+                """
         ),
         new Sample(
             "Python",
             "hello.py",
-            ""
-                + "from dataclasses import dataclass\n"
-                + "\n"
-                + "@dataclass\n"
-                + "class User:\n"
-                + "    name: str\n"
-                + "\n"
-                + "def greet(user: User | None) -> str:\n"
-                + "    # This is a comment\n"
-                + "    return f\"Hello, {user.name if user else 'world'}\"\\\n"
-                + "        .strip()\n"
-                + "\n"
-                + "print(greet(User('Ada')))\n"
+            """
+                from dataclasses import dataclass
+
+                @dataclass
+                class User:
+                    name: str
+
+                def greet(user: User | None) -> str:
+                    # This is a comment
+                    return f"Hello, {user.name if user else 'world'}"\\
+                        .strip()
+
+                print(greet(User('Ada')))
+                """
         ),
         new Sample(
             "JavaScript",
             "app.js",
-            ""
-                + "export function greet(name) {\n"
-                + "  // nullish coalescing\n"
-                + "  return `Hello, ${name ?? 'world'}`;\n"
-                + "}\n"
-                + "\n"
-                + "console.log(greet(null));\n"
+            """
+                export function greet(name) {
+                  // nullish coalescing
+                  return `Hello, ${name ?? 'world'}`;
+                }
+
+                console.log(greet(null));
+                """
         ),
         new Sample(
             "Rust",
             "main.rs",
-            ""
-                + "fn greet(name: Option<&str>) -> String {\n"
-                + "    // This is a comment\n"
-                + "    format!(\"Hello, {}\", name.unwrap_or(\"world\"))\n"
-                + "}\n"
-                + "\n"
-                + "fn main() {\n"
-                + "    println!(\"{}\", greet(None));\n"
-                + "    let n: i32 = 42;\n"
-                + "    println!(\"n={}\", n);\n"
-                + "}\n"
+            """
+                fn greet(name: Option<&str>) -> String {
+                    // This is a comment
+                    format!("Hello, {}", name.unwrap_or("world"))
+                }
+
+                fn main() {
+                    println!("{}", greet(None));
+                    let n: i32 = 42;
+                    println!("n={}", n);
+                }
+                """
         ),
         new Sample(
             "Markdown",
             "README.md",
-            ""
-                + "# TamboUI Demo\n"
-                + "\n"
-                + "A **terminal UI** framework for _Java_.\n"
-                + "\n"
-                + "## Features\n"
-                + "\n"
-                + "- Syntax highlighting\n"
-                + "- Rich text rendering\n"
-                + "- [Links](https://tamboui.dev)\n"
-                + "\n"
-                + "> Blockquote support!\n"
+            """
+                # TamboUI Demo
+
+                A **terminal UI** framework for _Java_.
+
+                ## Features
+
+                - Syntax highlighting
+                - Rich text rendering
+                - [Links](https://tamboui.dev)
+
+                > Blockquote support!
+                """
         ),
         new Sample(
             "Kotlin",
             "Main.kt",
-            ""
-                + "data class User(val name: String)\n"
-                + "\n"
-                + "fun greet(user: User?): String {\n"
-                + "    // Kotlin null-safe access\n"
-                + "    return \"Hello, ${user?.name ?: \"world\"}\"\n"
-                + "}\n"
-                + "\n"
-                + "fun main() {\n"
-                + "    println(greet(User(\"Alice\")))\n"
-                + "    println(greet(null))\n"
-                + "}\n"
+            """
+                data class User(val name: String)
+
+                fun greet(user: User?): String {
+                    // Kotlin null-safe access
+                    return "Hello, ${user?.name ?: "world"}"
+                }
+
+                fun main() {
+                    println(greet(User("Alice")))
+                    println(greet(null))
+                }
+                """
         ),
         new Sample(
             "HTML",
             "index.html",
-            ""
-                + "<!DOCTYPE html>\n"
-                + "<html lang=\"en\">\n"
-                + "<head>\n"
-                + "  <meta charset=\"UTF-8\">\n"
-                + "  <title>TamboUI</title>\n"
-                + "  <style>\n"
-                + "    body { font-family: sans-serif; }\n"
-                + "  </style>\n"
-                + "</head>\n"
-                + "<body>\n"
-                + "  <h1>Hello, World!</h1>\n"
-                + "  <script>console.log('Ready');</script>\n"
-                + "</body>\n"
-                + "</html>\n"
+            """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <title>TamboUI</title>
+                  <style>
+                    body { font-family: sans-serif; }
+                  </style>
+                </head>
+                <body>
+                  <h1>Hello, World!</h1>
+                  <script>console.log('Ready');</script>
+                </body>
+                </html>
+                """
         )
     );
 
     private final RichTextAreaElement codeArea;
     private final ListElement<Sample> sampleList;
+    private final GraalPySyntaxHighlighter highlighter;
 
     private final Text[] highlightedCache;
     private final String[] subtitleCache;
@@ -164,8 +176,11 @@ public final class PygmentsDemo implements Element {
     private Text cachedText = Text.empty();
     private String cachedSubtitle = "";
     private String cachedTitle = "";
+    private boolean initializing = false;
 
-    public PygmentsDemo() {
+    public GraalPyDemo() {
+        highlighter = new GraalPySyntaxHighlighter();
+
         codeArea = new RichTextAreaElement()
             .wrapCharacter()
             .scrollbar(RichTextAreaElement.ScrollBarPolicy.AS_NEEDED)
@@ -196,7 +211,6 @@ public final class PygmentsDemo implements Element {
     public static void main(String[] args) throws Exception {
         var config = TuiConfig.builder()
             .mouseCapture(true)
-            // Enable vim-style navigation (j/k, Ctrl+u/d) in addition to arrow keys.
             .bindings(BindingSets.vim())
             .build();
 
@@ -204,11 +218,12 @@ public final class PygmentsDemo implements Element {
             .config(config)
             .bindings(BindingSets.vim())
             .build()) {
-            var demo = new PygmentsDemo();
+            var demo = new GraalPyDemo();
             runner.run(() -> demo);
+        } finally {
+            // Clean up GraalPy resources
         }
     }
-
 
     @Override
     public void render(Frame frame, Rect area, RenderContext context) {
@@ -222,15 +237,22 @@ public final class PygmentsDemo implements Element {
 
         // Highlight each sample at most once (lazy cache).
         if (highlightedCache[selected] == null) {
-            Result result = SyntaxHighlighters.get().highlightWithInfo(
+            // Show initializing message on first highlight
+            if (!initializing && subtitleCache[selected] == null) {
+                initializing = true;
+                subtitleCache[selected] = "Initializing GraalPy (first run may take a moment)...";
+            }
+
+            Result result = highlighter.highlightWithInfo(
                 sample.filename,
                 sample.source,
-                Duration.ofSeconds(3) // Use default style resolver
+                Duration.ofSeconds(60) // Longer timeout for GraalPy init
             );
 
+            initializing = false;
             subtitleCache[selected] = result.highlighted()
-                ? "lexer=" + result.lexer().orElse("?")
-                : ("no highlighting (" + result.message().orElse("unknown") + ")");
+                ? "GraalPy: lexer=" + result.lexer().orElse("?")
+                : ("GraalPy: off (" + result.message().orElse("unknown") + ")");
             highlightedCache[selected] = addLineNumbers(result.text());
         }
 
@@ -239,7 +261,7 @@ public final class PygmentsDemo implements Element {
 
         column(
             panel(() -> row(
-                text(" Syntax highlighting (Pygmentize) ").bold(),
+                text(" Syntax highlighting (GraalPy) ").bold(),
                 spacer(1),
                 text(" [j/k] Navigate ").dim(),
                 text(" [q] Quit ").dim()
@@ -305,4 +327,3 @@ public final class PygmentsDemo implements Element {
         }
     }
 }
-

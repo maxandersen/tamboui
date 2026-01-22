@@ -2,11 +2,12 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.pygments;
+package dev.tamboui.pygments.process;
 
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.style.Tags;
+import dev.tamboui.pygments.RawTokenParser;
+import dev.tamboui.pygments.Result;
+import dev.tamboui.pygments.SyntaxHighlighter;
+import dev.tamboui.pygments.TokenStyleResolver;
 import dev.tamboui.text.Text;
 
 import java.io.ByteArrayOutputStream;
@@ -23,69 +24,59 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
- * Syntax-highlights source code by invoking the {@code pygmentize} CLI with the {@code raw} formatter.
- * It will first try `pygmentize`, then `uvx`, then `pipx` to find a working pygmentize command.
+ * Syntax highlighter implementation that uses the {@code pygmentize} CLI with the {@code raw} formatter.
+ * <p>
+ * It will first try {@code pygmentize}, then {@code uvx}, then {@code pipx} to find a working command.
  * <p>
  * The raw formatter emits one token per line in the form:
  * {@code Token.Keyword\t'repr(token_text)'}.
- * This class parses that output and converts it to {@link Text} by applying {@link dev.tamboui.style.Tags}
- * on spans (e.g. {@code syntax-comment}, {@code syntax-string}, etc).
- * 
+ * This class parses that output and converts it to {@link Text} by applying styles
+ * via a {@link TokenStyleResolver}.
  */
-public final class Pygments {
+public final class ProcessSyntaxHighlighter implements SyntaxHighlighter {
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(2);
     private static final String DEFAULT_BIN = "pygmentize";
     private static final String UVX_BIN = "uvx";
     private static final String PIPX_BIN = "pipx";
 
-    private static volatile Pygments CACHED;
-
     private volatile Invoker defaultInvoker;
 
-    private Pygments() {
-        // stateful utility
-    }
-
     /**
-     * Returns a cached {@link Pygments} instance.
-     * <p>
-     * The returned instance caches which invoker is usable (direct {@code pygmentize}, {@code uvx}, or {@code pipx})
-     * the first time it needs to run Pygments.
+     * Creates a new process-based syntax highlighter.
      */
-    public static Pygments pygments() {
-        Pygments v = CACHED;
-        if (v != null) {
-            return v;
-        }
-        synchronized (Pygments.class) {
-            if (CACHED == null) {
-                CACHED = new Pygments();
-            }
-            return CACHED;
-        }
+    public ProcessSyntaxHighlighter() {
+        // Instance-based to cache the detected invoker
     }
 
+    @Override
     public Text highlight(String filename, String source) {
-        return highlight(filename, source, DEFAULT_TIMEOUT, DEFAULT_STYLE_RESOLVER);
+        return highlight(filename, source, DEFAULT_TIMEOUT, TokenStyleResolver.defaultResolver());
     }
 
+    @Override
     public Text highlight(String filename, String source, TokenStyleResolver resolver) {
         return highlight(filename, source, DEFAULT_TIMEOUT, resolver);
     }
 
+    @Override
+    public Text highlight(String filename, String source, Duration timeout) {
+        return highlight(filename, source, timeout, TokenStyleResolver.defaultResolver());
+    }
+
+    @Override
     public Text highlight(String filename, String source, Duration timeout, TokenStyleResolver resolver) {
         Result result = highlightWithInfo(filename, source, timeout, resolver);
         return result.text();
     }
 
+    @Override
     public Result highlightWithInfo(String filename, String source, Duration timeout) {
-        return highlightWithInfo(filename, source, timeout, DEFAULT_STYLE_RESOLVER);
+        return highlightWithInfo(filename, source, timeout, TokenStyleResolver.defaultResolver());
     }
 
+    @Override
     public Result highlightWithInfo(String filename, String source, Duration timeout, TokenStyleResolver resolver) {
         Objects.requireNonNull(resolver, "resolver");
 
@@ -127,6 +118,7 @@ public final class Pygments {
         }
     }
 
+    @Override
     public boolean isAvailable() {
         return resolveInvoker() != null;
     }
@@ -302,7 +294,7 @@ public final class Pygments {
     }
 
     private Invoker resolveDefaultInvoker() {
-        if(defaultInvoker != null) {
+        if (defaultInvoker != null) {
             return defaultInvoker;
         }
         synchronized (this) {
@@ -323,13 +315,14 @@ public final class Pygments {
     }
 
     /**
-     * can i run the command and get a success exit code?
-     * @param bin the command to run
+     * Can the command run and return a success exit code?
+     *
+     * @param bin     the command to run
      * @param timeout the timeout
-     * @param args the arguments to pass to the command (--version, -V, etc.) to ensure it returns a succcess
-     * @return true if the command can be run and get a success exit code, false otherwise
+     * @param args    the arguments to pass to the command (--version, -V, etc.)
+     * @return true if the command can be run and returns a success exit code
      */
-    private static boolean canRunDirect(String bin, Duration timeout,String... args) {
+    private static boolean canRunDirect(String bin, Duration timeout, String... args) {
         try {
             List<String> cmd = new ArrayList<>(1 + args.length);
             cmd.add(bin);
@@ -388,134 +381,6 @@ public final class Pygments {
         return new String(baos.toByteArray(), StandardCharsets.UTF_8);
     }
 
-    /**
-     * Optional mapping from token information to a style patch.
-     */
-    @FunctionalInterface
-    public interface TokenStyleResolver {
-        /**
-         * @param tokenType full Pygments token type (e.g. {@code Token.Literal.String})
-         * @return a style to use for the given token type
-         */
-        Style resolve(String tokenType);
-    }
-
-    public static final TokenStyleResolver DEFAULT_STYLE_RESOLVER = createDefaultStyleResolver();
-
-    private static TokenStyleResolver createDefaultStyleResolver() {
-        Map<String, Style> tokenStyles = new HashMap<>();
-        // Token.Comment: "$text 60%"
-        tokenStyles.put("Token.Comment", Style.EMPTY.gray().dim().withExtension(Tags.class, Tags.of("syntax-comment")));
-        // Token.Error: "$text-error on $error-muted"
-        tokenStyles.put("Token.Error", Style.EMPTY.red().bg(Color.rgb(0x2c, 0x1e, 0x1e)).withExtension(Tags.class, Tags.of("syntax-error"))); // $text-error on $error-muted
-        // Token.Generic.Strong: "bold"
-        tokenStyles.put("Token.Generic.Strong", Style.EMPTY.bold());
-        // Token.Generic.Emph: "italic"
-        tokenStyles.put("Token.Generic.Emph", Style.EMPTY.italic());
-        // Token.Generic.Error: "$text-error on $error-muted"
-        tokenStyles.put("Token.Generic.Error", Style.EMPTY.red().bg(Color.rgb(0x2c, 0x1e, 0x1e)).withExtension(Tags.class, Tags.of("syntax-error")));
-        // Token.Generic.Heading: "$text-primary underline"
-        tokenStyles.put("Token.Generic.Heading", Style.EMPTY.underlineColor(Color.WHITE).withExtension(Tags.class, Tags.of("syntax-heading")));
-        // Token.Generic.Subheading: "$text-primary"
-        tokenStyles.put("Token.Generic.Subheading", Style.EMPTY.fg(Color.WHITE).withExtension(Tags.class, Tags.of("syntax-subheading")));
-        // Token.Keyword: "$text-accent"
-        tokenStyles.put("Token.Keyword", Style.EMPTY.fg(Color.CYAN).withExtension(Tags.class, Tags.of("syntax-keyword")));
-        // Token.Keyword.Constant: "bold $text-success 80%"
-        tokenStyles.put("Token.Keyword.Constant", Style.EMPTY.bold().fg(Color.rgb(0xa9, 0xdc, 0x76)).withExtension(Tags.class, Tags.of("syntax-constant"))); // $text-success 80%
-        // Token.Keyword.Namespace: "$text-error"
-        tokenStyles.put("Token.Keyword.Namespace", Style.EMPTY.fg(Color.RED).withExtension(Tags.class, Tags.of("syntax-namespace")));
-        // Token.Keyword.Type: "bold"
-        tokenStyles.put("Token.Keyword.Type", Style.EMPTY.bold());
-        // Token.Literal.Number: "$text-warning"
-        tokenStyles.put("Token.Literal.Number", Style.EMPTY.fg(Color.YELLOW).withExtension(Tags.class, Tags.of("syntax-number")));
-        // Token.Literal.String.Backtick: "$text 60%"
-        tokenStyles.put("Token.Literal.String.Backtick", Style.EMPTY.fg(Color.GRAY).withExtension(Tags.class, Tags.of("syntax-string-backtick")));
-        // Token.Literal.String: "$text-success 90%"
-        tokenStyles.put("Token.Literal.String", Style.EMPTY.fg(Color.rgb(0x8d, 0xcf, 0x8c)).withExtension(Tags.class, Tags.of("syntax-string"))); // $text-success 90%
-        // Token.Literal.String.Doc: "$text-success 80% italic"
-        tokenStyles.put("Token.Literal.String.Doc", Style.EMPTY.fg(Color.rgb(0xa9, 0xdc, 0x76)).italic().withExtension(Tags.class, Tags.of("syntax-string-doc")));
-        // Token.Literal.String.Double: "$text-success 90%"
-        tokenStyles.put("Token.Literal.String.Double", Style.EMPTY.fg(Color.rgb(0x8d, 0xcf, 0x8c)).withExtension(Tags.class, Tags.of("syntax-string-double")));
-        // Token.Name: "$text-primary"
-        tokenStyles.put("Token.Name", Style.EMPTY.fg(Color.WHITE).withExtension(Tags.class, Tags.of("syntax-name")));
-        // Token.Name.Attribute: "$text-warning"
-        tokenStyles.put("Token.Name.Attribute", Style.EMPTY.fg(Color.YELLOW).withExtension(Tags.class, Tags.of("syntax-attribute")));
-        // Token.Name.Builtin: "$text-accent"
-        tokenStyles.put("Token.Name.Builtin", Style.EMPTY.fg(Color.CYAN).withExtension(Tags.class, Tags.of("syntax-builtin"))  .withExtension(Tags.class, Tags.of("syntax-identifier")));
-        // Token.Name.Builtin.Pseudo: "italic"
-        tokenStyles.put("Token.Name.Builtin.Pseudo", Style.EMPTY.italic().withExtension(Tags.class, Tags.of("syntax-builtin-pseudo")));
-        // Token.Name.Class: "$text-warning bold"
-        tokenStyles.put("Token.Name.Class", Style.EMPTY.fg(Color.YELLOW).bold().withExtension(Tags.class, Tags.of("syntax-class")));
-        // Token.Name.Constant: "$text-error"
-        tokenStyles.put("Token.Name.Constant", Style.EMPTY.fg(Color.RED).withExtension(Tags.class, Tags.of("syntax-constant")));    
-        // Token.Name.Decorator: "$text-primary bold"
-        tokenStyles.put("Token.Name.Decorator", Style.EMPTY.fg(Color.WHITE).bold().withExtension(Tags.class, Tags.of("syntax-decorator")));
-        // Token.Name.Function: "$text-warning underline"
-        tokenStyles.put("Token.Name.Function", Style.EMPTY.fg(Color.YELLOW).underlineColor(Color.YELLOW).withExtension(Tags.class, Tags.of("syntax-function")));
-        // Token.Name.Function.Magic: "$text-warning underline"
-        tokenStyles.put("Token.Name.Function.Magic", Style.EMPTY.fg(Color.YELLOW).underlineColor(Color.YELLOW).withExtension(Tags.class, Tags.of("syntax-function-magic")));
-        // Token.Name.Tag: "$text-primary bold"
-        tokenStyles.put("Token.Name.Tag", Style.EMPTY.fg(Color.WHITE).bold().withExtension(Tags.class, Tags.of("syntax-tag")));
-        // Token.Name.Variable: "$text-secondary"
-        tokenStyles.put("Token.Name.Variable", Style.EMPTY.fg(Color.GRAY).withExtension(Tags.class, Tags.of("syntax-variable")));
-        // Token.Name.Namespace
-        tokenStyles.put("Token.Name.Namespace", Style.EMPTY.fg(Color.RED).withExtension(Tags.class, Tags.of("syntax-namespace")));
-        // Token.Number: "$text-warning"
-        tokenStyles.put("Token.Number", Style.EMPTY.fg(Color.YELLOW).withExtension(Tags.class, Tags.of("syntax-number")));
-        // Token.Operator: "bold"
-        tokenStyles.put("Token.Operator", Style.EMPTY.bold().withExtension(Tags.class, Tags.of("syntax-operator")));
-        // Token.Operator.Word: "bold $text-error"
-        tokenStyles.put("Token.Operator.Word", Style.EMPTY.bold().fg(Color.RED).withExtension(Tags.class, Tags.of("syntax-operator-word")));
-        // Token.String: "$text-success"
-        tokenStyles.put("Token.String", Style.EMPTY.fg(Color.GREEN).withExtension(Tags.class, Tags.of("syntax-string")));
-        // Token.Whitespace: ""
-        tokenStyles.put("Token.Text.Whitespace", Style.EMPTY.withExtension(Tags.class, Tags.of("syntax-whitespace")));
-        // Token.Whitespace: ""
-        tokenStyles.put("Token.Text.Punctuation", Style.EMPTY.withExtension(Tags.class, Tags.of("syntax-punctuation")));
-        
-        Map<String, Style> unmodifiableMap = Collections.unmodifiableMap(tokenStyles);
-        return k -> {
-            Style style = unmodifiableMap.get(k);
-            if (style == null) {
-                style = Style.EMPTY; //.withExtension(Tags.class, Tags.of("syntax-" + k.toLowerCase(Locale.ROOT)));
-            }
-            return style != null ? style : Style.EMPTY;
-        };
-    }
-
-    /**
-     * Highlight result with extra info for UIs.
-     */
-    public static final class Result {
-        private final Text text;
-        private final String lexer;
-        private final boolean highlighted;
-        private final String message;
-
-        private Result(Text text, String lexer, boolean highlighted, String message) {
-            this.text = Objects.requireNonNull(text, "text");
-            this.lexer = lexer;
-            this.highlighted = highlighted;
-            this.message = message;
-        }
-
-        public Text text() {
-            return text;
-        }
-
-        public Optional<String> lexer() {
-            return Optional.ofNullable(lexer);
-        }
-
-        public boolean highlighted() {
-            return highlighted;
-        }
-
-        public Optional<String> message() {
-            return Optional.ofNullable(message);
-        }
-    }
-
     private static final class ProcessResult {
         final int exitCode;
         final String stdout;
@@ -528,4 +393,3 @@ public final class Pygments {
         }
     }
 }
-

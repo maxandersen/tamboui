@@ -3,11 +3,10 @@ plugins {
     `java-test-fixtures`
 }
 
-description = "External process (pygmentize) syntax highlighting implementation for TamboUI"
+description = "Syntax highlighting API for TamboUI"
 
 dependencies {
-    api(projects.tambouiPygmentsApi)
+    api(projects.tambouiCore)
 
     testFixturesApi(libs.assertj.core)
 }
-

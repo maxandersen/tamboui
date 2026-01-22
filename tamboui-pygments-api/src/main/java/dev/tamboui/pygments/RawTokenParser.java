@@ -15,14 +15,25 @@ import java.util.List;
 /**
  * Parser for Pygments RawTokenFormatter output.
  * <p>
- * Package-private on purpose; public API is {@link Pygments}.
+ * The raw formatter emits one token per line in the form:
+ * {@code Token.Keyword\t'repr(token_text)'}
+ * <p>
+ * This parser converts that output to {@link Text} by applying styles
+ * from a {@link TokenStyleResolver}.
  */
-final class RawTokenParser {
+public final class RawTokenParser {
 
     private RawTokenParser() {
     }
 
-    static Text parse(String raw, Pygments.TokenStyleResolver resolver) {
+    /**
+     * Parses Pygments raw formatter output into styled Text.
+     *
+     * @param raw      the raw output from Pygments
+     * @param resolver the style resolver for mapping token types to styles
+     * @return the styled text
+     */
+    public static Text parse(String raw, TokenStyleResolver resolver) {
         if (raw == null || raw.isEmpty()) {
             return Text.empty();
         }
@@ -130,4 +141,3 @@ final class RawTokenParser {
         return -1;
     }
 }
-

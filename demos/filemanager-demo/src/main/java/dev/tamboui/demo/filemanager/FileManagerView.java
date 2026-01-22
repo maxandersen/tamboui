@@ -9,8 +9,8 @@ import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
-import static dev.tamboui.pygments.Pygments.pygments;
-import dev.tamboui.pygments.Pygments;
+import dev.tamboui.pygments.Result;
+import dev.tamboui.pygments.SyntaxHighlighters;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
@@ -23,7 +23,7 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.style.Overflow;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -394,7 +394,7 @@ public class FileManagerView implements Element {
     private void renderTextFile(Frame frame, Rect area, Path textPath) {
         try {
             String content = readFileUtf8WithLimit(textPath, 256 * 1024);
-            Pygments.Result result = pygments().highlightWithInfo(
+            Result result = SyntaxHighlighters.get().highlightWithInfo(
                 textPath.getFileName().toString(),
                 content,
                 Duration.ofSeconds(2)
