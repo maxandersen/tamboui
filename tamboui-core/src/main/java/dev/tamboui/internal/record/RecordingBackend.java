@@ -44,7 +44,7 @@ public final class RecordingBackend implements Backend {
         this.buffer = Buffer.empty(new Rect(0, 0, config.width(), config.height()));
         this.frames = new ArrayList<>();
         this.interactionPlayer = new InteractionPlayer(
-                InteractionPlayer.loadFromFile(config.configFile(), config.outputPath().getParent()), buffer);
+                InteractionPlayer.loadFromFile(config.configFile(), config.outputPath()), buffer);
         this.startTime = System.currentTimeMillis();
         this.lastCaptureTime = 0;
         this.recording = true;

@@ -43,14 +43,14 @@ final class InteractionPlayer {
      * @param path the tape file path
      * @return list of interactions, empty if file doesn't exist or has no interactions
      */
-    static List<Interaction> loadFromFile(Path path, Path root) {
+    static List<Interaction> loadFromFile(Path path, Path outputPath) {
         List<Interaction> interactions = new ArrayList<>();
         if (path == null || !Files.exists(path)) {
             return interactions;
         }
 
         try {
-            loadTapeFile(path, root, interactions);
+            loadTapeFile(path, outputPath, interactions);
         } catch (IOException e) {
             System.err.println("Warning: Failed to load tape file: " + e.getMessage());
         }
@@ -199,7 +199,8 @@ final class InteractionPlayer {
                 interactions.add(new Interaction.Wait(parseDuration(args)));
                 break;
             case "screenshot":
-                interactions.add(new Interaction.Screenshot(outputPath.resolveSibling(Paths.get(args))));
+                // Resolve screenshot path relative to the .cast file's directory (same folder)
+                interactions.add(new Interaction.Screenshot(outputPath.resolve(args)));
                 break;
             case "type":
                 // Type "text" - parse quoted string and type each character
