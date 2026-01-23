@@ -4,7 +4,9 @@
  */
 package dev.tamboui.internal.record;
 
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -12,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
-
+import java.nio.file.Paths;
+import dev.tamboui.export.BufferSvgExporter;
+import dev.tamboui.buffer.Buffer;
 /**
  * Plays back scripted interactions for demo recording.
  * Supports VHS tape format (charmbracelet/vhs).
@@ -26,9 +30,11 @@ final class InteractionPlayer {
     private final Deque<Integer> pendingBytes = new ArrayDeque<>();
     private int currentIndex = 0;
     private long waitUntil = 0;
+    private final Buffer buffer;
 
-    InteractionPlayer(List<Interaction> interactions) {
+    InteractionPlayer(List<Interaction> interactions, Buffer buffer) {
         this.interactions = interactions;
+        this.buffer = buffer;
     }
 
     /**
@@ -192,7 +198,9 @@ final class InteractionPlayer {
             case "sleep":
                 interactions.add(new Interaction.Wait(parseDuration(args)));
                 break;
-
+            case "screenshot":
+                interactions.add(new Interaction.Screenshot(Paths.get(args)));
+                break;
             case "type":
                 // Type "text" - parse quoted string and type each character
                 String text = parseQuotedString(args);
@@ -429,6 +437,16 @@ final class InteractionPlayer {
                 if (!pendingBytes.isEmpty()) {
                     return pendingBytes.poll();
                 }
+            } else if (interaction instanceof Interaction.Screenshot) {
+                Interaction.Screenshot screenshot = (Interaction.Screenshot) interaction;
+                String svg = BufferSvgExporter.exportSvg(buffer);
+                try {
+                    screenshot.path().getParent().toFile().mkdirs();
+                    Files.write(screenshot.path(), svg.getBytes(StandardCharsets.UTF_8));
+                } catch (IOException e) {
+                    throw new UncheckedIOException("Warning: Failed to write screenshot: " + e.getMessage(),e);
+                }
+                return -2; // Timeout to trigger redraw
             }
         }
 

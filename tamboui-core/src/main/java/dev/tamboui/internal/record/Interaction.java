@@ -4,6 +4,8 @@
  */
 package dev.tamboui.internal.record;
 
+import java.nio.file.Path;
+
 /**
  * Represents a scripted interaction for demo recording.
  * This is an internal API and not part of the public contract.
@@ -25,6 +27,21 @@ abstract class Interaction {
 
         int millis() {
             return millis;
+        }
+    }
+
+    /**
+     * Take a screenshot.
+     */
+    static final class Screenshot extends Interaction {
+        private final Path path;
+
+        Screenshot(Path path) {
+            this.path = path;
+        }
+
+        Path path() {
+            return path;
         }
     }
 
