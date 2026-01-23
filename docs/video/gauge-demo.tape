@@ -9,4 +9,5 @@ Show
 
 # Recording
 Sleep 5
+Screenshot screenshots/gauge-demo.svg
 

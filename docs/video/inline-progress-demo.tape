@@ -16,5 +16,6 @@ Sleep 4s
 
 # Part 3: Multi-phase completes
 # Answer restart prompt with any key to exit
+Screenshot screenshots/inline-progress-demo.svg
 Type "q"
 Sleep 1s

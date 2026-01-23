@@ -9,6 +9,7 @@ Show
 
 # Recording
 Type "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
+Screenshot screenshots/scrollbar-demo.svg
 Type "llllllllllllllllllllhhhhhhhhhhhhhhhhhhhhhh"
 Sleep 2
 

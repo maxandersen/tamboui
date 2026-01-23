@@ -9,4 +9,5 @@ Show
 
 # Recording
 Sleep 5s
+Screenshot screenshots/colors-rgb-demo.svg
 

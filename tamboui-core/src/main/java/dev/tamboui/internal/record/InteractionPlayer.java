@@ -43,14 +43,14 @@ final class InteractionPlayer {
      * @param path the tape file path
      * @return list of interactions, empty if file doesn't exist or has no interactions
      */
-    static List<Interaction> loadFromFile(Path path) {
+    static List<Interaction> loadFromFile(Path path, Path root) {
         List<Interaction> interactions = new ArrayList<>();
         if (path == null || !Files.exists(path)) {
             return interactions;
         }
 
         try {
-            loadTapeFile(path, interactions);
+            loadTapeFile(path, root, interactions);
         } catch (IOException e) {
             System.err.println("Warning: Failed to load tape file: " + e.getMessage());
         }
@@ -116,7 +116,7 @@ final class InteractionPlayer {
         return result;
     }
 
-    private static void loadTapeFile(Path path, List<Interaction> interactions) throws IOException {
+    private static void loadTapeFile(Path path, Path outputPath, List<Interaction> interactions) throws IOException {
         List<String> lines = Files.readAllLines(path);
         boolean visible = true; // Track Show/Hide state
 
@@ -132,7 +132,7 @@ final class InteractionPlayer {
                 String includePath = line.substring(7).trim();
                 Path includeFile = path.getParent().resolve(includePath);
                 if (Files.exists(includeFile)) {
-                    loadTapeFile(includeFile, interactions);
+                    loadTapeFile(includeFile, outputPath, interactions);
                 }
                 continue;
             }
@@ -162,11 +162,11 @@ final class InteractionPlayer {
                 continue;
             }
 
-            parseVhsCommand(line, interactions);
+            parseVhsCommand(outputPath, line, interactions);
         }
     }
 
-    private static void parseVhsCommand(String line, List<Interaction> interactions) {
+    private static void parseVhsCommand(Path outputPath, String line, List<Interaction> interactions) {
         // Check for timing suffix: Command@duration count
         // e.g., "Right@2.5s 3" means press Right 3 times with 2.5s between each
         String cmd = line;
@@ -199,7 +199,7 @@ final class InteractionPlayer {
                 interactions.add(new Interaction.Wait(parseDuration(args)));
                 break;
             case "screenshot":
-                interactions.add(new Interaction.Screenshot(Paths.get(args)));
+                interactions.add(new Interaction.Screenshot(outputPath.resolveSibling(Paths.get(args))));
                 break;
             case "type":
                 // Type "text" - parse quoted string and type each character

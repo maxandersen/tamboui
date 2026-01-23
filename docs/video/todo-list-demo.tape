@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 1s
+Screenshot screenshots/todo-list-demo.svg
 # Navigate down through items
 Type "j"
 Sleep 0.5

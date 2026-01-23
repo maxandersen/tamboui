@@ -9,5 +9,6 @@ Show
 
 # Recording
 Sleep 1s
+Screenshot screenshots/newyear-demo.svg
 Type s
 Sleep 5s

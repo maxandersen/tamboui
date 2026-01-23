@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/tfx-tui-demo.svg
 
 # Trigger sweep effect
 Type "1"

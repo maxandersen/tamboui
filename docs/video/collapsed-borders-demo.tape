@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 1s
+Screenshot screenshots/collapsed-borders-demo.svg
 Right
 Sleep 1s
 Right

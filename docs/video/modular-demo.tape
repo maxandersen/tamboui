@@ -9,3 +9,4 @@ Show
 
 # Recording
 Sleep 5s
+Screenshot screenshots/modular-demo.svg

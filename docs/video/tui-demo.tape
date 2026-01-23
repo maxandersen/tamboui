@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2
+Screenshot screenshots/tui-demo.svg
 Set TypingSpeed 1s
 Right
 Right

@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 1
+Screenshot screenshots/error-handling-demo.svg
 # Toggle faulty widget on
 Type "f"
 Sleep 1.5

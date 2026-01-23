@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 1s
+Screenshot screenshots/input-form-demo.svg
 # Type in first name
 Type "John"
 Sleep 0.5

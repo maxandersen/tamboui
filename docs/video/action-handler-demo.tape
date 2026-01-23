@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/action-handler-demo.svg
 Tab
 Sleep 500ms
 Right

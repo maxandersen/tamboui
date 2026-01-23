@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/tfx-demo.svg
 
 # Navigate down through effects
 Down

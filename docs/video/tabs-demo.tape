@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/tabs-demo.svg
 Show
 Sleep 1s
 Right@2.5s 3

@@ -9,6 +9,7 @@ Show
 
 # Recording
 Type "1"
+Screenshot screenshots/barchart-demo.svg
 Sleep 2
 Type "2"
 Sleep 2

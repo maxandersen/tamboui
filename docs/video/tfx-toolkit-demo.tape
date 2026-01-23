@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/tfx-toolkit-demo.svg
 
 # Apply effect to header
 Type "1"

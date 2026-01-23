@@ -9,6 +9,7 @@ Show
 
 # Recording
 Type "d"
+Screenshot screenshots/basic-demo.svg
 Sleep 0.5
 Type "d"
 Sleep 0.5

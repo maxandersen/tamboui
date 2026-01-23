@@ -7,7 +7,6 @@ Enter
 Sleep 2
 Show
 
-Screenshot screenshots/css-demo.svg
-
 # Recording
 Sleep 5s
+Screenshot screenshots/css-demo.svg

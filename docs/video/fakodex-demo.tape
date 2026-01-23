@@ -17,3 +17,4 @@ Type test
 Sleep 500ms
 Enter
 Sleep 5s
+Screenshot screenshots/fakodex-demo.svg

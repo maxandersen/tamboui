@@ -9,6 +9,7 @@ Show
 
 # Initial view - showing CPU bars, memory chart, and process list
 Sleep 3
+Screenshot screenshots/jtop-demo.svg
 
 # Toggle CPU view to sparklines (press 'c')
 Type "c"

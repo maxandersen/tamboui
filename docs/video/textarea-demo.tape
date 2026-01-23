@@ -9,6 +9,7 @@ Enter
 Sleep 2s
 Show
 Sleep 1s
+Screenshot screenshots/textarea-demo.svg
 Enter
 Type "Hello world!"
 Enter

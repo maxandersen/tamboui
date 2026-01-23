@@ -10,6 +10,7 @@ Show
 # Recording
 # Start on "Start" tab
 Sleep 2s
+Screenshot screenshots/rflex-demo.svg
 
 # Cycle through flex modes (Start -> Center -> End -> SpaceAround -> SpaceEvenly -> SpaceBetween)
 Right

@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2
+Screenshot screenshots/canvas-demo.svg
 Type "m"
 Sleep 2
 Type "m"

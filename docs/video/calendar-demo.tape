@@ -9,6 +9,7 @@ Show
 
 # Recording
 Type "kkkkkjjjj"
+Screenshot screenshots/calendar-demo.svg
 Sleep 0.5
 Type "s"
 Sleep 0.5

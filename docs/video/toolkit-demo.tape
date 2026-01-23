@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/toolkit-demo.svg
 
 # Show Tab navigation (focus switching)
 Sleep 1s

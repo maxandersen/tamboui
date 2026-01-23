@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 1s
+Screenshot screenshots/listelement-demo.svg
 Down
 Sleep 500ms
 Down

@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 2s
+Screenshot screenshots/form-table-demo.svg
 
 # Switch to table tab and move selection
 Right

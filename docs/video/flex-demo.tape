@@ -10,6 +10,7 @@ Show
 # Recording
 # Start on "1:Fixed" tab with START mode
 Sleep 2s
+Screenshot screenshots/flex-demo.svg
 
 # Cycle through flex modes on Fixed Items
 Right

@@ -9,4 +9,5 @@ Show
 
 # Recording
 Sleep 3s
+Screenshot screenshots/paragraph-demo.svg
 

@@ -9,6 +9,7 @@ Show
 
 # Recording
 Sleep 1s
+Screenshot screenshots/list-demo.svg
 Type "jjj"
 Sleep 1s
 Tab
