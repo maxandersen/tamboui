@@ -31,6 +31,12 @@
     "rflex-demo": {
       "script-ref": "demos/rflex-demo/src/main/java/dev/tamboui/demo/flex/RFlexDemo.java"
     },
+    "unicode-demo": {
+      "script-ref": "demos/unicode-demo/src/main/java/dev/tamboui/demo/UnicodeDemo.java"
+    },
+    "unicode-inline-demo": {
+      "script-ref": "demos/unicode-inline-demo/src/main/java/dev/tamboui/demo/UnicodeDemo.java"
+    },
     "css-demo": {
       "script-ref": "tamboui-css/demos/css-demo/src/main/java/dev/tamboui/demo/CssDemo.java"
     },

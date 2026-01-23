@@ -53,11 +53,11 @@ public final class Span {
     }
 
     /**
-     * Returns the display width of this span (simplified - counts code points).
-     * For proper Unicode width handling, a library like ICU4J would be needed.
+     * Returns the display width of this span in terminal columns.
+     * Wide characters (CJK, emoji) count as 2, combining marks as 0.
      */
     public int width() {
-        return content.codePointCount(0, content.length());
+        return CharWidth.of(content);
     }
 
     public boolean isEmpty() {

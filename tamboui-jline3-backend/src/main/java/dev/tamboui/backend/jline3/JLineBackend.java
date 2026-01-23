@@ -59,11 +59,18 @@ public class JLineBackend implements Backend {
         Hyperlink lastHyperlink = null;
 
         for (CellUpdate update : updates) {
+            Cell cell = update.cell();
+
+            // Skip continuation cells - the terminal fills them automatically
+            // when printing a wide character
+            if (cell.isContinuation()) {
+                continue;
+            }
+
             // Move cursor
             moveCursor(update.x(), update.y());
 
             // Apply style if changed
-            Cell cell = update.cell();
             if (!cell.style().equals(lastStyle)) {
                 // Check if hyperlink changed
                 Hyperlink currentHyperlink = cell.style().hyperlink().orElse(null);

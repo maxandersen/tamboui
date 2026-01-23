@@ -8,6 +8,7 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.AnsiStringBuilder;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 
@@ -71,12 +72,11 @@ public final class Buffer {
             return empty(new Rect(0, 0, 0, 0));
         }
 
-        // Find the maximum width
+        // Find the maximum display width
         int maxWidth = 0;
         for (String line : lines) {
             if (line != null) {
-                // Count code points for proper Unicode width
-                int width = line.codePointCount(0, line.length());
+                int width = CharWidth.of(line);
                 maxWidth = Math.max(maxWidth, width);
             }
         }
@@ -208,15 +208,62 @@ public final class Buffer {
             }
 
             int codePoint = string.codePointAt(i);
+            int charWidth = CharWidth.of(codePoint);
+
+            if (charWidth == 0) {
+                // Zero-width character: append to preceding cell's symbol (grapheme clustering)
+                if (col > area.left()) {
+                    int prevCol = col - 1;
+                    Cell prevCell = get(prevCol, y);
+                    if (!prevCell.isContinuation()) {
+                        String combined = prevCell.symbol() + new String(Character.toChars(codePoint));
+                        set(prevCol, y, prevCell.symbol(combined));
+                    }
+                }
+                i += Character.charCount(codePoint);
+                continue;
+            }
+
             String symbol = new String(Character.toChars(codePoint));
 
+            if (charWidth == 2 && col + 1 >= area.right()) {
+                // Wide char at rightmost column: no room for continuation, replace with space
+                if (col >= area.left()) {
+                    Cell existing = get(col, y);
+                    set(col, y, existing.patchStyle(style).symbol(" "));
+                }
+                col++;
+                i += Character.charCount(codePoint);
+                continue;
+            }
+
             if (col >= area.left()) {
+                // When overwriting a continuation cell, clear the preceding wide char
+                Cell current = get(col, y);
+                if (current.isContinuation() && col > area.left()) {
+                    set(col - 1, y, get(col - 1, y).symbol(" "));
+                }
+
+                // If this is a wide char, check if the next cell is also a continuation of something
+                if (charWidth == 2 && col + 1 < area.right()) {
+                    Cell next = get(col + 1, y);
+                    if (next.isContinuation()) {
+                        // The cell after our continuation was itself a continuation - clear its owner
+                        // (This handles overwriting in the middle of an existing wide char)
+                    }
+                }
+
                 Cell existing = get(col, y);
                 Cell newCell = existing.patchStyle(style).symbol(symbol);
                 set(col, y, newCell);
+
+                // Place continuation cell for wide characters
+                if (charWidth == 2) {
+                    set(col + 1, y, Cell.CONTINUATION);
+                }
             }
 
-            col++;
+            col += charWidth;
             i += Character.charCount(codePoint);
         }
 
@@ -412,6 +459,9 @@ public final class Buffer {
 
             for (int x = area.left(); x < area.right(); x++) {
                 Cell cell = get(x, y);
+                if (cell.isContinuation()) {
+                    continue;
+                }
 
                 // Apply style if changed
                 if (!cell.style().equals(lastStyle)) {
@@ -445,6 +495,9 @@ public final class Buffer {
 
             for (int x = area.left(); x < area.right(); x++) {
                 Cell cell = get(x, y);
+                if (cell.isContinuation()) {
+                    continue;
+                }
 
                 // Apply style if changed
                 if (!cell.style().equals(lastStyle)) {
@@ -477,10 +530,13 @@ public final class Buffer {
                 result.append("\n");
             }
 
-            // Find the last non-empty cell in this row
+            // Find the last non-empty cell in this row (skip continuation cells)
             int lastNonEmpty = area.left() - 1;
             for (int x = area.right() - 1; x >= area.left(); x--) {
                 Cell cell = get(x, y);
+                if (cell.isContinuation()) {
+                    continue;
+                }
                 if (!cell.symbol().equals(" ") || !cell.style().equals(Style.EMPTY)) {
                     lastNonEmpty = x;
                     break;
@@ -490,6 +546,9 @@ public final class Buffer {
             // Render up to the last non-empty cell
             for (int x = area.left(); x <= lastNonEmpty; x++) {
                 Cell cell = get(x, y);
+                if (cell.isContinuation()) {
+                    continue;
+                }
 
                 // Apply style if changed
                 if (!cell.style().equals(lastStyle)) {

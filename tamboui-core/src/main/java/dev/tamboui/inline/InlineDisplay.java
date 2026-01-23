@@ -12,6 +12,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Text;
 
 import java.io.IOException;
@@ -399,18 +400,22 @@ public final class InlineDisplay implements AutoCloseable {
             for (int y = 0; y < currentHeight; y++) {
                 if (y > 0) {
                     out.print("\n");
-                    backend.carriageReturn();
                 }
+                // Clear the line first (from col 0) to remove stale content.
+                // This avoids calling eraseToEndOfLine after rendering, which
+                // would interact badly with "pending wrap" state on some terminals.
+                backend.carriageReturn();
+                backend.eraseToEndOfLine();
 
-                // Find last non-empty cell to avoid printing at the terminal's
-                // right margin, which would trigger auto-wrap and break cursor tracking.
-                // Cap at width-1 to never print in the last column.
-                int lineEnd = Math.min(findLastContentPosition(y), width - 1);
+                int lineEnd = findLastContentPosition(y);
 
                 // Render the line from buffer up to last content position
                 Style lastStyle = null;
                 for (int x = 0; x < lineEnd; x++) {
                     Cell cell = buffer.get(x, y);
+                    if (cell.isContinuation()) {
+                        continue;
+                    }
 
                     if (!cell.style().equals(lastStyle)) {
                         out.print(AnsiStringBuilder.styleToAnsi(cell.style()));
@@ -418,20 +423,16 @@ public final class InlineDisplay implements AutoCloseable {
                     }
                     out.print(cell.symbol());
                 }
-
-                // Clear to end of line (handles trailing spaces and previous content)
-                backend.eraseToEndOfLine();
             }
 
-            // Reset style
+            // Reset style and cancel any pending-wrap state from last line
             out.print(AnsiStringBuilder.RESET);
+            backend.carriageReturn();
 
-            // Position cursor
-            // First go back to start of display area
+            // Position cursor - go back to start of display area
             if (currentHeight > 1) {
                 backend.moveCursorUp(currentHeight - 1);
             }
-            backend.carriageReturn();
 
             if (cursorX >= 0 && cursorY >= 0) {
                 // Use explicit cursor position
@@ -461,14 +462,18 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Finds the position after the last non-empty cell on a line.
+     * Finds the position after the last non-empty cell on a line,
+     * accounting for wide character display widths.
      */
     private int findLastContentPosition(int line) {
         for (int x = width - 1; x >= 0; x--) {
             Cell cell = buffer.get(x, line);
+            if (cell.isContinuation()) {
+                continue;
+            }
             String symbol = cell.symbol();
             if (!symbol.isEmpty() && !symbol.equals(" ")) {
-                return x + 1;
+                return x + CharWidth.of(symbol);
             }
         }
         return 0;

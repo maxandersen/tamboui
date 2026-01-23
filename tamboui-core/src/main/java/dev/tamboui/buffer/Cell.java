@@ -14,6 +14,13 @@ public final class Cell {
 
     public static final Cell EMPTY = new Cell(" ", Style.EMPTY);
 
+    /**
+     * A continuation cell placeholder for the trailing column(s) of a wide character.
+     * Wide characters (CJK, emoji) occupy 2 terminal columns; the second column
+     * is filled with this cell. Renderers must skip continuation cells.
+     */
+    public static final Cell CONTINUATION = new Cell("", Style.EMPTY);
+
     private final String symbol;
     private final Style style;
     private final int cachedHashCode;
@@ -65,6 +72,15 @@ public final class Cell {
     public Cell mergeSymbol(String otherSymbol, MergeStrategy strategy) {
         String merged = strategy.merge(this.symbol, otherSymbol);
         return new Cell(merged, this.style);
+    }
+
+    /**
+     * Returns whether this cell is a continuation placeholder for a wide character.
+     *
+     * @return true if this is a continuation cell
+     */
+    public boolean isContinuation() {
+        return symbol.isEmpty();
     }
 
     public boolean isEmpty() {

@@ -13,6 +13,7 @@ import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -192,18 +193,19 @@ public final class TextElement extends StyledElement<TextElement> {
             return countLines();
         }
 
-        // For wrapping modes, calculate how many lines we'll need
+        // For wrapping modes, calculate how many lines we'll need using display width
         int totalLines = 0;
         int start = 0;
         for (int i = 0; i <= content.length(); i++) {
             if (i == content.length() || content.charAt(i) == '\n') {
                 // Process this logical line
-                int lineLength = i - start;
-                if (lineLength == 0) {
+                String lineContent = content.substring(start, i);
+                int lineDisplayWidth = CharWidth.of(lineContent);
+                if (lineDisplayWidth == 0) {
                     totalLines++;
                 } else {
                     // Calculate wrapped lines for this segment
-                    totalLines += (lineLength + width - 1) / width;
+                    totalLines += (lineDisplayWidth + width - 1) / width;
                 }
                 start = i + 1;
             }
@@ -213,18 +215,18 @@ public final class TextElement extends StyledElement<TextElement> {
 
     @Override
     public int preferredWidth() {
-        // For multi-line text, return the longest line
+        // For multi-line text, return the longest line by display width
         int maxWidth = 0;
-        int currentWidth = 0;
-        for (int i = 0; i < content.length(); i++) {
-            if (content.charAt(i) == '\n') {
-                maxWidth = Math.max(maxWidth, currentWidth);
-                currentWidth = 0;
-            } else {
-                currentWidth++;
+        int lineStart = 0;
+        for (int i = 0; i <= content.length(); i++) {
+            if (i == content.length() || content.charAt(i) == '\n') {
+                String lineContent = content.substring(lineStart, i);
+                int lineWidth = CharWidth.of(lineContent);
+                maxWidth = Math.max(maxWidth, lineWidth);
+                lineStart = i + 1;
             }
         }
-        return Math.max(maxWidth, currentWidth);
+        return maxWidth;
     }
 
     @Override

@@ -20,6 +20,7 @@ import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -177,12 +178,16 @@ public final class Paragraph implements Widget {
                 }
 
                 String content = span.content();
-                if (content.length() <= remainingWidth) {
+                int spanWidth = CharWidth.of(content);
+                if (spanWidth <= remainingWidth) {
                     clippedSpans.add(span);
-                    remainingWidth -= content.length();
+                    remainingWidth -= spanWidth;
                 } else {
-                    // Partial span - truncate content
-                    clippedSpans.add(new Span(content.substring(0, remainingWidth), span.style()));
+                    // Partial span - truncate content by display width
+                    String clipped = CharWidth.substringByWidth(content, remainingWidth);
+                    if (!clipped.isEmpty()) {
+                        clippedSpans.add(new Span(clipped, span.style()));
+                    }
                     break;
                 }
             }
@@ -210,7 +215,7 @@ public final class Paragraph implements Widget {
 
             if (maxWidth <= ELLIPSIS.length()) {
                 // Not enough room for ellipsis, just clip
-                result.add(Line.from(new Span(fullText.substring(0, Math.min(fullText.length(), maxWidth)), lineStyle)));
+                result.add(Line.from(new Span(CharWidth.substringByWidth(fullText, maxWidth), lineStyle)));
                 continue;
             }
 
@@ -236,20 +241,21 @@ public final class Paragraph implements Widget {
     }
 
     private String truncateEnd(String text, int maxWidth) {
-        int availableChars = maxWidth - ELLIPSIS.length();
-        return text.substring(0, availableChars) + ELLIPSIS;
+        int availableWidth = maxWidth - ELLIPSIS.length();
+        return CharWidth.substringByWidth(text, availableWidth) + ELLIPSIS;
     }
 
     private String truncateStart(String text, int maxWidth) {
-        int availableChars = maxWidth - ELLIPSIS.length();
-        return ELLIPSIS + text.substring(text.length() - availableChars);
+        int availableWidth = maxWidth - ELLIPSIS.length();
+        return ELLIPSIS + CharWidth.substringByWidthFromEnd(text, availableWidth);
     }
 
     private String truncateMiddle(String text, int maxWidth) {
-        int availableChars = maxWidth - ELLIPSIS.length();
-        int leftChars = (availableChars + 1) / 2;
-        int rightChars = availableChars / 2;
-        return text.substring(0, leftChars) + ELLIPSIS + text.substring(text.length() - rightChars);
+        int availableWidth = maxWidth - ELLIPSIS.length();
+        int leftWidth = (availableWidth + 1) / 2;
+        int rightWidth = availableWidth / 2;
+        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS
+                + CharWidth.substringByWidthFromEnd(text, rightWidth);
     }
 
     private String lineToString(Line line) {
@@ -295,7 +301,7 @@ public final class Paragraph implements Widget {
         for (Span span : line.spans()) {
             String content = span.content();
             Style spanStyle = span.style();
-            
+
             // Ensure hyperlinks have IDs when wrapping across lines
             Style wrappedStyle = ensureHyperlinkIdForWrapping(spanStyle, hyperlinkIds);
 
@@ -310,12 +316,42 @@ public final class Paragraph implements Widget {
                     remainingWidth = maxWidth;
                 }
 
-                int end = Math.min(i + remainingWidth, content.length());
-                String chunk = content.substring(i, end);
+                // Build chunk by iterating code points and checking display width
+                StringBuilder chunk = new StringBuilder();
+                int chunkWidth = 0;
+                int j = i;
+                while (j < content.length()) {
+                    int codePoint = content.codePointAt(j);
+                    int cpWidth = CharWidth.of(codePoint);
+                    if (chunkWidth + cpWidth > remainingWidth) {
+                        break;
+                    }
+                    chunk.appendCodePoint(codePoint);
+                    chunkWidth += cpWidth;
+                    j += Character.charCount(codePoint);
+                }
 
-                currentSpans.add(new Span(chunk, wrappedStyle));
-                currentWidth += chunk.length();
-                i = end;
+                if (chunk.length() > 0) {
+                    currentSpans.add(new Span(chunk.toString(), wrappedStyle));
+                    currentWidth += chunkWidth;
+                    i = j;
+                } else {
+                    // Wide character doesn't fit on remaining space, wrap to next line
+                    if (currentWidth > 0) {
+                        wrapped.add(Line.from(currentSpans));
+                        currentSpans = new ArrayList<>();
+                        currentWidth = 0;
+                    } else {
+                        // Single character wider than maxWidth (shouldn't happen with maxWidth >= 2)
+                        int codePoint = content.codePointAt(j);
+                        chunk.appendCodePoint(codePoint);
+                        currentSpans.add(new Span(chunk.toString(), wrappedStyle));
+                        wrapped.add(Line.from(currentSpans));
+                        currentSpans = new ArrayList<>();
+                        currentWidth = 0;
+                        i = j + Character.charCount(codePoint);
+                    }
+                }
             }
         }
 
@@ -327,69 +363,84 @@ public final class Paragraph implements Widget {
     }
 
     private List<Line> wrapLineByWord(Line line, int maxWidth) {
-        // Build a character-to-style mapping to preserve span information
+        // Build a code-point-to-style mapping to preserve span information
         List<Span> spans = line.spans();
         if (spans.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // Build full text and track which span each character belongs to
+        // Build full text and track which code point index maps to which style
         StringBuilder fullText = new StringBuilder();
-        List<Style> charStyles = new ArrayList<>();
+        List<Style> cpStyles = new ArrayList<>();
+        List<Integer> cpWidths = new ArrayList<>();
         Map<String, String> hyperlinkIds = new HashMap<>();
 
         for (Span span : spans) {
             String content = span.content();
             Style spanStyle = span.style();
-            
+
             // Ensure hyperlinks have IDs when wrapping across lines
             Style wrappedStyle = ensureHyperlinkIdForWrapping(spanStyle, hyperlinkIds);
-            
-            for (int i = 0; i < content.length(); i++) {
-                fullText.append(content.charAt(i));
-                charStyles.add(wrappedStyle);
+
+            int i = 0;
+            while (i < content.length()) {
+                int codePoint = content.codePointAt(i);
+                fullText.appendCodePoint(codePoint);
+                cpStyles.add(wrappedStyle);
+                cpWidths.add(CharWidth.of(codePoint));
+                i += Character.charCount(codePoint);
             }
         }
 
         String text = fullText.toString();
         List<Line> wrapped = new ArrayList<>();
-        int pos = 0;
+        int pos = 0; // code point index
 
-        while (pos < text.length()) {
+        // Build a char-offset array for code point index -> string offset
+        int cpCount = cpStyles.size();
+        int[] cpOffsets = new int[cpCount + 1];
+        int off = 0;
+        for (int idx = 0; idx < cpCount; idx++) {
+            cpOffsets[idx] = off;
+            off += Character.charCount(text.codePointAt(cpOffsets[idx]));
+        }
+        cpOffsets[cpCount] = text.length();
+
+        while (pos < cpCount) {
             // Find the next word break point
-            int lineEnd = findNextWordBreak(text, pos, maxWidth);
-            
+            int lineEnd = findNextWordBreakByWidth(text, cpOffsets, cpWidths, pos, cpCount, maxWidth);
+
             // Extract the line and reconstruct spans with correct styles
             List<Span> lineSpans = new ArrayList<>();
             int spanStart = pos;
-            Style currentStyle = charStyles.get(pos);
-            
+            Style currentStyle = cpStyles.get(pos);
+
             for (int i = pos; i < lineEnd; i++) {
-                Style charStyle = charStyles.get(i);
-                if (!charStyle.equals(currentStyle)) {
-                    // Style changed, create a span for the previous style
+                Style cpStyle = cpStyles.get(i);
+                if (!cpStyle.equals(currentStyle)) {
                     if (spanStart < i) {
-                        lineSpans.add(new Span(text.substring(spanStart, i), currentStyle));
+                        lineSpans.add(new Span(text.substring(cpOffsets[spanStart], cpOffsets[i]), currentStyle));
                     }
                     spanStart = i;
-                    currentStyle = charStyle;
+                    currentStyle = cpStyle;
                 }
             }
-            
+
             // Add the final span
             if (spanStart < lineEnd) {
-                lineSpans.add(new Span(text.substring(spanStart, lineEnd), currentStyle));
+                lineSpans.add(new Span(text.substring(cpOffsets[spanStart], cpOffsets[lineEnd]), currentStyle));
             }
-            
+
             wrapped.add(Line.from(lineSpans));
             pos = lineEnd;
-            
-            // Skip leading whitespace at the start of next line (but preserve trailing whitespace on current line)
-            // Only skip if we broke at a word boundary (whitespace), not if we broke mid-word
-            if (lineEnd < text.length() && Character.isWhitespace(text.charAt(lineEnd - 1))) {
-                // We already included the whitespace in the line, so skip it for the next line
-                while (pos < text.length() && Character.isWhitespace(text.charAt(pos))) {
-                    pos++;
+
+            // Skip leading whitespace at the start of next line
+            if (lineEnd < cpCount && lineEnd > 0) {
+                int prevCp = text.codePointAt(cpOffsets[lineEnd - 1]);
+                if (Character.isWhitespace(prevCp)) {
+                    while (pos < cpCount && Character.isWhitespace(text.codePointAt(cpOffsets[pos]))) {
+                        pos++;
+                    }
                 }
             }
         }
@@ -398,39 +449,48 @@ public final class Paragraph implements Widget {
     }
 
     /**
-     * Finds the next word break point for word wrapping.
-     * Tries to break at word boundaries, but breaks by character if word is too long.
-     *
-     * @param text the full text
-     * @param startPos the starting position
-     * @param maxWidth the maximum width for the line
-     * @return the position to break at (exclusive)
+     * Finds the next word break point for word wrapping using display widths.
      */
-    private int findNextWordBreak(String text, int startPos, int maxWidth) {
-        int textLength = text.length();
-        int maxEnd = Math.min(startPos + maxWidth, textLength);
-        
-        // If we can fit everything, return the end
-        if (maxEnd >= textLength) {
-            return textLength;
+    private int findNextWordBreakByWidth(String text,
+                                         int[] cpOffsets,
+                                         List<Integer> cpWidths,
+                                         int startPos,
+                                         int cpCount,
+                                         int maxWidth) {
+        // Find max end position that fits within maxWidth display columns
+        int width = 0;
+        int maxEnd = startPos;
+        while (maxEnd < cpCount) {
+            int cpWidth = cpWidths.get(maxEnd);
+            if (width + cpWidth > maxWidth) {
+                break;
+            }
+            width += cpWidth;
+            maxEnd++;
         }
-        
+
+        // If we can fit everything, return the end
+        if (maxEnd >= cpCount) {
+            return cpCount;
+        }
+
         // Look backwards from maxEnd for a word boundary (whitespace)
         for (int i = maxEnd - 1; i > startPos; i--) {
-            if (Character.isWhitespace(text.charAt(i))) {
-                return i + 1; // Break after whitespace
+            int cp = text.codePointAt(cpOffsets[i]);
+            if (Character.isWhitespace(cp)) {
+                return i + 1;
             }
         }
-        
-        // No word boundary found - check if we can break at punctuation
+
+        // No word boundary found - check for punctuation
         for (int i = maxEnd - 1; i > startPos; i--) {
-            char c = text.charAt(i);
-            if (c == '-' || c == '/' || c == '\\') {
-                return i + 1; // Break after punctuation
+            int cp = text.codePointAt(cpOffsets[i]);
+            if (cp == '-' || cp == '/' || cp == '\\') {
+                return i + 1;
             }
         }
-        
-        // No good break point - break at character boundary (for long words)
+
+        // No good break point - break at character boundary
         return maxEnd;
     }
 
