@@ -7,11 +7,18 @@ plugins {
     alias(libs.plugins.allure.adapter) apply false
 }
 
+repositories {
+    mavenCentral()
+}
+
 val libsCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
 val allureJavaVersionValue = libsCatalog.findVersion("allure").get().requiredVersion
 val allureCommandlineVersionValue = libsCatalog.findVersion("allure-commandline").get().requiredVersion
 
 allprojects {
+    repositories {
+        mavenCentral()
+    }
     apply(plugin = "io.qameta.allure-adapter")
 
     plugins.withId("io.qameta.allure-adapter") {
