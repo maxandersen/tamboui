@@ -322,6 +322,10 @@ public final class InlineDisplay implements AutoCloseable {
         try {
             // Move cursor to after the display area and restore cursor visibility
             backend.carriageReturn();
+            int toBottom = currentHeight - 1 - lastCursorY;
+            if (toBottom > 0) {
+                backend.moveCursorDown(toBottom);
+            }
             out.print(AnsiStringBuilder.RESET);  // Reset style
             backend.showCursor();
             out.print("\u001b[0 q");  // Reset cursor to default style
