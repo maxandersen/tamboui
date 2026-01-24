@@ -8,17 +8,17 @@ plugins {
 }
 
 val libsCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-val allureJavaVersion = libsCatalog.findVersion("allure").get().requiredVersion
-val allureCommandlineVersion = libsCatalog.findVersion("allure-commandline").get().requiredVersion
+val allureJavaVersionValue = libsCatalog.findVersion("allure").get().requiredVersion
+val allureCommandlineVersionValue = libsCatalog.findVersion("allure-commandline").get().requiredVersion
 
 allprojects {
     apply(plugin = "io.qameta.allure-adapter")
 
     plugins.withId("io.qameta.allure-adapter") {
         extensions.configure<AllureExtension>("allure") {
-            version.set(allureCommandlineVersion)
+            version.set(allureCommandlineVersionValue)
             adapter {
-                allureJavaVersion.set(allureJavaVersion)
+                allureJavaVersion.set(allureJavaVersionValue)
             }
         }
     }
