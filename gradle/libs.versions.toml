@@ -2,6 +2,7 @@
 jline = "3.25.1"
 junit = "5.14.1"
 assertj = "3.27.6"
+allure = "2.32.0"
 native-build-tools = "0.11.1"
 picocli = "4.7.6"
 nexus = "2.0.0"
@@ -21,6 +22,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+allure-junit5 = { module = "io.qameta.allure:allure-junit5", version.ref = "allure" }
 graalvm-native = { module = "org.graalvm.buildtools:native-gradle-plugin", version.ref = "native-build-tools" }
 nexus-publishing-plugin = { module = "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin", version.ref = "nexus" }
 animal-sniffer-plugin = { module = "ru.vyarus:gradle-animalsniffer-plugin", version.ref = "animal-sniffer" }
