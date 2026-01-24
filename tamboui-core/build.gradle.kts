@@ -13,4 +13,5 @@ tasks.named<org.gradle.jvm.tasks.Jar>("jar") {
 
 dependencies {
     testFixturesApi(libs.assertj.core)
+    testImplementation(libs.allure.junit5)
 }
