@@ -15,7 +15,10 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Parses BBCode-style markup text and converts it to styled {@link Text} objects.
@@ -34,6 +37,7 @@ import java.util.Map;
  *   <li>Custom tags: resolved via a {@link StyleResolver}</li>
  *   <li>Escaped brackets: {@code [[} produces {@code [}, and {@code ]]} produces {@code ]}</li>
  *   <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
+ *   <li>Emoji codes: {@code :smiley:}, {@code :warning:}, {@code :success:}, etc. (replaced with Unicode emoji)</li>
  * </ul>
  * <p>
  * Example usage:
@@ -57,6 +61,9 @@ import java.util.Map;
  * Unclosed tags apply their style to the remaining content.
  */
 public final class MarkupParser {
+
+    private static final Pattern emoji_PATTERN = Pattern.compile(":([^:]+):");
+    private static final EmojiResolver DEFAULT_EMOJI_RESOLVER = (key) -> Emoji.emojis().get(key);
 
     private static final Map<String, Style> BUILT_IN_STYLES;
 
@@ -110,30 +117,75 @@ public final class MarkupParser {
     }
 
     /**
+     * Functional interface for resolving string expansion of emoji codes/names.
+     */
+    @FunctionalInterface
+    public interface EmojiResolver {
+        /**
+         * Resolves a string expansion for the given tag name.
+         *
+         * @param string the string to expand
+         * @return the expanded string, or null if not recognized
+         */
+        String resolve(String string);
+    }
+
+
+
+    /**
      * Parses markup text using only built-in styles.
      * <p>
      * Custom tags are rendered as plain text (the tag markers are preserved).
+     * Emoji codes (e.g. {@code :smiley:}, {@code :warning:}) are replaced with Unicode emoji characters.
      *
      * @param markup the markup text to parse
      * @return the parsed styled text
      */
     public static Text parse(String markup) {
-        return parse(markup, null);
+        return parse(markup, null, true);
     }
 
     /**
      * Parses markup text with custom style resolution.
+     * Emoji codes (e.g. {@code :smiley:}, {@code :warning:}) are replaced with Unicode emoji characters.
      *
      * @param markup the markup text to parse
      * @param resolver optional resolver for custom tags
      * @return the parsed styled text
      */
     public static Text parse(String markup, StyleResolver resolver) {
+        return parse(markup, resolver, true);
+    }
+
+    /**
+     * Parses markup text with custom style resolution and emoji replacement control.
+     *
+     * @param markup the markup text to parse
+     * @param resolver optional resolver for custom tags
+     * @param emoji whether to replace emoji codes (e.g. {@code :smiley:}) with Unicode characters
+     * @return the parsed styled text
+     */
+    public static Text parse(String markup, StyleResolver resolver, boolean emoji) {
         if (markup == null || markup.isEmpty()) {
             return Text.empty();
         }
 
-        Parser parser = new Parser(markup, resolver);
+        // Replace emoji codes if enabled
+        String processedMarkup = emoji ? replaceEmoji(markup, DEFAULT_EMOJI_RESOLVER) : markup;
+
+        Parser parser = new Parser(processedMarkup, resolver);
+        return parser.parse();
+    }
+
+    public static Text parse(String markup, StyleResolver resolver, EmojiResolver emojiResolver) {
+        if (markup == null || markup.isEmpty()) {
+            return Text.empty();
+        }
+
+        // Replace emoji codes if enabled
+        String processedMarkup = replaceEmoji(markup, emojiResolver);
+
+        Parser parser = new Parser(processedMarkup, resolver);
         return parser.parse();
     }
 
@@ -524,5 +576,51 @@ public final class MarkupParser {
                 this.style = style;
             }
         }
+    }
+
+    public static String replaceEmoji(String emoji) {
+        return replaceEmoji(emoji, DEFAULT_EMOJI_RESOLVER);
+    }
+
+     /**
+     * Replaces emoji codes in text with Unicode emoji characters.
+     *
+     * @param text text that may contain emoji codes
+     * @return text with emoji codes replaced
+     */
+     public static String replaceEmoji(String text, EmojiResolver resolver) {
+        if (text == null || text.isEmpty() || text.indexOf(':') < 0) {
+            return text == null ? "" : text;
+        }
+
+        if(resolver == null) { return text; }
+
+        Matcher matcher = emoji_PATTERN.matcher(text);
+        StringBuffer result = new StringBuffer();
+
+        while (matcher.find()) {
+            String emojiName = matcher.group(1);
+
+            String emoji = resolver.resolve(emojiName.toLowerCase(Locale.ROOT));
+            if (emoji != null) {
+                matcher.appendReplacement(result, Matcher.quoteReplacement(emoji));
+            } else {
+                // Unknown emoji code - leave it as-is
+                matcher.appendReplacement(result, matcher.group(0));
+            }
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+     /**
+     * Returns true if the given text contains any emoji codes.
+     *
+     * @param text text to check
+     * @return true if text contains emoji codes
+     */
+     public static boolean containsEmojiCodes(String text) {
+        return text != null && text.indexOf(':') >= 0 && emoji_PATTERN.matcher(text).find();
     }
 }

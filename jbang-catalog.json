@@ -67,6 +67,9 @@
     "custom-component-demo": {
       "script-ref": "tamboui-toolkit/demos/custom-component-demo/src/main/java/dev/tamboui/demo/CustomComponentDemo.java"
     },
+    "emoji-demo": {
+      "script-ref": "tamboui-toolkit/demos/emoji-demo/src/main/java/dev/tamboui/demo/EmojiDemo.java"
+    },
     "inline-toolkit-demo": {
       "script-ref": "tamboui-toolkit/demos/inline-toolkit-demo/src/main/java/dev/tamboui/demo/InlineToolkitDemo.java"
     },

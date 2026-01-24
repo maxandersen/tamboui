@@ -629,4 +629,62 @@ class MarkupParserTest {
             dev.tamboui.style.Modifier.ITALIC
         );
     }
+
+    @Test
+    @DisplayName("parse replaces emoji codes by default")
+    void parseReplacesEmojiCodesByDefault() {
+        Text text = MarkupParser.parse(":warning: Alert!");
+
+        assertThat(text.lines()).hasSize(1);
+        assertThat(text.rawContent()).contains("⚠");
+    }
+
+    @Test
+    @DisplayName("parse can disable emoji replacement")
+    void parseCanDisableEmoji() {
+        Text text = MarkupParser.parse(":warning: Alert!", null, false);
+
+        assertThat(text.lines()).hasSize(1);
+        assertThat(text.rawContent()).isEqualTo(":warning: Alert!");
+    }
+
+    @Test
+    @DisplayName("parse with emoji codes and markup tags")
+    void parseWithEmojiCodesAndMarkupTags() {
+        Text text = MarkupParser.parse("[bold]:warning: Alert![/bold]");
+
+        assertThat(text.lines()).hasSize(1);
+        assertThat(text.rawContent()).contains("⚠");
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
+            .contains(dev.tamboui.style.Modifier.BOLD);
+    }
+
+    @Test
+    @DisplayName("parse with multiple emoji codes")
+    void parseWithMultipleEmojiCodes() {
+        Text text = MarkupParser.parse(":cross_mark: :warning:");
+
+        assertThat(text.lines()).hasSize(1);
+        assertThat(text.rawContent()).contains("❌");
+        assertThat(text.rawContent()).contains("⚠");
+    }
+
+    @Test
+    @DisplayName("parse with unknown emoji codes leaves them unchanged")
+    void parseWithUnknownEmojiCodes() {
+        Text text = MarkupParser.parse("Hello :unknown_emoji: world");
+
+        assertThat(text.lines()).hasSize(1);
+        assertThat(text.rawContent()).isEqualTo("Hello :unknown_emoji: world");
+    }
+
+    @Test
+    @DisplayName("parse with emoji codes is case-insensitive")
+    void parseWithEmojiCodesCaseInsensitive() {
+        Text text = MarkupParser.parse(":SMILEY: :Warning:");
+
+        assertThat(text.lines()).hasSize(1);
+        assertThat(text.rawContent()).contains("😃");
+        assertThat(text.rawContent()).contains("⚠");
+    }
 }
