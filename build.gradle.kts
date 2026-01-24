@@ -1,4 +1,5 @@
 import io.qameta.allure.gradle.base.AllureExtension
+import org.gradle.api.artifacts.VersionCatalogsExtension
 
 plugins {
     id("dev.tamboui.parent")
@@ -6,8 +7,9 @@ plugins {
     alias(libs.plugins.allure.adapter) apply false
 }
 
-val allureJavaVersion = libs.versions.allure.get()
-val allureCommandlineVersion = libs.versions.allure.commandline.get()
+val libsCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val allureJavaVersion = libsCatalog.findVersion("allure").get().requiredVersion
+val allureCommandlineVersion = libsCatalog.findVersion("allure-commandline").get().requiredVersion
 
 allprojects {
     apply(plugin = "io.qameta.allure-adapter")
