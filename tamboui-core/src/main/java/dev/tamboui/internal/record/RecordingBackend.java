@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A backend wrapper that records frames to an Asciinema cast file.
@@ -31,8 +32,8 @@ public final class RecordingBackend implements Backend {
     private final Buffer buffer;
     private final List<TimedFrame> frames;
     private final InteractionPlayer interactionPlayer;
-    private final long startTime;
-    private long lastCaptureTime;
+    private final long startTimeNanos;
+    private long lastCaptureTimeNanos;
     private volatile boolean recording;
     private volatile boolean closed;
     private volatile boolean hasDrawn;  // Track if draw() was ever called
@@ -45,8 +46,8 @@ public final class RecordingBackend implements Backend {
         this.frames = new ArrayList<>();
         this.interactionPlayer = new InteractionPlayer(
                 InteractionPlayer.loadFromFile(config.configFile()));
-        this.startTime = System.currentTimeMillis();
-        this.lastCaptureTime = 0;
+        this.startTimeNanos = System.nanoTime();
+        this.lastCaptureTimeNanos = 0;
         this.recording = true;
         this.closed = false;
         // Note: AnsiTerminalCapture is installed by RecordingConfig.load()
@@ -74,20 +75,21 @@ public final class RecordingBackend implements Backend {
     }
 
     private void captureFrame() {
-        long now = System.currentTimeMillis();
-        long elapsed = now - startTime;
+        long nowNanos = System.nanoTime();
+        long elapsedNanos = nowNanos - startTimeNanos;
+        long elapsedMs = TimeUnit.NANOSECONDS.toMillis(elapsedNanos);
 
         // Check duration limit
-        if (elapsed > config.maxDurationMs()) {
+        if (elapsedMs > config.maxDurationMs()) {
             recording = false;
             return;
         }
 
         // Throttle based on FPS
-        long frameIntervalMs = 1000 / config.fps();
-        if (now - lastCaptureTime >= frameIntervalMs) {
-            frames.add(new TimedFrame(buffer.copy(), elapsed));
-            lastCaptureTime = now;
+        long frameIntervalNanos = TimeUnit.MILLISECONDS.toNanos(1000 / config.fps());
+        if (nowNanos - lastCaptureTimeNanos >= frameIntervalNanos) {
+            frames.add(new TimedFrame(buffer.copy(), elapsedMs));
+            lastCaptureTimeNanos = nowNanos;
         }
     }
 
@@ -99,7 +101,7 @@ public final class RecordingBackend implements Backend {
             return false;
         }
         // Check duration limit
-        if (System.currentTimeMillis() - startTime > config.maxDurationMs()) {
+        if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos) > config.maxDurationMs()) {
             recording = false;
             return false;
         }

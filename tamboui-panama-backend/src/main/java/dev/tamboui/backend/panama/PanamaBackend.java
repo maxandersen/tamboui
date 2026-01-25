@@ -18,6 +18,8 @@ import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.Mode2027Status;
+import dev.tamboui.terminal.Mode2027Support;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -41,6 +43,7 @@ public class PanamaBackend implements Backend {
     private final ByteArrayBuilder outputBuffer;
     private boolean inAlternateScreen;
     private boolean mouseEnabled;
+    private boolean mode2027Enabled;
 
     /**
      * Creates a new Panama backend.
@@ -55,6 +58,7 @@ public class PanamaBackend implements Backend {
         this.outputBuffer = new ByteArrayBuilder(INITIAL_BUFFER_SIZE);
         this.inAlternateScreen = false;
         this.mouseEnabled = false;
+        this.mode2027Enabled = false;
     }
 
     PanamaBackend(PlatformTerminal terminal) {
@@ -62,6 +66,7 @@ public class PanamaBackend implements Backend {
         this.outputBuffer = new ByteArrayBuilder(INITIAL_BUFFER_SIZE);
         this.inAlternateScreen = false;
         this.mouseEnabled = false;
+        this.mode2027Enabled = false;
     }
 
     private static PlatformTerminal createPlatformTerminal() throws IOException {
@@ -180,10 +185,24 @@ public class PanamaBackend implements Backend {
     @Override
     public void enableRawMode() throws IOException {
         terminal.enableRawMode();
+
+        // Query and enable Mode 2027 (grapheme cluster mode) after entering raw mode
+        // to prevent the response from being echoed to the terminal
+        Mode2027Status status = Mode2027Support.query(this, 500);
+        if (status.isSupported()) {
+            Mode2027Support.enable(this);
+            mode2027Enabled = true;
+        }
     }
 
     @Override
     public void disableRawMode() throws IOException {
+        // Disable Mode 2027 if it was enabled
+        if (mode2027Enabled) {
+            Mode2027Support.disable(this);
+            mode2027Enabled = false;
+        }
+
         terminal.disableRawMode();
     }
 
