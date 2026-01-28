@@ -1,0 +1,83 @@
+// Copyright TamboUI Contributors
+// SPDX-License-Identifier: MIT
+= Flamegraph Viewer
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+
+include::_attributes.adoc[]
+
+This guide explains how to generate collapsed flamegraph stacks from common Java tools
+and visualize them in the TamboUI flamegraph demo.
+
+== Supported input format
+
+The demo expects the standard "collapsed stack" format where each line is a stack
+trace followed by a sample count:
+
+[source,text]
+----
+com.example.App.run;com.example.Worker.step;com.example.Worker.ioWait 42
+----
+
+Stacks are separated by semicolons and the final number is the number of samples.
+
+== Generating collapsed stacks
+
+=== Async-profiler (CPU)
+
+[source,bash]
+----
+# Record 30 seconds of CPU samples
+./profiler.sh -d 30 -e cpu -o collapsed -f /tmp/profile.folded <pid>
+----
+
+=== Async-profiler (allocations)
+
+[source,bash]
+----
+# Record allocation samples
+./profiler.sh -d 30 -e alloc -o collapsed -f /tmp/alloc.folded <pid>
+----
+
+=== Java Flight Recorder (JFR)
+
+[source,bash]
+----
+# Create a 30s JFR recording
+jcmd <pid> JFR.start name=profile settings=profile duration=30s filename=/tmp/profile.jfr
+
+# Convert JFR to collapsed stacks using async-profiler's jfr2flame script
+/path/to/async-profiler/bin/jfr2flame --type cpu /tmp/profile.jfr > /tmp/profile.folded
+----
+
+The async-profiler distribution includes the `jfr2flame` helper script.
+
+== Visualizing in TamboUI
+
+Use the bundled sample:
+
+[source,bash]
+----
+./run-demo.sh flamegraph-visualization-demo
+----
+
+To visualize your own data:
+
+[source,bash]
+----
+./gradlew :demos:flamegraph-visualization-demo:installDist
+./demos/flamegraph-visualization-demo/build/install/flamegraph-visualization-demo/bin/flamegraph-visualization-demo /tmp/profile.folded
+----
+
+The demo also accepts gzip-compressed files with `.gz` or `.gzip` extensions.
+
+== Controls
+
+* Arrow keys: navigate frames (parent/child/siblings)
+* Enter or Space: zoom into selected frame
+* Backspace or Esc: zoom out
+* R: reset to full view
+* q: quit

@@ -81,6 +81,9 @@ BBCode-style markup for creating styled text with colors, modifiers, and custom 
 === link:widgets.html[Widgets Reference]
 Comprehensive guide to all available widgets with examples.
 
+=== link:flamegraphs.html[Flamegraph Viewer]
+How to generate collapsed stacks and visualize flamegraphs.
+
 === link:api-levels.html[API Levels]
 Detailed documentation for immediate mode, TuiRunner, Toolkit DSL, and inline display.
 
