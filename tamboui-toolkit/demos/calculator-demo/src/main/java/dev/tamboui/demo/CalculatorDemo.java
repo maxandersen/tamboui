@@ -134,7 +134,7 @@ public final class CalculatorDemo implements Element {
             )
                 .id("keypad")
 
-                .gridSize(4,4)
+                .gridSize(4,5)
                 .gutter(1, 1)
 
                 .fill()
@@ -389,6 +389,8 @@ public final class CalculatorDemo implements Element {
             this.text = text != null ? text : "";
         }
 
+       
+
         @Override
         public String styleType() {
             return "Digits";
@@ -430,6 +432,15 @@ public final class CalculatorDemo implements Element {
             return "CalcButton";
         }
 
+        @Override
+        public int preferredHeight() {
+            return 3;
+        }
+
+        @Override
+        public int preferredWidth() {
+            return 3;
+        }
         @Override
         public EventResult handleMouseEvent(MouseEvent event) {
             if (event.isClick()) {
