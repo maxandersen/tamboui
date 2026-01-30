@@ -76,6 +76,9 @@
     "action-handler-demo": {
       "script-ref": "tamboui-toolkit/demos/action-handler-demo/src/main/java/dev/tamboui/demo/actionhandler/ActionHandlerDemo.java"
     },
+    "calculator-demo": {
+      "script-ref": "tamboui-toolkit/demos/calculator-demo/src/main/java/dev/tamboui/demo/CalculatorDemo.java"
+    },
     "custom-component-demo": {
       "script-ref": "tamboui-toolkit/demos/custom-component-demo/src/main/java/dev/tamboui/demo/CustomComponentDemo.java"
     },
@@ -120,6 +123,9 @@
     },
     "block-demo": {
       "script-ref": "tamboui-widgets/demos/block-demo/src/main/java/dev/tamboui/demo/BlockDemo.java"
+    },
+    "boxtext-demo": {
+      "script-ref": "tamboui-widgets/demos/boxtext-demo/src/main/java/dev/tamboui/demo/BoxTextDemo.java"
     },
     "calendar-demo": {
       "script-ref": "tamboui-widgets/demos/calendar-demo/src/main/java/dev/tamboui/demo/CalendarDemo.java"

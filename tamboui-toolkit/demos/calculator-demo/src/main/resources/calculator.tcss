@@ -1,0 +1,40 @@
+$bg: black;
+$panel: #202124;
+$text: white;
+$button-bg: rgb(35,35,35);
+$button-fg: white;
+$button-primary-bg:rgb(34, 85, 172);
+$button-primary-fg: white;
+$button-op-bg: #ff9500;
+$button-op-fg: black;
+
+Screen {
+    background: $bg;
+    color: $text;
+}
+
+#calculator {
+    margin: 2 2;
+    background: $bg;
+    spacing: 2;
+    border-type: none;
+}
+
+CalcButton.numbers {
+    /* column-span: 4; */
+    padding: 0 1;
+    background: $button-bg;
+    color: $text;
+    text-align: center;
+}
+
+CalcButton.secondaryops {
+    background: $button-primary-bg;
+    color: $button-primary-fg;
+}
+
+CalcButton.primaryops {
+    background: $button-op-bg;
+    color: $button-op-fg;
+    text-style: bold;
+}

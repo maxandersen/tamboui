@@ -23,6 +23,10 @@ include::_attributes.adoc[]
 |Stateless
 |Multi-line text with wrapping and alignment
 
+|<<boxtext,BoxText>>
+|Stateless
+|Large 3-row "box" glyph text (A-Z/0-9)
+
 |<<listwidget,ListWidget>>
 |Stateful
 |Scrollable list with selection
@@ -144,6 +148,17 @@ Wrap modes:
 * `Wrap.NONE` - No wrapping, text is clipped
 * `Wrap.CHARACTER` - Wrap at any character
 * `Wrap.WORD` - Wrap at word boundaries
+
+[[boxtext]]
+=== BoxText
+
+Renders large 3-row tall text using box-drawing characters. Unknown characters are rendered as spaces.
+
+[source,java]
+----
+BoxText box = BoxText.from("TAMBOUI 2026");
+box.render(area, buffer);
+----
 
 == Selection Widgets
 
