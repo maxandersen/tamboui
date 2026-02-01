@@ -14,15 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          distribution: 'graalvm'
-          java-version: '25'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: gradle/actions/wrapper-validation@v4
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
+      - uses: ./.github/actions/shared-build-setup
       - name: Execute Gradle build
         if: env.CENTRAL_USERNAME
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository

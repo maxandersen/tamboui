@@ -14,13 +14,7 @@ jobs:
         with:
           fetch-depth: 1
           ssh-key: "${{ secrets.DOCS_SSH_PRIVATE_KEY }}"
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          java-version: '25'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: gradle/actions/wrapper-validation@v4
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: ./.github/actions/shared-build-setup
       - name: Setup git for SSH push
         env:
           GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
