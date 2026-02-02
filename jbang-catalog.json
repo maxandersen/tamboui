@@ -16,6 +16,9 @@
     "flex-demo": {
       "script-ref": "demos/flex-demo/src/main/java/dev/tamboui/demo/flex/FlexDemo.java"
     },
+    "flamegraph-visualization-demo": {
+      "script-ref": "demos/flamegraph-visualization-demo/src/main/java/dev/tamboui/demo/flamegraph/FlameGraphDemo.java"
+    },
     "form-table-demo": {
       "script-ref": "demos/form-table-demo/src/main/java/dev/tamboui/demo/layout/FormTableDemo.java"
     },
