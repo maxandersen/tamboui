@@ -15,19 +15,19 @@ import dev.tamboui.style.PropertyConverter;
  * <p>
  * Supported values (case-insensitive, hyphens or underscores):
  * <ul>
- * <li>{@code none} - no border</li>
- * <li>{@code plain} - standard box drawing characters</li>
- * <li>{@code rounded} - rounded corners</li>
- * <li>{@code double} - double-line borders</li>
- * <li>{@code thick} - thick/bold borders</li>
- * <li>{@code light-double-dashed} - light double-dashed borders</li>
- * <li>{@code heavy-double-dashed} - heavy double-dashed borders</li>
- * <li>{@code light-triple-dashed} - light triple-dashed borders</li>
- * <li>{@code heavy-triple-dashed} - heavy triple-dashed borders</li>
- * <li>{@code light-quadruple-dashed} - light quadruple-dashed borders</li>
- * <li>{@code heavy-quadruple-dashed} - heavy quadruple-dashed borders</li>
- * <li>{@code quadrant-inside} - quadrant block inside style</li>
- * <li>{@code quadrant-outside} - quadrant block outside style</li>
+ *   <li>{@code none} - no border</li>
+ *   <li>{@code plain} - standard box drawing characters</li>
+ *   <li>{@code rounded} - rounded corners</li>
+ *   <li>{@code double} - double-line borders</li>
+ *   <li>{@code thick} - thick/bold borders</li>
+ *   <li>{@code light-double-dashed} - light double-dashed borders</li>
+ *   <li>{@code heavy-double-dashed} - heavy double-dashed borders</li>
+ *   <li>{@code light-triple-dashed} - light triple-dashed borders</li>
+ *   <li>{@code heavy-triple-dashed} - heavy triple-dashed borders</li>
+ *   <li>{@code light-quadruple-dashed} - light quadruple-dashed borders</li>
+ *   <li>{@code heavy-quadruple-dashed} - heavy quadruple-dashed borders</li>
+ *   <li>{@code quadrant-inside} - quadrant block inside style</li>
+ *   <li>{@code quadrant-outside} - quadrant block outside style</li>
  * </ul>
  */
 public final class BorderTypeConverter implements PropertyConverter<BorderType> {

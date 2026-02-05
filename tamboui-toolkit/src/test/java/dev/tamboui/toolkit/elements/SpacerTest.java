@@ -62,9 +62,10 @@ class SpacerTest {
     @Test
     @DisplayName("Row with fixed spacer includes spacer in preferredWidth")
     void rowWithFixedSpacer() {
-        Row row = row(text("Left"), // 4
-                Spacer.length(4), // 4
-                text("Right") // 5
+        Row row = row(
+            text("Left"),      // 4
+            Spacer.length(4),  // 4
+            text("Right")      // 5
         );
         // 4 + 4 + 5 = 13
         assertThat(row.preferredWidth()).isEqualTo(13);
@@ -73,9 +74,10 @@ class SpacerTest {
     @Test
     @DisplayName("Row with fill spacer does not include spacer in preferredWidth")
     void rowWithFillSpacer() {
-        Row row = row(text("Left"), // 4
-                spacer(), // 0
-                text("Right") // 5
+        Row row = row(
+            text("Left"),      // 4
+            spacer(),          // 0
+            text("Right")      // 5
         );
         // 4 + 0 + 5 = 9
         assertThat(row.preferredWidth()).isEqualTo(9);

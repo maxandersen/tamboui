@@ -15,9 +15,8 @@ import dev.tamboui.css.cascade.PseudoClassState;
  * <p>
  * Example: {@code Panel { ... }} matches all Panel elements.
  * <p>
- * Type selectors also match subclasses. For example, if
- * {@code MyPanel extends Panel}, the selector {@code Panel { ... }} will match
- * both Panel and MyPanel elements.
+ * Type selectors also match subclasses. For example, if {@code MyPanel extends Panel},
+ * the selector {@code Panel { ... }} will match both Panel and MyPanel elements.
  */
 public final class TypeSelector implements Selector {
 
@@ -26,8 +25,7 @@ public final class TypeSelector implements Selector {
     /**
      * Creates a type selector for the given type name.
      *
-     * @param typeName
-     *            the element type name
+     * @param typeName the element type name
      */
     public TypeSelector(String typeName) {
         this.typeName = Objects.requireNonNull(typeName);

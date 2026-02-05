@@ -20,9 +20,8 @@ import dev.tamboui.tui.event.MouseEvent;
 /**
  * An element that lazily evaluates its content on each render.
  * <p>
- * This allows state to be captured in the supplier closure, enabling
- * encapsulated component-local state:
- * 
+ * This allows state to be captured in the supplier closure,
+ * enabling encapsulated component-local state:
  * <pre>{@code
  * int count = 0;
  * panel("Counter", () -> text("Count: " + count))
@@ -36,8 +35,7 @@ public final class LazyElement implements Element {
     /**
      * Creates a new lazy element with the given supplier.
      *
-     * @param supplier
-     *            the supplier that produces the element on each render
+     * @param supplier the supplier that produces the element on each render
      */
     public LazyElement(Supplier<? extends Element> supplier) {
         this.supplier = supplier;
@@ -119,9 +117,7 @@ public final class LazyElement implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        return lastElement != null
-                ? lastElement.handleKeyEvent(event, focused)
-                : EventResult.UNHANDLED;
+        return lastElement != null ? lastElement.handleKeyEvent(event, focused) : EventResult.UNHANDLED;
     }
 
     @Override

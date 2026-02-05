@@ -74,8 +74,7 @@ class SpacingConverterTest {
         assertThat(converter.convert("invalid", Collections.emptyMap())).isEmpty();
         assertThat(converter.convert("", Collections.emptyMap())).isEmpty();
         assertThat(converter.convert(null, Collections.emptyMap())).isEmpty();
-        assertThat(converter.convert("1 2 3", Collections.emptyMap())).isEmpty(); // 3 values not
-                                                                                  // supported
+        assertThat(converter.convert("1 2 3", Collections.emptyMap())).isEmpty(); // 3 values not supported
     }
 
     @Test

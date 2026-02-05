@@ -35,8 +35,8 @@ class DefaultRenderContextChildStyleTest {
     @DisplayName("childStyle with ChildPosition resolves nth-child(odd)")
     void childStyleResolvesNthChildOdd() {
         // Given CSS with nth-child selectors
-        String css = "ListElement-item:nth-child(odd) { background: red; }\n"
-                + "ListElement-item:nth-child(even) { background: blue; }";
+        String css = "ListElement-item:nth-child(odd) { background: red; }\n" +
+                     "ListElement-item:nth-child(even) { background: blue; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 
@@ -57,8 +57,8 @@ class DefaultRenderContextChildStyleTest {
     @DisplayName("childStyle with ChildPosition resolves nth-child(even)")
     void childStyleResolvesNthChildEven() {
         // Given CSS with nth-child selectors
-        String css = "ListElement-item:nth-child(odd) { background: red; }\n"
-                + "ListElement-item:nth-child(even) { background: blue; }";
+        String css = "ListElement-item:nth-child(odd) { background: red; }\n" +
+                     "ListElement-item:nth-child(even) { background: blue; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 
@@ -95,8 +95,8 @@ class DefaultRenderContextChildStyleTest {
     @DisplayName("childStyle with hex colors parses correctly")
     void childStyleParsesHexColors() {
         // Given CSS with hex color values (like the real theme)
-        String css = "ListElement-item:nth-child(odd) { background: #ff0000; }\n"
-                + "ListElement-item:nth-child(even) { background: #0000ff; }";
+        String css = "ListElement-item:nth-child(odd) { background: #ff0000; }\n" +
+                     "ListElement-item:nth-child(even) { background: #0000ff; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 
@@ -127,12 +127,11 @@ class DefaultRenderContextChildStyleTest {
     @Test
     @DisplayName("childStyle with universal selector override")
     void childStyleWithUniversalSelectorOverride() {
-        // Given CSS with universal selector AND specific nth-child rules (like real
-        // theme)
-        String css = "* { background: black; color: white; }\n"
-                + "ListElement-item { color: white; }\n"
-                + "ListElement-item:nth-child(odd) { background: #992299; }\n"
-                + "ListElement-item:nth-child(even) { background: #229922; }";
+        // Given CSS with universal selector AND specific nth-child rules (like real theme)
+        String css = "* { background: black; color: white; }\n" +
+                     "ListElement-item { color: white; }\n" +
+                     "ListElement-item:nth-child(odd) { background: #992299; }\n" +
+                     "ListElement-item:nth-child(even) { background: #229922; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 

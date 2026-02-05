@@ -41,7 +41,10 @@ class TextTest {
     @Test
     @DisplayName("Text.from(Line...) creates text from lines")
     void fromLines() {
-        Text text = Text.from(Line.from("First"), Line.from("Second"));
+        Text text = Text.from(
+            Line.from("First"),
+            Line.from("Second")
+        );
         assertThat(text.lines()).hasSize(2);
     }
 

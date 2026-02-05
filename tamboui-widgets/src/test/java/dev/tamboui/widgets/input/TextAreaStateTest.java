@@ -401,7 +401,7 @@ class TextAreaStateTest {
             TextAreaState state = new TextAreaState("L1\nL2\nL3\nL4\nL5\nL6\nL7");
             // 7 lines with 3 visible rows: maxScroll = 4
             state.scrollDown(3, 3); // scrollRow = min(4, 3) = 3
-            state.scrollUp(2); // scrollRow = max(0, 3-2) = 1
+            state.scrollUp(2);      // scrollRow = max(0, 3-2) = 1
 
             assertThat(state.scrollRow()).isEqualTo(1);
         }

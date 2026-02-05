@@ -5,6 +5,7 @@
 package dev.tamboui.build;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.ListProperty;
@@ -12,11 +13,11 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.options.Option;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecResult;
 
@@ -25,11 +26,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -79,10 +80,34 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
      * @return the verify builds property
      */
     @Option(option = "verify-builds", description = "Verify builds after writing the catalog")
-    @Input 
+    @Input
     @Optional
     public abstract Property<Boolean> getVerifyBuilds();
 
+    /**
+     * Fail-fast mode for build verification.
+     */
+    @Option(option = "verify-fail-fast", description = "Fail fast if any build verification fails (not effective if parallel is enabled)")
+    @Input
+    @Optional
+    public abstract Property<Boolean> getFailFast();
+
+     /**
+     * Verbose mode for build verification.
+     */
+     @Option(option = "verify-verbose", description = "Verbose output for build verification")
+     @Input
+     @Optional
+     public abstract Property<Boolean> getVerbose();
+
+    /**
+     * Parallel mode for build verification.
+     */
+    @Option(option = "verify-parallel", description = "Verify aliases in parallel")
+    @Input
+    @Optional
+    public abstract Property<Boolean> getParallel();
+    
     /**
      * Executes the task to update the jbang catalog.
      */
@@ -107,7 +132,7 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
 
         // Optionally verify builds
         if (getVerifyBuilds().getOrElse(false)) {
-            verifyBuilds(aliases.keySet());
+            verifyBuilds(aliases.keySet(), getFailFast().getOrElse(false), getParallel().getOrElse(false), getVerbose().getOrElse(false));
         }
     }
 
@@ -228,20 +253,25 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
      * Verifies builds for all aliases by running jbang build on each one.
      *
      * @param aliases the set of alias names to verify
+     * @param failFast whether to fail fast if any build fails
+     * @param parallel whether to build aliases in parallel (may cause JBang cache contention)
      */
-    private void verifyBuilds(java.util.Set<String> aliases) {
-        getLogger().lifecycle("Verifying builds for {} aliases...", aliases.size());
-        List<String> failedAliases = new ArrayList<>();
+    private void verifyBuilds(Set<String> aliases, boolean failFast, boolean parallel, boolean verbose) {
+        getLogger().lifecycle("Verifying builds for {} aliases{}...", aliases.size(), parallel ? " (parallel)" : "", failFast ? " (fail fast)" : "");
 
-        for (String alias : aliases) {
-            getLogger().lifecycle("Building alias: {}", alias);
-            if (!buildAlias(alias)) {
-                failedAliases.add(alias);
-            }
-        }
+        var stream = parallel ? aliases.parallelStream() : aliases.stream();
+        var failedAliases = stream
+                .map(alias -> {
+                    getLogger().lifecycle("Building alias: {}", alias);
+                    if (!buildAlias(alias, failFast, verbose)) {
+                        return alias;
+                    }
+                    return null;
+                }).filter(Objects::nonNull)
+                .toList();
 
         if (!failedAliases.isEmpty()) {
-            getLogger().error("Build verification failed for {} alias(es): {}", failedAliases.size(), String.join(", ", failedAliases));
+            throw new GradleException(String.format("Build verification failed for %d alias(es): %s", failedAliases.size(), String.join(", ", failedAliases)));
         } else {
             getLogger().lifecycle("All {} aliases built successfully", aliases.size());
         }
@@ -253,11 +283,12 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
      * @param aliasName the alias name to build
      * @return true if the build succeeded (exit code 0), false otherwise
      */
-    private boolean buildAlias(String aliasName) {
+    private boolean buildAlias(String aliasName, boolean failFast, boolean verbose) {
         try {
             ExecResult result = getExecOperations().exec(execSpec -> {
                 execSpec.commandLine(
                         "jbang", "build",
+                        "--verbose=" + verbose,
                         "-C=-Xdiags:compact",
                         "-C=-Xmaxerrs",
                         "-C=1",
@@ -269,11 +300,17 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
 
             if (result.getExitValue() != 0) {
                 getLogger().warn("Build failed for alias '{}' with exit code {}", aliasName, result.getExitValue());
+                if (failFast) {
+                    throw new GradleException(String.format("Build failed for alias '%s' with exit code %d", aliasName, result.getExitValue()));
+                }
                 return false;
             }
             return true;
         } catch (Exception e) {
             getLogger().error("Failed to execute jbang build for alias '{}': {}", aliasName, e.getMessage(), e);
+            if (failFast) {
+                throw new GradleException(String.format("Failed to execute jbang build for alias '%s': %s", aliasName, e.getMessage()), e);
+            }
             return false;
         }
     }

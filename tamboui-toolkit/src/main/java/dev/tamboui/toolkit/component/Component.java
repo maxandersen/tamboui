@@ -20,8 +20,8 @@ import dev.tamboui.tui.event.MouseEvent;
 /**
  * Base class for stateful components with event handling.
  * <p>
- * Components handle key and mouse events when focused using {@code @OnAction}
- * annotations:
+ * Components handle key and mouse events when focused using
+ * {@code @OnAction} annotations:
  *
  * 
  * <pre>{@code
@@ -40,17 +40,24 @@ import dev.tamboui.tui.event.MouseEvent;
  * }
  * }</pre>
  *
- * @param <T>
- *            the concrete component subclass, for fluent method chaining
+ * @param <T> the concrete component subclass, for fluent method chaining
  */
-public abstract class Component<T extends Component<T>> extends StyledElement<T>
-        implements
-            Focusable {
+public abstract class Component<T extends Component<T>> extends StyledElement<T> implements Focusable {
 
     /**
      * Creates a new component.
      */
     protected Component() {
+    }
+
+    @Override
+    public int preferredWidth() {
+        return 0;
+    }
+
+    @Override
+    public int preferredHeight() {
+        return 0;
     }
 
     private ActionHandler actionHandler;
@@ -71,8 +78,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
     }
 
     /**
-     * Renders the component's content. Subclasses must implement this to define the
-     * component's appearance.
+     * Renders the component's content.
+     * Subclasses must implement this to define the component's appearance.
      *
      * @return the element tree to render
      */
@@ -90,7 +97,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
 
         // Create ActionHandler on first render
         if (actionHandler == null) {
-            actionHandler = new ActionHandler(internalContext.bindings()).registerAnnotated(this);
+            actionHandler = new ActionHandler(internalContext.bindings())
+                    .registerAnnotated(this);
         }
 
         // Register as focusable
@@ -104,8 +112,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
     }
 
     /**
-     * Called internally to handle key events. Dispatches to {@code @OnAction}
-     * annotated methods via ActionHandler.
+     * Called internally to handle key events.
+     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
      */
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (focused && actionHandler != null && actionHandler.dispatch(event)) {
@@ -115,8 +123,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
     }
 
     /**
-     * Called internally to handle mouse events. Dispatches to {@code @OnAction}
-     * annotated methods via ActionHandler.
+     * Called internally to handle mouse events.
+     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
      */
     public EventResult handleMouseEvent(MouseEvent event) {
         if (actionHandler != null && actionHandler.dispatch(event)) {

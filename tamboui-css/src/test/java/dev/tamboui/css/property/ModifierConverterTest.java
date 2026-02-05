@@ -32,11 +32,11 @@ class ModifierConverterTest {
 
     @Test
     void convertsMultipleModifiers() {
-        Optional<Set<Modifier>> result = converter.convert("bold italic underlined",
-                Collections.<String, String>emptyMap());
+        Optional<Set<Modifier>> result = converter.convert("bold italic underlined", Collections.<String, String>emptyMap());
 
-        assertThat(result).hasValueSatisfying(mods -> assertThat(mods)
-                .containsExactlyInAnyOrder(Modifier.BOLD, Modifier.ITALIC, Modifier.UNDERLINED));
+        assertThat(result).hasValueSatisfying(mods ->
+                assertThat(mods).containsExactlyInAnyOrder(Modifier.BOLD, Modifier.ITALIC, Modifier.UNDERLINED)
+        );
     }
 
     @Test
@@ -53,11 +53,11 @@ class ModifierConverterTest {
 
     @Test
     void ignoresInvalidModifiers() {
-        Optional<Set<Modifier>> result = converter.convert("bold invalid italic",
-                Collections.<String, String>emptyMap());
+        Optional<Set<Modifier>> result = converter.convert("bold invalid italic", Collections.<String, String>emptyMap());
 
-        assertThat(result).hasValueSatisfying(
-                mods -> assertThat(mods).containsExactlyInAnyOrder(Modifier.BOLD, Modifier.ITALIC));
+        assertThat(result).hasValueSatisfying(mods ->
+                assertThat(mods).containsExactlyInAnyOrder(Modifier.BOLD, Modifier.ITALIC)
+        );
     }
 
     @Test

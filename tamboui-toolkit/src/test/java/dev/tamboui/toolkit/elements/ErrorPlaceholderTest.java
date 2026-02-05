@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
@@ -49,8 +50,10 @@ class ErrorPlaceholderTest {
         Frame frame = Frame.forTesting(buffer);
         RenderContext context = RenderContext.empty();
 
-        ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("Widget failed"),
-                "test-widget");
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(
+                new RuntimeException("Widget failed"),
+                "test-widget"
+        );
 
         placeholder.render(frame, area, context);
 
@@ -99,5 +102,51 @@ class ErrorPlaceholderTest {
         ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("Error"));
 
         assertThat(placeholder.id()).isNull();
+    }
+
+    @Test
+    @DisplayName("preferredWidth() accounts for title and message")
+    void preferredWidth() {
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(
+                new RuntimeException("Short"),
+                "my-long-widget-id"
+        );
+
+        // Width should accommodate the wider of title/message + border (2)
+        int width = placeholder.preferredWidth();
+        assertThat(width).isGreaterThan(2);
+    }
+
+    @Test
+    @DisplayName("preferredHeight() returns 3 (borders + content)")
+    void preferredHeight() {
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("Error"));
+
+        assertThat(placeholder.preferredHeight()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("renders border around error content")
+    void rendersBorderAroundContent() {
+        Rect area = new Rect(0, 0, 30, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        RenderContext context = RenderContext.empty();
+
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(
+                new RuntimeException("Oops"),
+                "widget-x"
+        );
+
+        placeholder.render(frame, area, context);
+
+        // Top-left border corner
+        BufferAssertions.assertThat(buffer).at(0, 0).hasSymbol("┌");
+        // Top-right border corner
+        BufferAssertions.assertThat(buffer).at(29, 0).hasSymbol("┐");
+        // Bottom-left border corner
+        BufferAssertions.assertThat(buffer).at(0, 2).hasSymbol("└");
+        // Bottom-right border corner
+        BufferAssertions.assertThat(buffer).at(29, 2).hasSymbol("┘");
     }
 }

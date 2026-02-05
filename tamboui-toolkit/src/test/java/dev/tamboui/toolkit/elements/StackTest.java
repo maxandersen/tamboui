@@ -35,7 +35,8 @@ class StackTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        stack(text("AAAAAAAAAA"), text("B")).render(frame, area, RenderContext.empty());
+        stack(text("AAAAAAAAAA"), text("B"))
+            .render(frame, area, RenderContext.empty());
 
         // "B" renders on top of "A" at position 0
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "B");
@@ -66,7 +67,8 @@ class StackTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        stack().render(frame, area, RenderContext.empty());
+        stack()
+            .render(frame, area, RenderContext.empty());
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -78,7 +80,8 @@ class StackTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        stack(text("Hello")).render(frame, area, RenderContext.empty());
+        stack(text("Hello"))
+            .render(frame, area, RenderContext.empty());
 
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "H");
     }
@@ -93,8 +96,10 @@ class StackTest {
     @Test
     @DisplayName("fluent API chains correctly")
     void fluentApiChaining() {
-        StackElement s = stack(text("A")).alignment(ContentAlignment.CENTER).margin(1)
-                .margin(new Margin(1, 2, 3, 4));
+        StackElement s = stack(text("A"))
+            .alignment(ContentAlignment.CENTER)
+            .margin(1)
+            .margin(new Margin(1, 2, 3, 4));
 
         assertThat(s).isInstanceOf(StackElement.class);
     }
@@ -125,7 +130,9 @@ class StackTest {
 
             // "X" is 1 char wide, 1 char high
             // center in 20x5: x=(20-1)/2=9, y=(5-1)/2=2
-            stack(text("X")).addClass("s").render(frame, area, ctx);
+            stack(text("X"))
+                .addClass("s")
+                .render(frame, area, ctx);
 
             BufferAssertions.assertThat(buffer).hasSymbolAt(9, 2, "X");
         }
@@ -139,7 +146,9 @@ class StackTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            stack(text("X")).addClass("s").render(frame, area, ctx);
+            stack(text("X"))
+                .addClass("s")
+                .render(frame, area, ctx);
 
             // With margin 1 and STRETCH, text renders at (1,1)
             BufferAssertions.assertThat(buffer).hasSymbolAt(1, 1, "X");
@@ -155,11 +164,36 @@ class StackTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Programmatic STRETCH overrides CSS top-left
-            stack(text("X")).addClass("s").alignment(ContentAlignment.STRETCH).render(frame, area,
-                    ctx);
+            stack(text("X"))
+                .addClass("s")
+                .alignment(ContentAlignment.STRETCH)
+                .render(frame, area, ctx);
 
             // With STRETCH, text renders at (0,0)
             BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "X");
         }
+    }
+
+    @Test
+    @DisplayName("preferredHeight returns max of all children")
+    void preferredHeight() {
+        StackElement s = stack(text("A"), text("B"), text("C"));
+        // All height 1
+        assertThat(s.preferredHeight()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("preferredHeight returns 0 for empty stack")
+    void preferredHeightEmpty() {
+        StackElement s = stack();
+        assertThat(s.preferredHeight()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("preferredHeight includes margin")
+    void preferredHeightWithMargin() {
+        StackElement s = stack(text("A")).margin(new Margin(2, 0, 3, 0));
+        // 1 + 2 + 3 = 6
+        assertThat(s.preferredHeight()).isEqualTo(6);
     }
 }

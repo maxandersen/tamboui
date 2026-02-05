@@ -14,8 +14,8 @@ import dev.tamboui.style.PropertyConverter;
  * <p>
  * Supported values (case-insensitive):
  * <ul>
- * <li>{@code row-first} — items fill left-to-right, then top-to-bottom</li>
- * <li>{@code column-first} — items fill top-to-bottom, then left-to-right</li>
+ *   <li>{@code row-first} — items fill left-to-right, then top-to-bottom</li>
+ *   <li>{@code column-first} — items fill top-to-bottom, then left-to-right</li>
  * </ul>
  */
 public final class ColumnOrderConverter implements PropertyConverter<ColumnOrder> {
@@ -37,11 +37,11 @@ public final class ColumnOrderConverter implements PropertyConverter<ColumnOrder
         String normalized = value.trim().toLowerCase();
 
         switch (normalized) {
-            case "row-first" :
+            case "row-first":
                 return Optional.of(ColumnOrder.ROW_FIRST);
-            case "column-first" :
+            case "column-first":
                 return Optional.of(ColumnOrder.COLUMN_FIRST);
-            default :
+            default:
                 return Optional.empty();
         }
     }

@@ -40,7 +40,10 @@ class TabsTest {
     @Test
     @DisplayName("Tabs renders with divider")
     void rendersWithDivider() {
-        Tabs tabs = Tabs.builder().titles("A", "B").divider(" | ").build();
+        Tabs tabs = Tabs.builder()
+            .titles("A", "B")
+            .divider(" | ")
+            .build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -58,7 +61,10 @@ class TabsTest {
     @Test
     @DisplayName("Tabs renders with custom divider")
     void rendersWithCustomDivider() {
-        Tabs tabs = Tabs.builder().titles("X", "Y").divider(" - ").build();
+        Tabs tabs = Tabs.builder()
+            .titles("X", "Y")
+            .divider(" - ")
+            .build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -74,8 +80,11 @@ class TabsTest {
     @DisplayName("Tabs renders with selection")
     void rendersWithSelection() {
         Style highlightStyle = Style.EMPTY.fg(Color.YELLOW);
-        Tabs tabs = Tabs.builder().titles("First", "Second").highlightStyle(highlightStyle)
-                .divider("|").build();
+        Tabs tabs = Tabs.builder()
+            .titles("First", "Second")
+            .highlightStyle(highlightStyle)
+            .divider("|")
+            .build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState(1); // Select second tab
@@ -90,7 +99,11 @@ class TabsTest {
     @Test
     @DisplayName("Tabs with block")
     void withBlock() {
-        Tabs tabs = Tabs.builder().titles("Tab1").block(Block.bordered()).divider("").build();
+        Tabs tabs = Tabs.builder()
+            .titles("Tab1")
+            .block(Block.bordered())
+            .divider("")
+            .build();
         Rect area = new Rect(0, 0, 15, 3);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -106,7 +119,11 @@ class TabsTest {
     @Test
     @DisplayName("Tabs with padding")
     void withPadding() {
-        Tabs tabs = Tabs.builder().titles("A", "B").divider("|").padding(" ", " ").build();
+        Tabs tabs = Tabs.builder()
+            .titles("A", "B")
+            .divider("|")
+            .padding(" ", " ")
+            .build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -137,7 +154,10 @@ class TabsTest {
     @Test
     @DisplayName("Tabs from Line array")
     void fromLineArray() {
-        Tabs tabs = Tabs.from(Line.from(Span.raw("Tab1").bold()), Line.from("Tab2"));
+        Tabs tabs = Tabs.from(
+            Line.from(Span.raw("Tab1").bold()),
+            Line.from("Tab2")
+        );
         assertThat(tabs.size()).isEqualTo(2);
     }
 
@@ -157,7 +177,10 @@ class TabsTest {
     @Test
     @DisplayName("Tabs truncates when area too small")
     void truncatesWhenTooSmall() {
-        Tabs tabs = Tabs.builder().titles("VeryLongTabName", "Another").divider("|").build();
+        Tabs tabs = Tabs.builder()
+            .titles("VeryLongTabName", "Another")
+            .divider("|")
+            .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -172,7 +195,10 @@ class TabsTest {
     @DisplayName("Tabs with styled divider")
     void styledDivider() {
         Span dividerSpan = Span.raw(" | ").fg(Color.DARK_GRAY);
-        Tabs tabs = Tabs.builder().titles("A", "B").divider(dividerSpan).build();
+        Tabs tabs = Tabs.builder()
+            .titles("A", "B")
+            .divider(dividerSpan)
+            .build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -186,8 +212,11 @@ class TabsTest {
     @Test
     @DisplayName("Tabs builder addTitle")
     void builderAddTitle() {
-        Tabs tabs = Tabs.builder().addTitle("First").addTitle("Second").addTitle(Line.from("Third"))
-                .build();
+        Tabs tabs = Tabs.builder()
+            .addTitle("First")
+            .addTitle("Second")
+            .addTitle(Line.from("Third"))
+            .build();
         assertThat(tabs.size()).isEqualTo(3);
     }
 
@@ -195,7 +224,11 @@ class TabsTest {
     @DisplayName("Divider inherits base style including background")
     void dividerInheritsBaseStyle() {
         Style baseStyle = Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE);
-        Tabs tabs = Tabs.builder().titles("A", "B").style(baseStyle).divider(" | ").build();
+        Tabs tabs = Tabs.builder()
+            .titles("A", "B")
+            .style(baseStyle)
+            .divider(" | ")
+            .build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
         TabsState state = new TabsState();
@@ -203,13 +236,17 @@ class TabsTest {
         tabs.render(area, buffer, state);
 
         // Divider at position 1-3 (" | ") should inherit the base style background
-        BufferAssertions.assertThat(buffer).at(2, 0).hasSymbol("|").hasBackground(Color.BLUE);
+        BufferAssertions.assertThat(buffer).at(2, 0)
+            .hasSymbol("|")
+            .hasBackground(Color.BLUE);
     }
 
     @Test
     @DisplayName("Tabs uses HIGHLIGHT_COLOR property from StylePropertyResolver")
     void usesHighlightColorProperty() {
-        Tabs tabs = Tabs.builder().titles("First", "Second").divider("|")
+        Tabs tabs = Tabs.builder()
+                .titles("First", "Second")
+                .divider("|")
                 .styleResolver(TestStylePropertyResolver.of("highlight-color", Color.MAGENTA))
                 .build();
         Rect area = new Rect(0, 0, 20, 1);

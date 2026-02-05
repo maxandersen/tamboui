@@ -68,9 +68,9 @@ class AnsiStringBuilderTest {
         // Order may vary based on EnumSet iteration
         assertThat(result).startsWith("\u001b[0;");
         assertThat(result).endsWith("m");
-        assertThat(result).contains(";1"); // bold
-        assertThat(result).contains(";3"); // italic
-        assertThat(result).contains(";4"); // underlined
+        assertThat(result).contains(";1");   // bold
+        assertThat(result).contains(";3");   // italic
+        assertThat(result).contains(";4");   // underlined
     }
 
     @Test
@@ -80,9 +80,9 @@ class AnsiStringBuilderTest {
         String result = AnsiStringBuilder.styleToAnsi(style);
         assertThat(result).startsWith("\u001b[0;");
         assertThat(result).endsWith("m");
-        assertThat(result).contains(";36"); // cyan fg
-        assertThat(result).contains(";45"); // magenta bg
-        assertThat(result).contains(";1"); // bold
+        assertThat(result).contains(";36");  // cyan fg
+        assertThat(result).contains(";45");  // magenta bg
+        assertThat(result).contains(";1");   // bold
     }
 
     @Test
@@ -106,8 +106,7 @@ class AnsiStringBuilderTest {
     void hyperlinkStartEscapesParams() {
         Hyperlink hyperlink = Hyperlink.of("https://example.com/a;b\\c", "id;1\\2");
         String result = AnsiStringBuilder.hyperlinkStart(hyperlink);
-        assertThat(result)
-                .isEqualTo("\u001b]8;id=id\\;1\\\\2;https://example.com/a\\;b\\\\c\u001b\\");
+        assertThat(result).isEqualTo("\u001b]8;id=id\\;1\\\\2;https://example.com/a\\;b\\\\c\u001b\\");
     }
 
     @Test

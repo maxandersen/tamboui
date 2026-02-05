@@ -20,30 +20,36 @@ class AlignmentConverterTest {
 
     @Test
     void convertsLeftAlignment() {
-        assertThat(converter.convert("left", Collections.emptyMap())).hasValue(Alignment.LEFT);
+        assertThat(converter.convert("left", Collections.emptyMap()))
+            .hasValue(Alignment.LEFT);
     }
 
     @Test
     void convertsCenterAlignment() {
-        assertThat(converter.convert("center", Collections.emptyMap())).hasValue(Alignment.CENTER);
+        assertThat(converter.convert("center", Collections.emptyMap()))
+            .hasValue(Alignment.CENTER);
     }
 
     @Test
     void convertsRightAlignment() {
-        assertThat(converter.convert("right", Collections.emptyMap())).hasValue(Alignment.RIGHT);
+        assertThat(converter.convert("right", Collections.emptyMap()))
+            .hasValue(Alignment.RIGHT);
     }
 
     @Test
     void caseInsensitive() {
-        assertThat(converter.convert("LEFT", Collections.emptyMap())).hasValue(Alignment.LEFT);
-        assertThat(converter.convert("Center", Collections.emptyMap())).hasValue(Alignment.CENTER);
-        assertThat(converter.convert("RIGHT", Collections.emptyMap())).hasValue(Alignment.RIGHT);
+        assertThat(converter.convert("LEFT", Collections.emptyMap()))
+            .hasValue(Alignment.LEFT);
+        assertThat(converter.convert("Center", Collections.emptyMap()))
+            .hasValue(Alignment.CENTER);
+        assertThat(converter.convert("RIGHT", Collections.emptyMap()))
+            .hasValue(Alignment.RIGHT);
     }
 
     @Test
     void handlesWhitespace() {
         assertThat(converter.convert("  center  ", Collections.emptyMap()))
-                .hasValue(Alignment.CENTER);
+            .hasValue(Alignment.CENTER);
     }
 
     @Test
@@ -51,7 +57,8 @@ class AlignmentConverterTest {
         Map<String, String> variables = new HashMap<>();
         variables.put("align", "center");
 
-        assertThat(converter.convert("$align", variables)).hasValue(Alignment.CENTER);
+        assertThat(converter.convert("$align", variables))
+            .hasValue(Alignment.CENTER);
     }
 
     @Test

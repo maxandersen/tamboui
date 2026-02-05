@@ -82,8 +82,7 @@ class ColorConverterTest {
 
     @Test
     void variableResolutionHappensAtCssLevel() {
-        // The core ColorConverter doesn't handle variables - that happens in the CSS
-        // layer
+        // The core ColorConverter doesn't handle variables - that happens in the CSS layer
         // When a variable is pre-resolved, the value is passed directly
         assertThat(converter.convert("blue")).hasValue(Color.BLUE);
     }

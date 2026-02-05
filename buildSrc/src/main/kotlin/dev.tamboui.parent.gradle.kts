@@ -34,10 +34,26 @@ tasks.named("check") {
     dependsOn(splitPackageCheck)
 }
 
+val incomingDemos by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    description = "Configuration to collect demo projects from all modules"
+}
+
+dependencies {
+    rootProject.allprojects.forEach { p ->
+        p.pluginManager.withPlugin("dev.tamboui.demo-project") {
+            incomingDemos(project(p.path)) {
+                isTransitive = false
+            }
+        }
+    }
+}
+
 tasks.register<UpdateJBangCatalogTask>("updateJBangCatalog") {
     description = "Updates the jbang-catalog.json file with discovered demos"
     group = "build"
-
+    inputs.files(incomingDemos)
     projectDir = layout.projectDirectory
     modules =  rootProject.subprojects.map { it.name }
     catalogFile = layout.projectDirectory.file("jbang-catalog.json")

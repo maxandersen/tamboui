@@ -29,24 +29,24 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
      * <p>
      * CSS property name: {@code cursor-color}
      */
-    public static final PropertyDefinition<Color> CURSOR_COLOR = PropertyDefinition
-            .of("cursor-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> CURSOR_COLOR =
+            PropertyDefinition.of("cursor-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the placeholder text color.
      * <p>
      * CSS property name: {@code placeholder-color}
      */
-    public static final PropertyDefinition<Color> PLACEHOLDER_COLOR = PropertyDefinition
-            .of("placeholder-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> PLACEHOLDER_COLOR =
+            PropertyDefinition.of("placeholder-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the line number gutter color.
      * <p>
      * CSS property name: {@code line-number-color}
      */
-    public static final PropertyDefinition<Color> LINE_NUMBER_COLOR = PropertyDefinition
-            .of("line-number-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> LINE_NUMBER_COLOR =
+            PropertyDefinition.of("line-number-color", ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(CURSOR_COLOR, PLACEHOLDER_COLOR, LINE_NUMBER_COLOR);
@@ -138,8 +138,12 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
 
         Rect textArea = inputArea;
         if (gutterWidth > 0 && inputArea.width() > gutterWidth) {
-            textArea = new Rect(inputArea.left() + gutterWidth, inputArea.top(),
-                    inputArea.width() - gutterWidth, inputArea.height());
+            textArea = new Rect(
+                inputArea.left() + gutterWidth,
+                inputArea.top(),
+                inputArea.width() - gutterWidth,
+                inputArea.height()
+            );
         }
 
         String text = state.text();
@@ -169,7 +173,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
                     String lineNum = String.format("%" + (gutterWidth - 2) + "d ", lineIndex + 1);
                     buffer.setString(inputArea.left(), screenY, lineNum, lineNumberStyle);
                     buffer.set(inputArea.left() + gutterWidth - 1, screenY,
-                            new Cell("|", lineNumberStyle));
+                        new Cell("|", lineNumberStyle));
                 } else {
                     // Empty line number area
                     for (int x = inputArea.left(); x < inputArea.left() + gutterWidth; x++) {
@@ -182,8 +186,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
                 String line = state.getLine(lineIndex);
 
                 // Calculate visible portion of line
-                // scrollCol is a character offset; convert to proper substring then truncate by
-                // width
+                // scrollCol is a character offset; convert to proper substring then truncate by width
                 String visibleText = "";
                 if (scrollCol < line.length()) {
                     String lineFromScroll = line.substring(scrollCol);
@@ -208,17 +211,13 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
     }
 
     /**
-     * Renders the widget and sets the cursor position on the frame. Call this
-     * instead of render() when this input is focused.
+     * Renders the widget and sets the cursor position on the frame.
+     * Call this instead of render() when this input is focused.
      *
-     * @param area
-     *            the area to render in
-     * @param buffer
-     *            the buffer to render to
-     * @param state
-     *            the text area state
-     * @param frame
-     *            the frame for cursor positioning
+     * @param area   the area to render in
+     * @param buffer the buffer to render to
+     * @param state  the text area state
+     * @param frame  the frame for cursor positioning
      */
     public void renderWithCursor(Rect area, Buffer buffer, TextAreaState state, Frame frame) {
         render(area, buffer, state);
@@ -238,8 +237,12 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
 
         Rect textArea = inputArea;
         if (gutterWidth > 0 && inputArea.width() > gutterWidth) {
-            textArea = new Rect(inputArea.left() + gutterWidth, inputArea.top(),
-                    inputArea.width() - gutterWidth, inputArea.height());
+            textArea = new Rect(
+                inputArea.left() + gutterWidth,
+                inputArea.top(),
+                inputArea.width() - gutterWidth,
+                inputArea.height()
+            );
         }
 
         int cursorRow = state.cursorRow();
@@ -251,8 +254,8 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         int relativeRow = cursorRow - scrollRow;
         int relativeCol = cursorCol - scrollCol;
 
-        if (relativeRow >= 0 && relativeRow < textArea.height() && relativeCol >= 0
-                && relativeCol < textArea.width()) {
+        if (relativeRow >= 0 && relativeRow < textArea.height() &&
+            relativeCol >= 0 && relativeCol < textArea.width()) {
 
             int cursorX = textArea.left() + relativeCol;
             int cursorY = textArea.top() + relativeRow;
@@ -283,14 +286,12 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         private Color placeholderColor;
         private Color lineNumberColor;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Wraps the text area in a block.
          *
-         * @param block
-         *            the block to wrap in
+         * @param block the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -301,8 +302,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         /**
          * Sets the base style.
          *
-         * @param style
-         *            the base style
+         * @param style the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -313,8 +313,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         /**
          * Sets the cursor style.
          *
-         * @param cursorStyle
-         *            the cursor style
+         * @param cursorStyle the cursor style
          * @return this builder
          */
         public Builder cursorStyle(Style cursorStyle) {
@@ -325,8 +324,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         /**
          * Sets the placeholder text shown when the text area is empty.
          *
-         * @param placeholder
-         *            the placeholder text
+         * @param placeholder the placeholder text
          * @return this builder
          */
         public Builder placeholder(String placeholder) {
@@ -337,8 +335,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         /**
          * Sets the placeholder text style.
          *
-         * @param placeholderStyle
-         *            the placeholder style
+         * @param placeholderStyle the placeholder style
          * @return this builder
          */
         public Builder placeholderStyle(Style placeholderStyle) {
@@ -349,8 +346,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         /**
          * Sets whether to show line numbers.
          *
-         * @param show
-         *            true to show line numbers
+         * @param show true to show line numbers
          * @return this builder
          */
         public Builder showLineNumbers(boolean show) {
@@ -361,8 +357,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         /**
          * Sets the line number style.
          *
-         * @param style
-         *            the line number style
+         * @param style the line number style
          * @return this builder
          */
         public Builder lineNumberStyle(Style style) {
@@ -374,11 +369,10 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * Sets the property resolver for style-aware properties.
          * <p>
          * When set, properties like {@code color}, {@code background},
-         * {@code cursor-color}, {@code placeholder-color}, and
-         * {@code line-number-color} will be resolved if not set programmatically.
+         * {@code cursor-color}, {@code placeholder-color}, and {@code line-number-color}
+         * will be resolved if not set programmatically.
          *
-         * @param resolver
-         *            the property resolver
+         * @param resolver the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -391,8 +385,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the background color
+         * @param color the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -405,8 +398,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the foreground color
+         * @param color the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {
@@ -419,8 +411,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the cursor color
+         * @param color the cursor color
          * @return this builder
          */
         public Builder cursorColor(Color color) {
@@ -433,8 +424,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the placeholder color
+         * @param color the placeholder color
          * @return this builder
          */
         public Builder placeholderColor(Color color) {
@@ -447,8 +437,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the line number color
+         * @param color the line number color
          * @return this builder
          */
         public Builder lineNumberColor(Color color) {

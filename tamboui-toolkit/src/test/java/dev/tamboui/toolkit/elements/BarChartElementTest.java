@@ -33,8 +33,7 @@ class BarChartElementTest {
     @DisplayName("Attribute selector [title] affects BarChart border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "BarChartElement[title=\"Revenue\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test", "BarChartElement[title=\"Revenue\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

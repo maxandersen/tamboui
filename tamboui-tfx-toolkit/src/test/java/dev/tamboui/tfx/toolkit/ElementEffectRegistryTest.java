@@ -61,21 +61,19 @@ class ElementEffectRegistryTest {
 
         // Process once at initial position
         TFxDuration delta = TFxDuration.fromMillis(16);
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
-                styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
 
         assertThat(processedAreas).hasSize(1);
         assertThat(processedAreas.get(0)).isEqualTo(initialArea);
 
         // Simulate resize: clear and re-register at NEW position
         styledAreaRegistry.clear();
-        Rect newArea = new Rect(15, 8, 25, 1); // Different position and size
+        Rect newArea = new Rect(15, 8, 25, 1);  // Different position and size
         styledAreaRegistry.register(taggedStyle, newArea, null);
 
         // Process again - should use NEW area
         processedAreas.clear();
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
-                styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
 
         assertThat(processedAreas).hasSize(1);
         assertThat(processedAreas.get(0)).isEqualTo(newArea);
@@ -97,8 +95,7 @@ class ElementEffectRegistryTest {
 
         // Process once
         TFxDuration delta = TFxDuration.fromMillis(16);
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
-                styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
         assertThat(processedAreas).hasSize(1);
 
         // Simulate resize where the region no longer exists
@@ -107,8 +104,7 @@ class ElementEffectRegistryTest {
 
         // Process again - should not process any effect (no matching areas)
         processedAreas.clear();
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
-                styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
 
         assertThat(processedAreas).isEmpty();
     }

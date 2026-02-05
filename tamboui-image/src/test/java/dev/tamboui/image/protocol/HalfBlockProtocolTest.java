@@ -72,8 +72,7 @@ class HalfBlockProtocolTest {
     void render_two_colors_uses_fg_and_bg() throws IOException {
         HalfBlockProtocol protocol = new HalfBlockProtocol();
 
-        // Create image with red top row and green bottom row (each row = 1 virtual
-        // pixel)
+        // Create image with red top row and green bottom row (each row = 1 virtual pixel)
         BufferedImage source = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
         source.setRGB(0, 0, 0xFFFF0000); // Red top-left
         source.setRGB(1, 0, 0xFFFF0000); // Red top-right

@@ -31,32 +31,27 @@ import dev.tamboui.widget.Widget;
  * A multi-column grid layout container that arranges children into columns.
  * <p>
  * The column count is auto-calculated from the available width and the maximum
- * preferred width of children, or can be set explicitly via
- * {@link #columnCount(int)}.
+ * preferred width of children, or can be set explicitly via {@link #columnCount(int)}.
  * <p>
  * Items can be ordered row-first (default) or column-first:
  * <ul>
- * <li>Row-first: items fill left-to-right, then top-to-bottom (like reading
- * text)</li>
- * <li>Column-first: items fill top-to-bottom, then left-to-right (like
- * newspaper columns)</li>
+ *   <li>Row-first: items fill left-to-right, then top-to-bottom (like reading text)</li>
+ *   <li>Column-first: items fill top-to-bottom, then left-to-right (like newspaper columns)</li>
  * </ul>
  * <p>
- * All layout properties can be set via CSS or programmatically. Programmatic
- * values override CSS values when both are set.
+ * All layout properties can be set via CSS or programmatically.
+ * Programmatic values override CSS values when both are set.
  * <p>
  * Supported CSS properties:
  * <ul>
- * <li>{@code flex} — "start", "center", "end", "space-between", "space-around",
- * "space-evenly"</li>
- * <li>{@code spacing} — gap between columns in cells</li>
- * <li>{@code margin} — margin around the columns</li>
- * <li>{@code column-count} — explicit number of columns</li>
- * <li>{@code column-order} — "row-first" or "column-first"</li>
+ *   <li>{@code flex} — "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code spacing} — gap between columns in cells</li>
+ *   <li>{@code margin} — margin around the columns</li>
+ *   <li>{@code column-count} — explicit number of columns</li>
+ *   <li>{@code column-order} — "row-first" or "column-first"</li>
  * </ul>
  * <p>
  * Example usage:
- * 
  * <pre>
  * columns(text("A"), text("B"), text("C"), text("D")).columnCount(2).spacing(1)
  * </pre>
@@ -66,14 +61,14 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     /**
      * CSS property definition for the number of columns.
      */
-    public static final PropertyDefinition<Integer> COLUMN_COUNT = PropertyDefinition
-            .of("column-count", IntegerConverter.INSTANCE);
+    public static final PropertyDefinition<Integer> COLUMN_COUNT =
+        PropertyDefinition.of("column-count", IntegerConverter.INSTANCE);
 
     /**
      * CSS property definition for the column ordering mode.
      */
-    public static final PropertyDefinition<ColumnOrder> COLUMN_ORDER = PropertyDefinition
-            .of("column-order", ColumnOrderConverter.INSTANCE);
+    public static final PropertyDefinition<ColumnOrder> COLUMN_ORDER =
+        PropertyDefinition.of("column-order", ColumnOrderConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(COLUMN_COUNT, COLUMN_ORDER);
@@ -94,8 +89,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     /**
      * Creates a columns layout with the given children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public ColumnsElement(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -104,8 +98,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     /**
      * Creates a columns layout with the given children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public ColumnsElement(Collection<? extends Element> children) {
         this.children.addAll(children);
@@ -116,8 +109,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
      * <p>
      * Can also be set via CSS {@code spacing} property.
      *
-     * @param spacing
-     *            spacing in cells between adjacent columns
+     * @param spacing spacing in cells between adjacent columns
      * @return this columns layout for method chaining
      */
     public ColumnsElement spacing(int spacing) {
@@ -130,8 +122,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
      * <p>
      * Can also be set via CSS {@code flex} property.
      *
-     * @param flex
-     *            the flex mode for space distribution
+     * @param flex the flex mode for space distribution
      * @return this columns layout for method chaining
      * @see Flex
      */
@@ -145,8 +136,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
      * <p>
      * Can also be set via CSS {@code margin} property.
      *
-     * @param margin
-     *            the margin
+     * @param margin the margin
      * @return this columns layout for method chaining
      */
     public ColumnsElement margin(Margin margin) {
@@ -157,8 +147,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     /**
      * Sets uniform margin around the columns layout.
      *
-     * @param value
-     *            the margin value for all sides
+     * @param value the margin value for all sides
      * @return this columns layout for method chaining
      */
     public ColumnsElement margin(int value) {
@@ -171,8 +160,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
      * <p>
      * Can also be set via CSS {@code column-count} property.
      *
-     * @param count
-     *            the number of columns
+     * @param count the number of columns
      * @return this columns layout for method chaining
      */
     public ColumnsElement columnCount(int count) {
@@ -185,8 +173,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
      * <p>
      * Can also be set via CSS {@code column-order} property.
      *
-     * @param order
-     *            the column ordering mode
+     * @param order the column ordering mode
      * @return this columns layout for method chaining
      * @see ColumnOrder
      */
@@ -232,6 +219,32 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     }
 
     @Override
+    public int preferredHeight() {
+        if (children.isEmpty()) {
+            return 0;
+        }
+
+        int cols = columnCount != null ? columnCount : children.size();
+        cols = Math.min(cols, children.size());
+        int rows = (children.size() + cols - 1) / cols;
+
+        // For each row, compute max child height
+        int totalHeight = 0;
+        for (int row = 0; row < rows; row++) {
+            int rowHeight = 1;
+            for (int col = 0; col < cols; col++) {
+                int childIndex = row * cols + col;
+                if (childIndex < children.size()) {
+                    rowHeight = Math.max(rowHeight, children.get(childIndex).preferredHeight());
+                }
+            }
+            totalHeight += rowHeight;
+        }
+
+        return totalHeight;
+    }
+
+    @Override
     public int preferredHeight(int availableWidth, RenderContext context) {
         if (children.isEmpty() || availableWidth <= 0) {
             return 0;
@@ -249,8 +262,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
                 int childIndex = effectiveOrder.resolveIndex(row, col, rows, cols);
                 if (childIndex < children.size()) {
                     Element child = children.get(childIndex);
-                    int childWidth = Math.max(1,
-                            (availableWidth - effectiveSpacing * (cols - 1)) / cols);
+                    int childWidth = Math.max(1, (availableWidth - effectiveSpacing * (cols - 1)) / cols);
                     rowHeight = Math.max(rowHeight, child.preferredHeight(childWidth, context));
                 }
             }
@@ -263,12 +275,9 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     /**
      * Computes the number of columns based on available width and child widths.
      *
-     * @param availableWidth
-     *            the available width in cells
-     * @param spacing
-     *            the spacing between columns
-     * @param explicitCount
-     *            explicit column count override, or {@code null} for auto-detection
+     * @param availableWidth the available width in cells
+     * @param spacing        the spacing between columns
+     * @param explicitCount  explicit column count override, or {@code null} for auto-detection
      * @return the computed column count
      */
     private int computeColumnCount(int availableWidth, int spacing, Integer explicitCount) {
@@ -348,8 +357,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
         }
 
         // Compute column count from effective area
-        int cols = computeColumnCount(effectiveArea.width(), effectiveSpacing,
-                effectiveColumnCount);
+        int cols = computeColumnCount(effectiveArea.width(), effectiveSpacing, effectiveColumnCount);
         int rows = (children.size() + cols - 1) / cols;
 
         // Build horizontal constraints to compute column widths for preferred height
@@ -362,8 +370,9 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
         }
 
         List<Rect> colAreas = Layout.horizontal()
-                .constraints(hConstraints.toArray(new Constraint[0])).flex(effectiveFlex)
-                .split(effectiveArea);
+            .constraints(hConstraints.toArray(new Constraint[0]))
+            .flex(effectiveFlex)
+            .split(effectiveArea);
 
         // Extract only the column areas (skip spacing areas)
         List<Rect> columnRects = new ArrayList<>();
@@ -396,9 +405,14 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
         }
 
         // Build and render the Columns widget
-        Columns widget = Columns.builder().children(childWidgets).columnCount(cols)
-                .spacing(effectiveSpacing).flex(effectiveFlex).order(effectiveOrder)
-                .rowHeights(rowHeights).build();
+        Columns widget = Columns.builder()
+            .children(childWidgets)
+            .columnCount(cols)
+            .spacing(effectiveSpacing)
+            .flex(effectiveFlex)
+            .order(effectiveOrder)
+            .rowHeights(rowHeights)
+            .build();
 
         frame.renderWidget(widget, effectiveArea);
     }

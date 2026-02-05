@@ -25,25 +25,14 @@ abstract class PanelContent {
         this.color = color;
     }
 
-    String title() {
-        return title;
-    }
-    int width() {
-        return width;
-    }
-    int height() {
-        return height;
-    }
-    Color color() {
-        return color;
-    }
+    String title() { return title; }
+    int width() { return width; }
+    int height() { return height; }
+    Color color() { return color; }
 
     abstract Element render(boolean focused);
 
-    void onTick(long tick) {
-    }
+    void onTick(long tick) {}
 
-    EventResult handleKey(KeyEvent event) {
-        return EventResult.UNHANDLED;
-    }
+    EventResult handleKey(KeyEvent event) { return EventResult.UNHANDLED; }
 }

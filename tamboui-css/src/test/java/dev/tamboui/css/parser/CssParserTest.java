@@ -45,8 +45,9 @@ class CssParserTest {
         String css = "$primary: blue;\n$error: red;";
         Stylesheet stylesheet = CssParser.parse(css);
 
-        assertThat(stylesheet.variables()).containsEntry("primary", "blue").containsEntry("error",
-                "red");
+        assertThat(stylesheet.variables())
+                .containsEntry("primary", "blue")
+                .containsEntry("error", "red");
     }
 
     @Test
@@ -144,8 +145,7 @@ class CssParserTest {
         assertThat(desc1.ancestor()).isInstanceOf(TypeSelector.class);
         assertThat(desc1.descendant()).isInstanceOf(ClassSelector.class);
 
-        // .muted Text - descendant selector (Text element INSIDE element with class
-        // muted)
+        // .muted Text - descendant selector (Text element INSIDE element with class muted)
         Stylesheet descendant2 = CssParser.parse(".muted Text { color: gray; }");
         assertThat(descendant2.rules()).hasSize(1);
         assertThat(descendant2.rules().get(0).selector()).isInstanceOf(DescendantSelector.class);
@@ -239,13 +239,15 @@ class CssParserTest {
     @Test
     void throwsOnMissingOpenBrace() {
         assertThatThrownBy(() -> CssParser.parse("Panel color: red; }"))
-                .isInstanceOf(CssParseException.class).hasMessageContaining("Expected '{'");
+                .isInstanceOf(CssParseException.class)
+                .hasMessageContaining("Expected '{'");
     }
 
     @Test
     void throwsOnMissingCloseBrace() {
         assertThatThrownBy(() -> CssParser.parse("Panel { color: red;"))
-                .isInstanceOf(CssParseException.class).hasMessageContaining("Expected '}'");
+                .isInstanceOf(CssParseException.class)
+                .hasMessageContaining("Expected '}'");
     }
 
     @Test
@@ -348,22 +350,17 @@ class CssParserTest {
 
     @Test
     void parsesSelectorListWithThreeSelectors() {
-        Stylesheet stylesheet = CssParser
-                .parse(".error, .warning, .info { border-type: rounded; }");
+        Stylesheet stylesheet = CssParser.parse(".error, .warning, .info { border-type: rounded; }");
 
         assertThat(stylesheet.rules()).hasSize(3);
-        assertThat(((ClassSelector) stylesheet.rules().get(0).selector()).className())
-                .isEqualTo("error");
-        assertThat(((ClassSelector) stylesheet.rules().get(1).selector()).className())
-                .isEqualTo("warning");
-        assertThat(((ClassSelector) stylesheet.rules().get(2).selector()).className())
-                .isEqualTo("info");
+        assertThat(((ClassSelector) stylesheet.rules().get(0).selector()).className()).isEqualTo("error");
+        assertThat(((ClassSelector) stylesheet.rules().get(1).selector()).className()).isEqualTo("warning");
+        assertThat(((ClassSelector) stylesheet.rules().get(2).selector()).className()).isEqualTo("info");
     }
 
     @Test
     void parsesSelectorListWithComplexSelectors() {
-        Stylesheet stylesheet = CssParser
-                .parse("Panel.primary, Button > Label, #sidebar { color: blue; }");
+        Stylesheet stylesheet = CssParser.parse("Panel.primary, Button > Label, #sidebar { color: blue; }");
 
         assertThat(stylesheet.rules()).hasSize(3);
 
@@ -384,7 +381,7 @@ class CssParserTest {
         assertThat(stylesheet.rules()).hasSize(2);
         // All rules from a selector list should share the same source order
         assertThat(stylesheet.rules().get(0).sourceOrder())
-                .isEqualTo(stylesheet.rules().get(1).sourceOrder());
+            .isEqualTo(stylesheet.rules().get(1).sourceOrder());
     }
 
     @Test
@@ -502,8 +499,7 @@ class CssParserTest {
 
     @Test
     void parsesAttributeSelectorInSelectorList() {
-        Stylesheet stylesheet = CssParser
-                .parse("Panel[title=\"A\"], Panel[title=\"B\"] { color: green; }");
+        Stylesheet stylesheet = CssParser.parse("Panel[title=\"A\"], Panel[title=\"B\"] { color: green; }");
 
         assertThat(stylesheet.rules()).hasSize(2);
 

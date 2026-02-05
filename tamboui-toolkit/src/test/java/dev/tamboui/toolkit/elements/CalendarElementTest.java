@@ -26,16 +26,14 @@ class CalendarElementTest {
     @Test
     @DisplayName("styleAttributes exposes title")
     void styleAttributes_exposesTitle() {
-        assertThat(calendar().title("Schedule").styleAttributes()).containsEntry("title",
-                "Schedule");
+        assertThat(calendar().title("Schedule").styleAttributes()).containsEntry("title", "Schedule");
     }
 
     @Test
     @DisplayName("Attribute selector [title] affects Calendar border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "CalendarElement[title=\"Schedule\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test", "CalendarElement[title=\"Schedule\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

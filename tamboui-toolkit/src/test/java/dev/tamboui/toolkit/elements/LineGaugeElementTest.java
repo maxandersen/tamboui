@@ -25,8 +25,7 @@ class LineGaugeElementTest {
     @Test
     @DisplayName("styleAttributes exposes label")
     void styleAttributes_exposesLabel() {
-        assertThat(lineGauge(0.5).label("Processing").styleAttributes()).containsEntry("label",
-                "Processing");
+        assertThat(lineGauge(0.5).label("Processing").styleAttributes()).containsEntry("label", "Processing");
     }
 
     @Test
@@ -39,8 +38,7 @@ class LineGaugeElementTest {
     @DisplayName("Attribute selector [label] affects LineGauge filled style via child selector")
     void attributeSelector_label_affectsFilledStyle() {
         StyleEngine styleEngine = StyleEngine.create();
-        // Use child selector to style the filled portion of LineGauge with matching
-        // label
+        // Use child selector to style the filled portion of LineGauge with matching label
         styleEngine.addStylesheet("test",
                 "LineGaugeElement[label=\"Processing\"] LineGaugeElement-filled { color: cyan; }");
         styleEngine.setActiveStylesheet("test");

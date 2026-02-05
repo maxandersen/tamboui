@@ -49,8 +49,8 @@ class CharsetDetectionTest {
     }
 
     /**
-     * Assumes a terminal is available for the test. Skips the test if /dev/tty
-     * cannot be opened.
+     * Assumes a terminal is available for the test.
+     * Skips the test if /dev/tty cannot be opened.
      */
     private void assumeTerminalAvailable() {
         int fd = LibC.open("/dev/tty", LibC.O_RDWR);

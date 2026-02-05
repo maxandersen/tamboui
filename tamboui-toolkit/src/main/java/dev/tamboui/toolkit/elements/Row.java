@@ -26,16 +26,14 @@ import dev.tamboui.toolkit.element.RenderContext;
  * <p>
  * Layout properties can be set via CSS or programmatically:
  * <ul>
- * <li>{@code flex} - Flex positioning mode: "start", "center", "end",
- * "space-between", "space-around", "space-evenly"</li>
- * <li>{@code spacing} - Gap between children in cells</li>
- * <li>{@code margin} - Margin around the row</li>
+ *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code spacing} - Gap between children in cells</li>
+ *   <li>{@code margin} - Margin around the row</li>
  * </ul>
  * <p>
  * Programmatic values override CSS values when both are set.
  * <p>
  * Example usage:
- * 
  * <pre>
  * row(child1, child2, child3).flex(Flex.CENTER).spacing(1)
  * </pre>
@@ -53,8 +51,7 @@ public final class Row extends ContainerElement<Row> {
     /**
      * Creates a row with the given children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public Row(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -65,8 +62,7 @@ public final class Row extends ContainerElement<Row> {
      * <p>
      * Can also be set via CSS {@code spacing} property.
      *
-     * @param spacing
-     *            spacing in cells between adjacent children
+     * @param spacing spacing in cells between adjacent children
      * @return this row for method chaining
      */
     public Row spacing(int spacing) {
@@ -79,8 +75,7 @@ public final class Row extends ContainerElement<Row> {
      * <p>
      * Can also be set via CSS {@code flex} property.
      *
-     * @param flex
-     *            the flex mode for space distribution
+     * @param flex the flex mode for space distribution
      * @return this row for method chaining
      * @see Flex
      */
@@ -94,8 +89,7 @@ public final class Row extends ContainerElement<Row> {
      * <p>
      * Can also be set via CSS {@code margin} property.
      *
-     * @param margin
-     *            the margin
+     * @param margin the margin
      * @return this row for method chaining
      */
     public Row margin(Margin margin) {
@@ -106,8 +100,7 @@ public final class Row extends ContainerElement<Row> {
     /**
      * Sets uniform margin around the row.
      *
-     * @param value
-     *            the margin value for all sides
+     * @param value the margin value for all sides
      * @return this row for method chaining
      */
     public Row margin(int value) {
@@ -140,6 +133,19 @@ public final class Row extends ContainerElement<Row> {
         }
 
         return width;
+    }
+
+    @Override
+    public int preferredHeight() {
+        if (children.isEmpty()) {
+            return 1;
+        }
+        // Horizontal layout: max height of children
+        int maxHeight = 1;
+        for (Element child : children) {
+            maxHeight = Math.max(maxHeight, child.preferredHeight());
+        }
+        return maxHeight;
     }
 
     @Override
@@ -235,8 +241,10 @@ public final class Row extends ContainerElement<Row> {
             }
         }
 
-        List<Rect> areas = Layout.horizontal().constraints(constraints.toArray(new Constraint[0]))
-                .flex(effectiveFlex).split(effectiveArea);
+        List<Rect> areas = Layout.horizontal()
+            .constraints(constraints.toArray(new Constraint[0]))
+            .flex(effectiveFlex)
+            .split(effectiveArea);
 
         // Render children (skipping spacing areas)
         int childIndex = 0;

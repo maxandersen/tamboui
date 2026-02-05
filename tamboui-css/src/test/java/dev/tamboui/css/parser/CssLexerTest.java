@@ -148,7 +148,8 @@ class CssLexerTest {
     void throwsOnUnexpectedCharacter() {
         CssLexer lexer = new CssLexer("@invalid");
 
-        assertThatThrownBy(lexer::tokenizeFiltered).isInstanceOf(CssParseException.class)
+        assertThatThrownBy(lexer::tokenizeFiltered)
+                .isInstanceOf(CssParseException.class)
                 .hasMessageContaining("Unexpected character");
     }
 

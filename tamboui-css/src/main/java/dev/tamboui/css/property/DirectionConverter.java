@@ -14,8 +14,8 @@ import dev.tamboui.layout.Direction;
  * <p>
  * Supports the following values:
  * <ul>
- * <li>{@code "horizontal"} or {@code "row"} - horizontal layout</li>
- * <li>{@code "vertical"} or {@code "column"} - vertical layout</li>
+ *   <li>{@code "horizontal"} or {@code "row"} - horizontal layout</li>
+ *   <li>{@code "vertical"} or {@code "column"} - vertical layout</li>
  * </ul>
  */
 public final class DirectionConverter implements PropertyConverter<Direction> {
@@ -35,13 +35,13 @@ public final class DirectionConverter implements PropertyConverter<Direction> {
         String resolved = PropertyConverter.resolveVariables(value.trim(), variables).toLowerCase();
 
         switch (resolved) {
-            case "horizontal" :
-            case "row" :
+            case "horizontal":
+            case "row":
                 return Optional.of(Direction.HORIZONTAL);
-            case "vertical" :
-            case "column" :
+            case "vertical":
+            case "column":
                 return Optional.of(Direction.VERTICAL);
-            default :
+            default:
                 return Optional.empty();
         }
     }

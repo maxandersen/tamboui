@@ -82,7 +82,10 @@ class LineGaugeTest {
     @Test
     @DisplayName("LineGauge with label")
     void withLabel() {
-        LineGauge gauge = LineGauge.builder().percent(50).label("CPU: ").build();
+        LineGauge gauge = LineGauge.builder()
+            .percent(50)
+            .label("CPU: ")
+            .build();
         Rect area = new Rect(0, 0, 15, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -105,7 +108,10 @@ class LineGaugeTest {
     @DisplayName("LineGauge with filled style")
     void withFilledStyle() {
         Style filledStyle = Style.EMPTY.fg(Color.GREEN);
-        LineGauge gauge = LineGauge.builder().percent(100).filledStyle(filledStyle).build();
+        LineGauge gauge = LineGauge.builder()
+            .percent(100)
+            .filledStyle(filledStyle)
+            .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -118,7 +124,10 @@ class LineGaugeTest {
     @DisplayName("LineGauge with unfilled style")
     void withUnfilledStyle() {
         Style unfilledStyle = Style.EMPTY.fg(Color.DARK_GRAY);
-        LineGauge gauge = LineGauge.builder().percent(0).unfilledStyle(unfilledStyle).build();
+        LineGauge gauge = LineGauge.builder()
+            .percent(0)
+            .unfilledStyle(unfilledStyle)
+            .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -130,7 +139,10 @@ class LineGaugeTest {
     @Test
     @DisplayName("LineGauge with thick line set")
     void withThickLineSet() {
-        LineGauge gauge = LineGauge.builder().percent(50).lineSet(LineGauge.THICK).build();
+        LineGauge gauge = LineGauge.builder()
+            .percent(50)
+            .lineSet(LineGauge.THICK)
+            .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -144,7 +156,10 @@ class LineGaugeTest {
     @Test
     @DisplayName("LineGauge with double line set")
     void withDoubleLineSet() {
-        LineGauge gauge = LineGauge.builder().percent(50).lineSet(LineGauge.DOUBLE).build();
+        LineGauge gauge = LineGauge.builder()
+            .percent(50)
+            .lineSet(LineGauge.DOUBLE)
+            .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -158,7 +173,10 @@ class LineGaugeTest {
     @DisplayName("LineGauge with custom line set")
     void withCustomLineSet() {
         LineGauge.LineSet customSet = new LineGauge.LineSet(".", "#");
-        LineGauge gauge = LineGauge.builder().percent(50).lineSet(customSet).build();
+        LineGauge gauge = LineGauge.builder()
+            .percent(50)
+            .lineSet(customSet)
+            .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -172,18 +190,18 @@ class LineGaugeTest {
     @DisplayName("LineGauge percent validation")
     void percentValidation() {
         assertThatThrownBy(() -> LineGauge.builder().percent(-1))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> LineGauge.builder().percent(101))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("LineGauge ratio validation")
     void ratioValidation() {
         assertThatThrownBy(() -> LineGauge.builder().ratio(-0.1))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> LineGauge.builder().ratio(1.1))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -191,9 +209,9 @@ class LineGaugeTest {
     void lineSetValidation() {
         // Empty strings should throw IllegalArgumentException
         assertThatThrownBy(() -> new LineGauge.LineSet("", "#"))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new LineGauge.LineSet(".", ""))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
         // Valid LineSet should work
         LineGauge.LineSet validSet = new LineGauge.LineSet(".", "#");
         assertThat(validSet.unfilled()).isEqualTo(".");
@@ -203,8 +221,10 @@ class LineGaugeTest {
     @Test
     @DisplayName("LineGauge uses FILLED_COLOR property from StylePropertyResolver")
     void usesFilledColorProperty() {
-        LineGauge gauge = LineGauge.builder().percent(100)
-                .styleResolver(TestStylePropertyResolver.of("filled-color", Color.GREEN)).build();
+        LineGauge gauge = LineGauge.builder()
+                .percent(100)
+                .styleResolver(TestStylePropertyResolver.of("filled-color", Color.GREEN))
+                .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -216,7 +236,8 @@ class LineGaugeTest {
     @Test
     @DisplayName("LineGauge uses UNFILLED_COLOR property from StylePropertyResolver")
     void usesUnfilledColorProperty() {
-        LineGauge gauge = LineGauge.builder().percent(0)
+        LineGauge gauge = LineGauge.builder()
+                .percent(0)
                 .styleResolver(TestStylePropertyResolver.of("unfilled-color", Color.DARK_GRAY))
                 .build();
         Rect area = new Rect(0, 0, 10, 1);

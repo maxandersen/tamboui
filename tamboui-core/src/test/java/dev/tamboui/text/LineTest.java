@@ -26,14 +26,21 @@ class LineTest {
     @Test
     @DisplayName("Line.from(Span...) creates line with multiple spans")
     void fromSpans() {
-        Line line = Line.from(Span.raw("Hello "), Span.styled("World", Style.EMPTY.fg(Color.RED)));
+        Line line = Line.from(
+            Span.raw("Hello "),
+            Span.styled("World", Style.EMPTY.fg(Color.RED))
+        );
         assertThat(line.spans()).hasSize(2);
     }
 
     @Test
     @DisplayName("Line width is sum of span widths")
     void width() {
-        Line line = Line.from(Span.raw("Hello"), Span.raw(" "), Span.raw("World"));
+        Line line = Line.from(
+            Span.raw("Hello"),
+            Span.raw(" "),
+            Span.raw("World")
+        );
         assertThat(line.width()).isEqualTo(11);
     }
 

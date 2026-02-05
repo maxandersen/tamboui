@@ -16,7 +16,19 @@ public enum EventResult {
     /**
      * The event was not handled and should continue propagating.
      */
-    UNHANDLED;
+    UNHANDLED,
+
+    /**
+     * Request to move focus to the next focusable element.
+     * Used by form elements to enable up/down arrow navigation.
+     */
+    FOCUS_NEXT,
+
+    /**
+     * Request to move focus to the previous focusable element.
+     * Used by form elements to enable up/down arrow navigation.
+     */
+    FOCUS_PREVIOUS;
 
     /**
      * Returns whether this result indicates the event was handled.
@@ -39,8 +51,7 @@ public enum EventResult {
     /**
      * Combines two results, returning HANDLED if either is HANDLED.
      *
-     * @param other
-     *            the other result
+     * @param other the other result
      * @return HANDLED if either is HANDLED, UNHANDLED otherwise
      */
     public EventResult or(EventResult other) {

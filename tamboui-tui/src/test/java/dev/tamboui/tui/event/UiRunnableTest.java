@@ -17,8 +17,7 @@ class UiRunnableTest {
     @Test
     @DisplayName("UiRunnable implements Event interface")
     void implementsEventInterface() {
-        UiRunnable runnable = new UiRunnable(() -> {
-        });
+        UiRunnable runnable = new UiRunnable(() -> {});
         assertThat(runnable).isInstanceOf(Event.class);
     }
 
@@ -53,7 +52,8 @@ class UiRunnableTest {
             throw new RuntimeException("test error");
         });
 
-        assertThatThrownBy(runnable::run).isInstanceOf(RuntimeException.class)
-                .hasMessage("test error");
+        assertThatThrownBy(runnable::run)
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("test error");
     }
 }

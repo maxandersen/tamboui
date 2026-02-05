@@ -27,8 +27,13 @@ class TableTest {
     @DisplayName("Table renders basic content")
     void rendersBasicContent() {
         Table table = Table.builder()
-                .rows(Arrays.asList(Row.from("Alice", "30"), Row.from("Bob", "25")))
-                .widths(Constraint.length(10), Constraint.length(5)).highlightSymbol("").build();
+            .rows(Arrays.asList(
+                Row.from("Alice", "30"),
+                Row.from("Bob", "25")
+            ))
+            .widths(Constraint.length(10), Constraint.length(5))
+            .highlightSymbol("")
+            .build();
 
         Rect area = new Rect(0, 0, 20, 3);
         Buffer buffer = Buffer.empty(area);
@@ -46,9 +51,12 @@ class TableTest {
     @Test
     @DisplayName("Table renders header")
     void rendersHeader() {
-        Table table = Table.builder().header(Row.from("Name", "Age"))
-                .rows(Arrays.asList(Row.from("Alice", "30")))
-                .widths(Constraint.length(10), Constraint.length(5)).highlightSymbol("").build();
+        Table table = Table.builder()
+            .header(Row.from("Name", "Age"))
+            .rows(Arrays.asList(Row.from("Alice", "30")))
+            .widths(Constraint.length(10), Constraint.length(5))
+            .highlightSymbol("")
+            .build();
 
         Rect area = new Rect(0, 0, 20, 3);
         Buffer buffer = Buffer.empty(area);
@@ -67,9 +75,15 @@ class TableTest {
     void rendersWithSelection() {
         Style highlightStyle = Style.EMPTY.bg(Color.BLUE);
         Table table = Table.builder()
-                .rows(Arrays.asList(Row.from("Alice", "30"), Row.from("Bob", "25")))
-                .widths(Constraint.length(10), Constraint.length(5)).highlightStyle(highlightStyle)
-                .highlightSymbol("> ").highlightSpacing(Table.HighlightSpacing.ALWAYS).build();
+            .rows(Arrays.asList(
+                Row.from("Alice", "30"),
+                Row.from("Bob", "25")
+            ))
+            .widths(Constraint.length(10), Constraint.length(5))
+            .highlightStyle(highlightStyle)
+            .highlightSymbol("> ")
+            .highlightSpacing(Table.HighlightSpacing.ALWAYS)
+            .build();
 
         Rect area = new Rect(0, 0, 20, 3);
         Buffer buffer = Buffer.empty(area);
@@ -86,8 +100,12 @@ class TableTest {
     @Test
     @DisplayName("Table with block")
     void withBlock() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("Data")))
-                .widths(Constraint.length(10)).block(Block.bordered()).highlightSymbol("").build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("Data")))
+            .widths(Constraint.length(10))
+            .block(Block.bordered())
+            .highlightSymbol("")
+            .build();
 
         Rect area = new Rect(0, 0, 15, 5);
         Buffer buffer = Buffer.empty(area);
@@ -104,9 +122,12 @@ class TableTest {
     @Test
     @DisplayName("Table column spacing")
     void columnSpacing() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("A", "B")))
-                .widths(Constraint.length(3), Constraint.length(3)).columnSpacing(2)
-                .highlightSymbol("").build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("A", "B")))
+            .widths(Constraint.length(3), Constraint.length(3))
+            .columnSpacing(2)
+            .highlightSymbol("")
+            .build();
 
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
@@ -123,9 +144,12 @@ class TableTest {
     @Test
     @DisplayName("Table with footer")
     void withFooter() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("Data")))
-                .footer(Row.from("Total: 1")).widths(Constraint.length(15)).highlightSymbol("")
-                .build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("Data")))
+            .footer(Row.from("Total: 1"))
+            .widths(Constraint.length(15))
+            .highlightSymbol("")
+            .build();
 
         Rect area = new Rect(0, 0, 20, 3);
         Buffer buffer = Buffer.empty(area);
@@ -143,7 +167,10 @@ class TableTest {
     @DisplayName("Table rows accessor")
     void rowsAccessor() {
         List<Row> rows = Arrays.asList(Row.from("A"), Row.from("B"));
-        Table table = Table.builder().rows(rows).widths(Constraint.length(5)).build();
+        Table table = Table.builder()
+            .rows(rows)
+            .widths(Constraint.length(5))
+            .build();
 
         assertThat(table.rows()).hasSize(2);
     }
@@ -151,9 +178,12 @@ class TableTest {
     @Test
     @DisplayName("Table with percentage constraints")
     void percentageConstraints() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("Left", "Right")))
-                .widths(Constraint.percentage(50), Constraint.percentage(50)).highlightSymbol("")
-                .columnSpacing(0).build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("Left", "Right")))
+            .widths(Constraint.percentage(50), Constraint.percentage(50))
+            .highlightSymbol("")
+            .columnSpacing(0)
+            .build();
 
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
@@ -171,9 +201,12 @@ class TableTest {
     @Test
     @DisplayName("Table highlight spacing NEVER does not reserve space")
     void highlightSpacingNever() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("Data")))
-                .widths(Constraint.length(10)).highlightSymbol(">> ")
-                .highlightSpacing(Table.HighlightSpacing.NEVER).build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("Data")))
+            .widths(Constraint.length(10))
+            .highlightSymbol(">> ")
+            .highlightSpacing(Table.HighlightSpacing.NEVER)
+            .build();
 
         Rect area = new Rect(0, 0, 15, 1);
         Buffer buffer = Buffer.empty(area);
@@ -189,9 +222,12 @@ class TableTest {
     @Test
     @DisplayName("Table highlight spacing ALWAYS reserves space")
     void highlightSpacingAlways() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("Data")))
-                .widths(Constraint.length(10)).highlightSymbol(">> ")
-                .highlightSpacing(Table.HighlightSpacing.ALWAYS).build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("Data")))
+            .widths(Constraint.length(10))
+            .highlightSymbol(">> ")
+            .highlightSpacing(Table.HighlightSpacing.ALWAYS)
+            .build();
 
         Rect area = new Rect(0, 0, 15, 1);
         Buffer buffer = Buffer.empty(area);
@@ -208,7 +244,9 @@ class TableTest {
     @Test
     @DisplayName("Empty table renders nothing")
     void emptyTable() {
-        Table table = Table.builder().widths(Constraint.length(10)).build();
+        Table table = Table.builder()
+            .widths(Constraint.length(10))
+            .build();
 
         Rect area = new Rect(0, 0, 15, 3);
         Buffer buffer = Buffer.empty(area);
@@ -223,7 +261,9 @@ class TableTest {
     @Test
     @DisplayName("Table without widths renders nothing")
     void noWidths() {
-        Table table = Table.builder().rows(Arrays.asList(Row.from("Data"))).build();
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("Data")))
+            .build();
 
         Rect area = new Rect(0, 0, 15, 3);
         Buffer buffer = Buffer.empty(area);
@@ -239,10 +279,15 @@ class TableTest {
     @DisplayName("Table uses HIGHLIGHT_COLOR property from StylePropertyResolver")
     void usesHighlightColorProperty() {
         Table table = Table.builder()
-                .rows(Arrays.asList(Row.from("Alice", "30"), Row.from("Bob", "25")))
-                .widths(Constraint.length(10), Constraint.length(5)).highlightSymbol("")
+                .rows(Arrays.asList(
+                    Row.from("Alice", "30"),
+                    Row.from("Bob", "25")
+                ))
+                .widths(Constraint.length(10), Constraint.length(5))
+                .highlightSymbol("")
                 .highlightSpacing(Table.HighlightSpacing.NEVER)
-                .styleResolver(TestStylePropertyResolver.of("highlight-color", Color.BLUE)).build();
+                .styleResolver(TestStylePropertyResolver.of("highlight-color", Color.BLUE))
+                .build();
 
         Rect area = new Rect(0, 0, 20, 3);
         Buffer buffer = Buffer.empty(area);

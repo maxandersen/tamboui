@@ -170,9 +170,15 @@ class TextAreaElementTest {
         @Test
         @DisplayName("Chaining multiple methods works")
         void chainingMethods() {
-            TextAreaElement element = textArea().text("Hello").title("Editor")
-                    .placeholder("Type here...").showLineNumbers().rounded()
-                    .borderColor(Color.GREEN).id("my-editor").fill();
+            TextAreaElement element = textArea()
+                .text("Hello")
+                .title("Editor")
+                .placeholder("Type here...")
+                .showLineNumbers()
+                .rounded()
+                .borderColor(Color.GREEN)
+                .id("my-editor")
+                .fill();
 
             assertThat(element.getState().text()).isEqualTo("Hello");
             assertThat(element.id()).isEqualTo("my-editor");
@@ -354,7 +360,8 @@ class TextAreaElementTest {
         @DisplayName("Listener is called on text change")
         void listenerCalledOnChange() {
             AtomicReference<String> capturedText = new AtomicReference<>();
-            TextAreaElement element = textArea().onTextChange(capturedText::set);
+            TextAreaElement element = textArea()
+                .onTextChange(capturedText::set);
 
             KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, 'H');
             element.handleKeyEvent(event, true);
@@ -366,7 +373,8 @@ class TextAreaElementTest {
         @DisplayName("Listener receives updated text after multiple changes")
         void listenerReceivesUpdatedText() {
             AtomicReference<String> capturedText = new AtomicReference<>();
-            TextAreaElement element = textArea().onTextChange(capturedText::set);
+            TextAreaElement element = textArea()
+                .onTextChange(capturedText::set);
 
             element.handleKeyEvent(new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, 'H'), true);
             element.handleKeyEvent(new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, 'i'), true);
@@ -378,7 +386,8 @@ class TextAreaElementTest {
         @DisplayName("Listener is not called when unfocused")
         void listenerNotCalledWhenUnfocused() {
             AtomicReference<String> capturedText = new AtomicReference<>();
-            TextAreaElement element = textArea().onTextChange(capturedText::set);
+            TextAreaElement element = textArea()
+                .onTextChange(capturedText::set);
 
             element.handleKeyEvent(new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, 'H'), false);
 
@@ -397,7 +406,8 @@ class TextAreaElementTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            textArea().text("Hello").render(frame, area, RenderContext.empty());
+            textArea().text("Hello")
+                .render(frame, area, RenderContext.empty());
 
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
         }
@@ -420,8 +430,11 @@ class TextAreaElementTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            textArea().text("Hello").title("Editor").rounded().render(frame, area,
-                    RenderContext.empty());
+            textArea()
+                .text("Hello")
+                .title("Editor")
+                .rounded()
+                .render(frame, area, RenderContext.empty());
 
             // Title should be in first row
             // Text should be inside the border
@@ -484,23 +497,20 @@ class TextAreaElementTest {
         @Test
         @DisplayName("styleAttributes exposes title")
         void styleAttributes_exposesTitle() {
-            assertThat(textArea().title("Description").styleAttributes()).containsEntry("title",
-                    "Description");
+            assertThat(textArea().title("Description").styleAttributes()).containsEntry("title", "Description");
         }
 
         @Test
         @DisplayName("styleAttributes exposes placeholder")
         void styleAttributes_exposesPlaceholder() {
-            assertThat(textArea().placeholder("Enter text...").styleAttributes())
-                    .containsEntry("placeholder", "Enter text...");
+            assertThat(textArea().placeholder("Enter text...").styleAttributes()).containsEntry("placeholder", "Enter text...");
         }
 
         @Test
         @DisplayName("Attribute selector [title] affects TextArea border color")
         void attributeSelector_title_affectsBorderColor() {
             StyleEngine styleEngine = StyleEngine.create();
-            styleEngine.addStylesheet("test",
-                    "TextAreaElement[title=\"Editor\"] { border-color: cyan; }");
+            styleEngine.addStylesheet("test", "TextAreaElement[title=\"Editor\"] { border-color: cyan; }");
             styleEngine.setActiveStylesheet("test");
 
             DefaultRenderContext context = DefaultRenderContext.createEmpty();
@@ -519,8 +529,7 @@ class TextAreaElementTest {
         @DisplayName("Attribute selector [placeholder] affects TextArea styling")
         void attributeSelector_placeholder_affectsStyling() {
             StyleEngine styleEngine = StyleEngine.create();
-            styleEngine.addStylesheet("test",
-                    "TextAreaElement[placeholder=\"Type here...\"] { border-color: yellow; }");
+            styleEngine.addStylesheet("test", "TextAreaElement[placeholder=\"Type here...\"] { border-color: yellow; }");
             styleEngine.setActiveStylesheet("test");
 
             DefaultRenderContext context = DefaultRenderContext.createEmpty();

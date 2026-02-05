@@ -106,7 +106,9 @@ class SpinnerElementCssTest {
         Frame frame = Frame.forTesting(buffer);
 
         // Set explicit ARC style which has frames: "◜", "◝", "◞", "◟"
-        SpinnerElement spinner = spinner().addClass("spinner").spinnerStyle(SpinnerStyle.ARC);
+        SpinnerElement spinner = spinner()
+                .addClass("spinner")
+                .spinnerStyle(SpinnerStyle.ARC);
         spinner.render(frame, area, context);
 
         // State advances during render, so first render shows frame 1 which is "◝"
@@ -126,7 +128,8 @@ class SpinnerElementCssTest {
         Frame frame = Frame.forTesting(buffer);
 
         // Set explicit frame set: "A", "B", "C"
-        SpinnerElement spinner = spinner().addClass("spinner")
+        SpinnerElement spinner = spinner()
+                .addClass("spinner")
                 .frameSet(SpinnerFrameSet.of("A", "B", "C"));
         spinner.render(frame, area, context);
 
@@ -147,7 +150,9 @@ class SpinnerElementCssTest {
         Frame frame = Frame.forTesting(buffer);
 
         // Set explicit frames via varargs: "!", "?", "&"
-        SpinnerElement spinner = spinner().addClass("spinner").frames("!", "?", "&");
+        SpinnerElement spinner = spinner()
+                .addClass("spinner")
+                .frames("!", "?", "&");
         spinner.render(frame, area, context);
 
         // State advances during render, so first render shows frame 1 which is "?"
@@ -206,10 +211,9 @@ class SpinnerElementCssTest {
         SpinnerElement spinner = spinner().addClass("bar-spinner");
         spinner.render(frame, area, context);
 
-        // BOUNCING_BAR frames start with "[ ]", "[= ]", ...
-        // State advances during render, so first render shows frame 1 which starts with
-        // "["
-        // Second frame is "[= ]"
+        // BOUNCING_BAR frames start with "[    ]", "[=   ]", ...
+        // State advances during render, so first render shows frame 1 which starts with "["
+        // Second frame is "[=   ]"
         String cell0 = buffer.get(0, 0).symbol();
         assertThat(cell0).isEqualTo("[");
     }

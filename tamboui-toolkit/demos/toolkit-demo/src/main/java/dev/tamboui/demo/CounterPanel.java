@@ -25,8 +25,10 @@ final class CounterPanel extends PanelContent {
     Element render(boolean focused) {
         var display = String.format("%+d", counter);
         var valueColor = counter > 0 ? Color.GREEN : (counter < 0 ? Color.RED : Color.WHITE);
-        return column(row(text("Value: ").dim(), text(display).bold().fg(valueColor)),
-                text("[k] Inc  [j] Dec").dim());
+        return column(
+            row(text("Value: ").dim(), text(display).bold().fg(valueColor)),
+            text("[k] Inc  [j] Dec").dim()
+        );
     }
 
     @Override

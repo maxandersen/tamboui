@@ -20,20 +20,20 @@ import dev.tamboui.toolkit.element.RenderContext;
 /**
  * A scope element that can show/hide its content dynamically.
  * <p>
- * When visible, renders its children in a vertical layout. When hidden, the
- * scope collapses to zero height, taking no space. This is useful for temporary
- * displays like parallel downloads that should disappear when complete.
+ * When visible, renders its children in a vertical layout.
+ * When hidden, the scope collapses to zero height, taking no space.
+ * This is useful for temporary displays like parallel downloads that
+ * should disappear when complete.
  *
  * <h2>Key Features</h2>
  * <ul>
- * <li>Declarative visibility: state drives rendering</li>
- * <li>Zero height when hidden (collapses completely)</li>
- * <li>Optional clearing when hiding</li>
- * <li>Works with parent event loop (no separate event handling)</li>
+ *   <li>Declarative visibility: state drives rendering</li>
+ *   <li>Zero height when hidden (collapses completely)</li>
+ *   <li>Optional clearing when hiding</li>
+ *   <li>Works with parent event loop (no separate event handling)</li>
  * </ul>
  *
  * <h2>Example Usage</h2>
- * 
  * <pre>{@code
  * import static dev.tamboui.toolkit.InlineToolkit.*;
  * import static dev.tamboui.toolkit.Toolkit.*;
@@ -44,20 +44,24 @@ import dev.tamboui.toolkit.element.RenderContext;
  *
  * @Override
  * protected Element render() {
- *     return column(waveText("Package Installation").cyan(),
+ *     return column(
+ *         waveText("Package Installation").cyan(),
  *
- *             // Scope for parallel downloads - collapses when done
- *             scope(downloading, row(text("file1.zip: "), gauge(progress[0])),
- *                     row(text("file2.zip: "), gauge(progress[1])),
- *                     row(text("file3.zip: "), gauge(progress[2]))),
+ *         // Scope for parallel downloads - collapses when done
+ *         scope(downloading,
+ *             row(text("file1.zip: "), gauge(progress[0])),
+ *             row(text("file2.zip: "), gauge(progress[1])),
+ *             row(text("file3.zip: "), gauge(progress[2]))
+ *         ),
  *
- *             // Always visible
- *             text(downloading ? "Downloading..." : "Complete!").dim());
+ *         // Always visible
+ *         text(downloading ? "Downloading..." : "Complete!").dim()
+ *     );
  * }
  *
  * // When downloads complete:
  * private void onDownloadsComplete() {
- *     downloading = false; // Scope collapses on next render
+ *     downloading = false;  // Scope collapses on next render
  *     println(text("All downloads complete!").green());
  * }
  * }</pre>
@@ -77,8 +81,7 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
     /**
      * Creates a scope element with the given children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public InlineScopeElement(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -87,11 +90,10 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
     /**
      * Sets the visibility of this scope.
      * <p>
-     * When visible is false, the scope collapses to zero height and its children
-     * are not rendered.
+     * When visible is false, the scope collapses to zero height
+     * and its children are not rendered.
      *
-     * @param visible
-     *            true to show, false to hide
+     * @param visible true to show, false to hide
      * @return this scope for chaining
      */
     public InlineScopeElement visible(boolean visible) {
@@ -131,8 +133,7 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
     /**
      * Adds child elements to this scope.
      *
-     * @param children
-     *            the children to add
+     * @param children the children to add
      * @return this scope for chaining
      */
     public InlineScopeElement children(Element... children) {
@@ -163,6 +164,32 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
             }
         }
         return totalHeight > 0 ? Constraint.length(totalHeight) : Constraint.fill();
+    }
+
+    @Override
+    public int preferredWidth() {
+        if (!visible || children.isEmpty()) {
+            return 0;
+        }
+        // Vertical layout: max width of children
+        int maxWidth = 0;
+        for (Element child : children) {
+            maxWidth = Math.max(maxWidth, child.preferredWidth());
+        }
+        return maxWidth;
+    }
+
+    @Override
+    public int preferredHeight() {
+        if (!visible || children.isEmpty()) {
+            return 0;
+        }
+        // Sum heights of all children
+        int totalHeight = 0;
+        for (Element child : children) {
+            totalHeight += child.preferredHeight();
+        }
+        return totalHeight;
     }
 
     @Override
@@ -214,7 +241,8 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
         }
 
         // Layout children vertically
-        Layout layout = Layout.vertical().constraints(constraints.toArray(new Constraint[0]));
+        Layout layout = Layout.vertical()
+                .constraints(constraints.toArray(new Constraint[0]));
         List<Rect> areas = layout.split(area);
 
         // Render each child

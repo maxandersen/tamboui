@@ -47,11 +47,13 @@ public class JLineBackend implements Backend {
     /**
      * Creates a new JLine 3 backend using the system terminal.
      *
-     * @throws IOException
-     *             if the terminal cannot be opened
+     * @throws IOException if the terminal cannot be opened
      */
     public JLineBackend() throws IOException {
-        this.terminal = TerminalBuilder.builder().system(true).jansi(true).build();
+        this.terminal = TerminalBuilder.builder()
+            .system(true)
+            .jansi(true)
+            .build();
         this.writer = terminal.writer();
         this.reader = terminal.reader();
         this.inAlternateScreen = false;
@@ -116,8 +118,8 @@ public class JLineBackend implements Backend {
 
     @Override
     public void clear() throws IOException {
-        writer.print(CSI + "2J"); // Clear entire screen
-        writer.print(CSI + "H"); // Move cursor to home
+        writer.print(CSI + "2J");  // Clear entire screen
+        writer.print(CSI + "H");    // Move cursor to home
         writer.flush();
     }
 
@@ -200,10 +202,10 @@ public class JLineBackend implements Backend {
     @Override
     public void enableMouseCapture() throws IOException {
         // Enable mouse tracking modes
-        writer.print(CSI + "?1000h"); // Normal tracking
-        writer.print(CSI + "?1002h"); // Button event tracking
-        writer.print(CSI + "?1015h"); // urxvt style
-        writer.print(CSI + "?1006h"); // SGR extended mode
+        writer.print(CSI + "?1000h");  // Normal tracking
+        writer.print(CSI + "?1002h");  // Button event tracking
+        writer.print(CSI + "?1015h");  // urxvt style
+        writer.print(CSI + "?1006h");  // SGR extended mode
         writer.flush();
         mouseEnabled = true;
     }
@@ -316,7 +318,7 @@ public class JLineBackend implements Backend {
     @Override
     public void close() throws IOException {
         // Reset state
-        writer.print(CSI + "0m"); // Reset style
+        writer.print(CSI + "0m");  // Reset style
 
         if (mouseEnabled) {
             disableMouseCapture();
@@ -340,7 +342,7 @@ public class JLineBackend implements Backend {
 
     private void applyStyle(Style style) {
         StringBuilder sb = new StringBuilder();
-        sb.append(CSI).append("0"); // Reset first
+        sb.append(CSI).append("0");  // Reset first
 
         // Foreground color
         style.fg().ifPresent(color -> {

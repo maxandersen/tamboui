@@ -37,7 +37,8 @@ class EmojiMarkupParserTest {
     @Test
     @DisplayName("replace multiple emoji codes")
     void replaceMultipleEmojiCodes() {
-        assertThat(replaceEmoji(":cross_mark: :warning:")).isEqualTo("❌ ⚠");
+        assertThat(replaceEmoji(":cross_mark: :warning:"))
+            .isEqualTo("❌ ⚠");
     }
 
     @Test

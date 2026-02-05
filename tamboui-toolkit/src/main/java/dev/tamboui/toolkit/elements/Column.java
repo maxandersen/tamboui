@@ -26,16 +26,14 @@ import dev.tamboui.toolkit.element.RenderContext;
  * <p>
  * Layout properties can be set via CSS or programmatically:
  * <ul>
- * <li>{@code flex} - Flex positioning mode: "start", "center", "end",
- * "space-between", "space-around", "space-evenly"</li>
- * <li>{@code spacing} - Gap between children in cells</li>
- * <li>{@code margin} - Margin around the column</li>
+ *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code spacing} - Gap between children in cells</li>
+ *   <li>{@code margin} - Margin around the column</li>
  * </ul>
  * <p>
  * Programmatic values override CSS values when both are set.
  * <p>
  * Example usage:
- * 
  * <pre>
  * column(child1, child2, child3).flex(Flex.CENTER).spacing(1)
  * </pre>
@@ -55,8 +53,7 @@ public final class Column extends ContainerElement<Column> {
     /**
      * Creates a new column with the given children.
      *
-     * @param children
-     *            the child elements to arrange vertically
+     * @param children the child elements to arrange vertically
      */
     public Column(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -67,8 +64,7 @@ public final class Column extends ContainerElement<Column> {
      * <p>
      * Can also be set via CSS {@code spacing} property.
      *
-     * @param spacing
-     *            spacing in cells between adjacent children
+     * @param spacing spacing in cells between adjacent children
      * @return this column for method chaining
      */
     public Column spacing(int spacing) {
@@ -81,8 +77,7 @@ public final class Column extends ContainerElement<Column> {
      * <p>
      * Can also be set via CSS {@code flex} property.
      *
-     * @param flex
-     *            the flex mode for space distribution
+     * @param flex the flex mode for space distribution
      * @return this column for method chaining
      * @see Flex
      */
@@ -96,8 +91,7 @@ public final class Column extends ContainerElement<Column> {
      * <p>
      * Can also be set via CSS {@code margin} property.
      *
-     * @param margin
-     *            the margin
+     * @param margin the margin
      * @return this column for method chaining
      */
     public Column margin(Margin margin) {
@@ -108,8 +102,7 @@ public final class Column extends ContainerElement<Column> {
     /**
      * Sets uniform margin around the column.
      *
-     * @param value
-     *            the margin value for all sides
+     * @param value the margin value for all sides
      * @return this column for method chaining
      */
     public Column margin(int value) {
@@ -138,6 +131,21 @@ public final class Column extends ContainerElement<Column> {
     }
 
     @Override
+    public int preferredHeight() {
+        if (children.isEmpty()) {
+            return 0;
+        }
+        // Vertical layout: sum of children heights + spacing
+        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
+        int totalHeight = 0;
+        for (Element child : children) {
+            totalHeight += child.preferredHeight();
+        }
+        return totalHeight + totalSpacing;
+    }
+
+    @Override
     public int preferredHeight(int availableWidth, RenderContext context) {
         if (children.isEmpty() || availableWidth <= 0) {
             return 0;
@@ -147,8 +155,7 @@ public final class Column extends ContainerElement<Column> {
         int effectiveSpacing = this.spacing != null ? this.spacing : 0;
         int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
 
-        // Sum heights of all children (Column is vertical, so all children get full
-        // width)
+        // Sum heights of all children (Column is vertical, so all children get full width)
         int totalHeight = 0;
         for (Element child : children) {
             totalHeight += child.preferredHeight(availableWidth, context);
@@ -232,7 +239,8 @@ public final class Column extends ContainerElement<Column> {
         }
 
         // Build layout - only apply flex if explicitly set
-        Layout layout = Layout.vertical().constraints(constraints.toArray(new Constraint[0]));
+        Layout layout = Layout.vertical()
+            .constraints(constraints.toArray(new Constraint[0]));
 
         if (effectiveFlex != null) {
             layout = layout.flex(effectiveFlex);
@@ -255,8 +263,8 @@ public final class Column extends ContainerElement<Column> {
     }
 
     /**
-     * Calculates a default height constraint for elements that return null. For
-     * text elements, this returns a constraint based on line count.
+     * Calculates a default height constraint for elements that return null.
+     * For text elements, this returns a constraint based on line count.
      */
     private Constraint calculateDefaultConstraint(Element child) {
         if (child instanceof TextElement) {

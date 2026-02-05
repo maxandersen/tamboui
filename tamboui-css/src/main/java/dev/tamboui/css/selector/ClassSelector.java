@@ -22,8 +22,7 @@ public final class ClassSelector implements Selector {
     /**
      * Creates a class selector for the given CSS class name.
      *
-     * @param className
-     *            the CSS class name
+     * @param className the CSS class name
      */
     public ClassSelector(String className) {
         this.className = Objects.requireNonNull(className);

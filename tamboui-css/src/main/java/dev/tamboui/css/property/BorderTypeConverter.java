@@ -15,9 +15,9 @@ import dev.tamboui.widgets.block.BorderType;
  * CSS values are derived from enum names by converting to lowercase and
  * replacing underscores with hyphens. For example:
  * <ul>
- * <li>{@code NONE} becomes {@code "none"}</li>
- * <li>{@code PLAIN} becomes {@code "plain"}</li>
- * <li>{@code LIGHT_DOUBLE_DASHED} becomes {@code "light-double-dashed"}</li>
+ *   <li>{@code NONE} becomes {@code "none"}</li>
+ *   <li>{@code PLAIN} becomes {@code "plain"}</li>
+ *   <li>{@code LIGHT_DOUBLE_DASHED} becomes {@code "light-double-dashed"}</li>
  * </ul>
  */
 public final class BorderTypeConverter implements PropertyConverter<BorderType> {

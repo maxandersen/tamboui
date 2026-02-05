@@ -56,7 +56,8 @@ class FaultTolerantRenderingTest {
             Element faultyElement = createFaultyElement();
 
             assertThatThrownBy(() -> context.renderChild(faultyElement, frame, area))
-                    .isInstanceOf(RuntimeException.class).hasMessage("Intentional render failure");
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("Intentional render failure");
         }
 
         @Test
@@ -151,8 +152,7 @@ class FaultTolerantRenderingTest {
         void faultTolerantDisabledByDefault() {
             FocusManager fm = new FocusManager();
             ElementRegistry registry = new ElementRegistry();
-            DefaultRenderContext newContext = new DefaultRenderContext(fm,
-                    new EventRouter(fm, registry));
+            DefaultRenderContext newContext = new DefaultRenderContext(fm, new EventRouter(fm, registry));
 
             assertThat(newContext.isFaultTolerant()).isFalse();
         }
@@ -163,6 +163,16 @@ class FaultTolerantRenderingTest {
             @Override
             public void render(Frame frame, Rect area, RenderContext context) {
                 throw new RuntimeException("Intentional render failure");
+            }
+
+            @Override
+            public int preferredWidth() {
+                return 0;
+            }
+
+            @Override
+            public int preferredHeight() {
+                return 0;
             }
 
             @Override
@@ -177,6 +187,16 @@ class FaultTolerantRenderingTest {
             @Override
             public void render(Frame frame, Rect area, RenderContext context) {
                 rendered.set(true);
+            }
+
+            @Override
+            public int preferredWidth() {
+                return 0;
+            }
+
+            @Override
+            public int preferredHeight() {
+                return 0;
             }
 
             @Override

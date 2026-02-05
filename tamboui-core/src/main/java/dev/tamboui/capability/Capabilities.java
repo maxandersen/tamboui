@@ -29,26 +29,23 @@ public final class Capabilities {
         List<CapabilityProvider> providers = new ArrayList<CapabilityProvider>();
         List<String> providerLoadErrors = new ArrayList<String>();
 
-        providers.addAll(SafeServiceLoader.load(CapabilityProvider.class,
-                err -> providerLoadErrors.add(String.valueOf(err.getMessage()))));
+        providers.addAll(SafeServiceLoader.load(CapabilityProvider.class, err ->
+                providerLoadErrors.add(String.valueOf(err.getMessage()))));
         providers.sort(Comparator.comparing(CapabilityProvider::source));
 
         CapabilityReportBuilder builder = new CapabilityReportBuilder();
 
         for (int i = 0; i < providerLoadErrors.size(); i++) {
-            builder.feature("tamboui-core", "capabilityProvider.loadError." + i,
-                    providerLoadErrors.get(i));
+            builder.feature("tamboui-core", "capabilityProvider.loadError." + i, providerLoadErrors.get(i));
         }
 
         for (CapabilityProvider provider : providers) {
             try {
                 provider.contribute(builder);
             } catch (Exception e) {
-                builder.feature(provider.source(), "error",
-                        e.getClass().getName() + ": " + e.getMessage());
+                builder.feature(provider.source(), "error", e.getClass().getName() + ": " + e.getMessage());
             } catch (LinkageError e) {
-                builder.feature(provider.source(), "error",
-                        e.getClass().getName() + ": " + e.getMessage());
+                builder.feature(provider.source(), "error", e.getClass().getName() + ": " + e.getMessage());
             }
         }
 
@@ -58,8 +55,7 @@ public final class Capabilities {
     /**
      * Detects capabilities and prints the report to the given stream.
      *
-     * @param out
-     *            the output stream to print to
+     * @param out the output stream to print to
      */
     public static void print(PrintStream out) {
         detect().print(out);
@@ -68,8 +64,7 @@ public final class Capabilities {
     /**
      * Prints the capability report to standard output.
      *
-     * @param args
-     *            command-line arguments (ignored)
+     * @param args command-line arguments (ignored)
      */
     public static void main(String[] args) {
         print(System.out);

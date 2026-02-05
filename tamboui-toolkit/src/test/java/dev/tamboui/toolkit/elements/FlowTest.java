@@ -35,10 +35,13 @@ class FlowTest {
         Frame frame = Frame.forTesting(buffer);
 
         // "AB" (2) + "CD" (2) + "EF" (2) = 6, fits in 20
-        flow(text("AB"), text("CD"), text("EF")).render(frame, area, RenderContext.empty());
+        flow(text("AB"), text("CD"), text("EF"))
+            .render(frame, area, RenderContext.empty());
 
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(2, 0, "C")
-                .hasSymbolAt(4, 0, "E");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(2, 0, "C")
+            .hasSymbolAt(4, 0, "E");
     }
 
     @Test
@@ -49,10 +52,13 @@ class FlowTest {
         Frame frame = Frame.forTesting(buffer);
 
         // "AB"(2) + "CD"(2) = 4 fits in 5, "EF"(2) wraps to row 2
-        flow(text("AB"), text("CD"), text("EF")).render(frame, area, RenderContext.empty());
+        flow(text("AB"), text("CD"), text("EF"))
+            .render(frame, area, RenderContext.empty());
 
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(2, 0, "C")
-                .hasSymbolAt(0, 1, "E");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(2, 0, "C")
+            .hasSymbolAt(0, 1, "E");
     }
 
     @Test
@@ -86,7 +92,8 @@ class FlowTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        flow().render(frame, area, RenderContext.empty());
+        flow()
+            .render(frame, area, RenderContext.empty());
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -101,8 +108,11 @@ class FlowTest {
     @Test
     @DisplayName("fluent API chains correctly")
     void fluentApiChaining() {
-        FlowElement f = flow(text("A")).spacing(1).rowSpacing(2).margin(1)
-                .margin(new Margin(1, 2, 3, 4));
+        FlowElement f = flow(text("A"))
+            .spacing(1)
+            .rowSpacing(2)
+            .margin(1)
+            .margin(new Margin(1, 2, 3, 4));
 
         assertThat(f).isInstanceOf(FlowElement.class);
     }
@@ -131,10 +141,14 @@ class FlowTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            flow(text("AB"), text("CD")).addClass("f").render(frame, area, ctx);
+            flow(text("AB"), text("CD"))
+                .addClass("f")
+                .render(frame, area, ctx);
 
             // "AB" at x=0, spacing=2, "CD" at x=4
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(4, 0, "C");
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "A")
+                .hasSymbolAt(4, 0, "C");
         }
 
         @Test
@@ -147,14 +161,13 @@ class FlowTest {
             Frame frame = Frame.forTesting(buffer);
 
             // "AB"(2) fits on row 0, "CD"(2) wraps to row with spacing
-            flow(text("AB"), text("CD")).addClass("f").render(frame, area, ctx);
+            flow(text("AB"), text("CD"))
+                .addClass("f")
+                .render(frame, area, ctx);
 
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(0, 2, "C"); // y=0+1+1=2
-                                                                                               // (height
-                                                                                               // 1
-                                                                                               // +
-                                                                                               // rowSpacing
-                                                                                               // 1)
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "A")
+                .hasSymbolAt(0, 2, "C");  // y=0+1+1=2 (height 1 + rowSpacing 1)
         }
 
         @Test
@@ -166,7 +179,9 @@ class FlowTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            flow(text("X")).addClass("f").render(frame, area, ctx);
+            flow(text("X"))
+                .addClass("f")
+                .render(frame, area, ctx);
 
             // With margin 1, text renders at (1,1)
             BufferAssertions.assertThat(buffer).hasSymbolAt(1, 1, "X");
@@ -182,10 +197,48 @@ class FlowTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Programmatic spacing(0) overrides CSS spacing: 5
-            flow(text("AB"), text("CD")).addClass("f").spacing(0).render(frame, area, ctx);
+            flow(text("AB"), text("CD"))
+                .addClass("f")
+                .spacing(0)
+                .render(frame, area, ctx);
 
             // "AB" at x=0, "CD" at x=2 (no spacing)
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(2, 0, "C");
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "A")
+                .hasSymbolAt(2, 0, "C");
         }
+    }
+
+    @Test
+    @DisplayName("preferredHeight returns max child height")
+    void preferredHeight() {
+        FlowElement f = flow(text("A"), text("B"), text("C"));
+        // All height 1
+        assertThat(f.preferredHeight()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("preferredHeight returns 0 for empty flow")
+    void preferredHeightEmpty() {
+        FlowElement f = flow();
+        assertThat(f.preferredHeight()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("preferredHeight includes margin")
+    void preferredHeightWithMargin() {
+        FlowElement f = flow(text("A")).margin(new Margin(2, 0, 3, 0));
+        // 1 + 2 + 3 = 6
+        assertThat(f.preferredHeight()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("preferredHeight with available width wraps items")
+    void preferredHeightWithWidth() {
+        // "AB"(2) + "CD"(2) = 4, fits in 5
+        // "EF"(2) wraps to row 2
+        FlowElement f = flow(text("AB"), text("CD"), text("EF"));
+        int height = f.preferredHeight(5, RenderContext.empty());
+        assertThat(height).isEqualTo(2);
     }
 }

@@ -14,8 +14,8 @@ import picocli.CommandLine.Mixin;
 /**
  * Base class for PicoCLI commands that run TUI applications.
  * <p>
- * Extend this class to create a TUI application with CLI argument parsing. The
- * class handles terminal setup and teardown automatically.
+ * Extend this class to create a TUI application with CLI argument parsing.
+ * The class handles terminal setup and teardown automatically.
  *
  * <pre>{@code
  * &#64;Command(name = "myapp", description = "My TUI Application")
@@ -28,7 +28,10 @@ import picocli.CommandLine.Mixin;
  *     protected void runTui(TuiRunner runner) throws Exception {
  *         AppState state = loadState(configFile);
  *
- *         runner.run((event, r) -> handleEvent(event, r, state), frame -> render(frame, state));
+ *         runner.run(
+ *             (event, r) -> handleEvent(event, r, state),
+ *             frame -> render(frame, state)
+ *         );
  *     }
  *
  *     public static void main(String[] args) {
@@ -54,21 +57,19 @@ public abstract class TuiCommand implements Callable<Integer> {
     /**
      * Runs the TUI application.
      * <p>
-     * Override this method to implement your TUI logic. The TuiRunner is already
-     * created and configured based on CLI options.
+     * Override this method to implement your TUI logic. The TuiRunner
+     * is already created and configured based on CLI options.
      *
-     * @param runner
-     *            the configured TUI runner
-     * @throws Exception
-     *             if an error occurs during execution
+     * @param runner the configured TUI runner
+     * @throws Exception if an error occurs during execution
      */
     protected abstract void runTui(TuiRunner runner) throws Exception;
 
     /**
      * Creates the TuiConfig for this command.
      * <p>
-     * Override this method to customize the configuration beyond what the CLI
-     * options provide.
+     * Override this method to customize the configuration beyond what
+     * the CLI options provide.
      *
      * @return the TuiConfig to use
      */

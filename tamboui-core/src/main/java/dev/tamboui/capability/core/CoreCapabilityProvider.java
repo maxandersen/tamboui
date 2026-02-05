@@ -14,8 +14,7 @@ import dev.tamboui.terminal.BackendProvider;
 import dev.tamboui.util.SafeServiceLoader;
 
 /**
- * Core capability contributor: prints what core assumes/uses and what it can
- * infer from the environment.
+ * Core capability contributor: prints what core assumes/uses and what it can infer from the environment.
  */
 public final class CoreCapabilityProvider implements CapabilityProvider {
 
@@ -53,8 +52,7 @@ public final class CoreCapabilityProvider implements CapabilityProvider {
         });
 
         report.feature(source(), "backend.provider_count", providers.size());
-        report.feature(source(), "backend.provider_names", String.join(",",
-                providers.stream().map(BackendProvider::name).collect(Collectors.toList())));
+        report.feature(source(), "backend.provider_names", String.join(",", providers.stream().map(BackendProvider::name).collect(Collectors.toList())));
         for (int i = 0; i < loadErrors.size(); i++) {
             report.feature(source(), "backend.provider_error." + i, loadErrors.get(i));
         }

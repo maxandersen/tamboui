@@ -40,8 +40,13 @@ class BarChartTest {
     @Test
     @DisplayName("Bar builder with all options")
     void barBuilderWithAllOptions() {
-        Bar bar = Bar.builder().value(100).label("Test").textValue("100%")
-                .style(Style.EMPTY.fg(Color.RED)).valueStyle(Style.EMPTY.fg(Color.GREEN)).build();
+        Bar bar = Bar.builder()
+            .value(100)
+            .label("Test")
+            .textValue("100%")
+            .style(Style.EMPTY.fg(Color.RED))
+            .valueStyle(Style.EMPTY.fg(Color.GREEN))
+            .build();
 
         assertThat(bar.value()).isEqualTo(100);
         assertThat(bar.textValue()).contains("100%");
@@ -75,7 +80,10 @@ class BarChartTest {
     @Test
     @DisplayName("BarGroup creates from bars")
     void barGroupCreatesFromBars() {
-        BarGroup group = BarGroup.of(Bar.of(10, "A"), Bar.of(20, "B"));
+        BarGroup group = BarGroup.of(
+            Bar.of(10, "A"),
+            Bar.of(20, "B")
+        );
         assertThat(group.size()).isEqualTo(2);
         assertThat(group.label()).isEmpty();
     }
@@ -83,7 +91,10 @@ class BarChartTest {
     @Test
     @DisplayName("BarGroup creates with label")
     void barGroupCreatesWithLabel() {
-        BarGroup group = BarGroup.of("Q1", Bar.of(100, "Jan"), Bar.of(150, "Feb"));
+        BarGroup group = BarGroup.of("Q1",
+            Bar.of(100, "Jan"),
+            Bar.of(150, "Feb")
+        );
         assertThat(group.label()).isPresent();
         assertThat(group.label().get().rawContent()).isEqualTo("Q1");
     }
@@ -91,8 +102,12 @@ class BarChartTest {
     @Test
     @DisplayName("BarGroup builder")
     void barGroupBuilder() {
-        BarGroup group = BarGroup.builder().label("Test").addBar(10).addBar(20, "B")
-                .addBar(Bar.of(30)).build();
+        BarGroup group = BarGroup.builder()
+            .label("Test")
+            .addBar(10)
+            .addBar(20, "B")
+            .addBar(Bar.of(30))
+            .build();
 
         assertThat(group.size()).isEqualTo(3);
         assertThat(group.maxValue()).isEqualTo(30);
@@ -101,8 +116,12 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart renders vertical bars")
     void rendersVerticalBars() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(8)).max(8).barWidth(1).barGap(0)
-                .build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(8))
+            .max(8)
+            .barWidth(1)
+            .barGap(0)
+            .build();
         Rect area = new Rect(0, 0, 3, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -117,7 +136,11 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart renders half-height bar")
     void rendersHalfHeightBar() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(4)).max(8).barWidth(1).build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(4))
+            .max(8)
+            .barWidth(1)
+            .build();
         Rect area = new Rect(0, 0, 3, 4);
         Buffer buffer = Buffer.empty(area);
 
@@ -131,8 +154,12 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart renders multiple bars")
     void rendersMultipleBars() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(4, 8)).max(8).barWidth(1).barGap(1)
-                .build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(4, 8))
+            .max(8)
+            .barWidth(1)
+            .barGap(1)
+            .build();
         Rect area = new Rect(0, 0, 5, 4);
         Buffer buffer = Buffer.empty(area);
 
@@ -149,8 +176,11 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart renders with bar style")
     void rendersWithBarStyle() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(8)).max(8)
-                .barStyle(Style.EMPTY.fg(Color.CYAN)).build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(8))
+            .max(8)
+            .barStyle(Style.EMPTY.fg(Color.CYAN))
+            .build();
         Rect area = new Rect(0, 0, 3, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -162,8 +192,11 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart renders with block")
     void rendersWithBlock() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(8)).max(8).block(Block.bordered())
-                .build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(8))
+            .max(8)
+            .block(Block.bordered())
+            .build();
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -179,8 +212,12 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart renders horizontal bars")
     void rendersHorizontalBars() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(Bar.of(8, "A"))).max(8)
-                .direction(Direction.HORIZONTAL).barWidth(1).build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(Bar.of(8, "A")))
+            .max(8)
+            .direction(Direction.HORIZONTAL)
+            .barWidth(1)
+            .build();
         Rect area = new Rect(0, 0, 10, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -202,8 +239,16 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart with multiple groups")
     void withMultipleGroups() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(4), BarGroup.of(8)).max(8).barWidth(1)
-                .barGap(0).groupGap(1).build();
+        BarChart chart = BarChart.builder()
+            .data(
+                BarGroup.of(4),
+                BarGroup.of(8)
+            )
+            .max(8)
+            .barWidth(1)
+            .barGap(0)
+            .groupGap(1)
+            .build();
         Rect area = new Rect(0, 0, 5, 4);
         Buffer buffer = Buffer.empty(area);
 
@@ -231,7 +276,9 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart handles empty area")
     void handlesEmptyArea() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(1, 2, 3)).build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(1, 2, 3))
+            .build();
         Rect area = new Rect(0, 0, 0, 0);
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 5));
 
@@ -242,7 +289,11 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart with wider bars")
     void withWiderBars() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(8)).max(8).barWidth(3).build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(8))
+            .max(8)
+            .barWidth(3)
+            .build();
         Rect area = new Rect(0, 0, 5, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -278,8 +329,11 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart auto-scales to max value")
     void autoScalesToMaxValue() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(50, 100)).barWidth(1).barGap(1)
-                .build();
+        BarChart chart = BarChart.builder()
+            .data(BarGroup.of(50, 100))
+            .barWidth(1)
+            .barGap(1)
+            .build();
         Rect area = new Rect(0, 0, 5, 4);
         Buffer buffer = Buffer.empty(area);
 
@@ -300,8 +354,11 @@ class BarChartTest {
     @Test
     @DisplayName("BarChart uses BAR_COLOR property from StylePropertyResolver")
     void usesBarColorProperty() {
-        BarChart chart = BarChart.builder().data(BarGroup.of(8)).max(8)
-                .styleResolver(TestStylePropertyResolver.of("bar-color", Color.CYAN)).build();
+        BarChart chart = BarChart.builder()
+                .data(BarGroup.of(8))
+                .max(8)
+                .styleResolver(TestStylePropertyResolver.of("bar-color", Color.CYAN))
+                .build();
         Rect area = new Rect(0, 0, 3, 3);
         Buffer buffer = Buffer.empty(area);
 

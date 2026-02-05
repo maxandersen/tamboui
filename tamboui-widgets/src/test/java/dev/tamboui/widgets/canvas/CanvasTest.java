@@ -27,7 +27,10 @@ class CanvasTest {
 
     @Test
     void builder_accepts_bounds() {
-        Canvas canvas = Canvas.builder().xBounds(-100, 100).yBounds(-50, 50).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(-100, 100)
+            .yBounds(-50, 50)
+            .build();
 
         assertThat(canvas).isNotNull();
     }
@@ -35,30 +38,38 @@ class CanvasTest {
     @Test
     void builder_accepts_marker() {
         for (Marker marker : Marker.values()) {
-            Canvas canvas = Canvas.builder().marker(marker).build();
+            Canvas canvas = Canvas.builder()
+                .marker(marker)
+                .build();
             assertThat(canvas).isNotNull();
         }
     }
 
     @Test
     void builder_accepts_block() {
-        Canvas canvas = Canvas.builder().block(Block.bordered()).build();
+        Canvas canvas = Canvas.builder()
+            .block(Block.bordered())
+            .build();
 
         assertThat(canvas).isNotNull();
     }
 
     @Test
     void builder_accepts_background_color() {
-        Canvas canvas = Canvas.builder().backgroundColor(Color.BLUE).build();
+        Canvas canvas = Canvas.builder()
+            .backgroundColor(Color.BLUE)
+            .build();
 
         assertThat(canvas).isNotNull();
     }
 
     @Test
     void builder_accepts_paint_callback() {
-        Canvas canvas = Canvas.builder().paint(ctx -> {
-            ctx.draw(new Line(0, 0, 1, 1, Color.RED));
-        }).build();
+        Canvas canvas = Canvas.builder()
+            .paint(ctx -> {
+                ctx.draw(new Line(0, 0, 1, 1, Color.RED));
+            })
+            .build();
 
         assertThat(canvas).isNotNull();
     }
@@ -74,7 +85,9 @@ class CanvasTest {
 
     @Test
     void render_with_block() {
-        Canvas canvas = Canvas.builder().block(Block.bordered()).build();
+        Canvas canvas = Canvas.builder()
+            .block(Block.bordered())
+            .build();
 
         Rect area = new Rect(0, 0, 20, 10);
         Buffer buffer = Buffer.empty(area);
@@ -88,7 +101,9 @@ class CanvasTest {
 
     @Test
     void render_with_background_color() {
-        Canvas canvas = Canvas.builder().backgroundColor(Color.BLUE).build();
+        Canvas canvas = Canvas.builder()
+            .backgroundColor(Color.BLUE)
+            .build();
 
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -101,10 +116,14 @@ class CanvasTest {
 
     @Test
     void render_line_with_braille_marker() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.BRAILLE)
-                .paint(ctx -> {
-                    ctx.draw(new Line(0, 0, 10, 10, Color.RED));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.BRAILLE)
+            .paint(ctx -> {
+                ctx.draw(new Line(0, 0, 10, 10, Color.RED));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -127,10 +146,14 @@ class CanvasTest {
 
     @Test
     void render_line_with_dot_marker() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.draw(new Line(0, 0, 10, 10, Color.GREEN));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.draw(new Line(0, 0, 10, 10, Color.GREEN));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -143,10 +166,14 @@ class CanvasTest {
 
     @Test
     void render_line_with_block_marker() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.BLOCK)
-                .paint(ctx -> {
-                    ctx.draw(new Line(5, 5, 5, 5, Color.CYAN));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.BLOCK)
+            .paint(ctx -> {
+                ctx.draw(new Line(5, 5, 5, 5, Color.CYAN));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -159,10 +186,14 @@ class CanvasTest {
 
     @Test
     void render_rectangle() {
-        Canvas canvas = Canvas.builder().xBounds(0, 20).yBounds(0, 10).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.draw(new Rectangle(5, 2, 10, 6, Color.YELLOW));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 20)
+            .yBounds(0, 10)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.draw(new Rectangle(5, 2, 10, 6, Color.YELLOW));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 20, 10);
         Buffer buffer = Buffer.empty(area);
@@ -174,10 +205,14 @@ class CanvasTest {
 
     @Test
     void render_circle() {
-        Canvas canvas = Canvas.builder().xBounds(0, 20).yBounds(0, 20).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.draw(new Circle(10, 10, 5, Color.MAGENTA));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 20)
+            .yBounds(0, 20)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.draw(new Circle(10, 10, 5, Color.MAGENTA));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 20, 20);
         Buffer buffer = Buffer.empty(area);
@@ -189,10 +224,14 @@ class CanvasTest {
 
     @Test
     void render_points() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.draw(new Points(new double[][]{{0, 0}, {5, 5}, {10, 10}}, Color.WHITE));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.draw(new Points(new double[][] {{0, 0}, {5, 5}, {10, 10}}, Color.WHITE));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -206,11 +245,15 @@ class CanvasTest {
 
     @Test
     void render_multiple_shapes() {
-        Canvas canvas = Canvas.builder().xBounds(0, 20).yBounds(0, 20).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.draw(new Line(0, 0, 20, 20, Color.RED));
-                    ctx.draw(new Circle(10, 10, 5, Color.BLUE));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 20)
+            .yBounds(0, 20)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.draw(new Line(0, 0, 20, 20, Color.RED));
+                ctx.draw(new Circle(10, 10, 5, Color.BLUE));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 20, 20);
         Buffer buffer = Buffer.empty(area);
@@ -221,10 +264,14 @@ class CanvasTest {
 
     @Test
     void render_with_labels() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.print(5, 5, "Center");
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.print(5, 5, "Center");
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -237,12 +284,16 @@ class CanvasTest {
 
     @Test
     void render_with_layers() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
-                .paint(ctx -> {
-                    ctx.draw(new Line(0, 5, 10, 5, Color.RED));
-                    ctx.layer();
-                    ctx.draw(new Line(5, 0, 5, 10, Color.BLUE));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.DOT)
+            .paint(ctx -> {
+                ctx.draw(new Line(0, 5, 10, 5, Color.RED));
+                ctx.layer();
+                ctx.draw(new Line(5, 0, 5, 10, Color.BLUE));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -255,10 +306,14 @@ class CanvasTest {
 
     @Test
     void render_half_block_marker() {
-        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.HALF_BLOCK)
-                .paint(ctx -> {
-                    ctx.draw(new Points(new double[][]{{5, 5}}, Color.GREEN));
-                }).build();
+        Canvas canvas = Canvas.builder()
+            .xBounds(0, 10)
+            .yBounds(0, 10)
+            .marker(Marker.HALF_BLOCK)
+            .paint(ctx -> {
+                ctx.draw(new Points(new double[][] {{5, 5}}, Color.GREEN));
+            })
+            .build();
 
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -270,7 +325,9 @@ class CanvasTest {
 
     @Test
     void marker_null_defaults_to_braille() {
-        Canvas canvas = Canvas.builder().marker(null).build();
+        Canvas canvas = Canvas.builder()
+            .marker(null)
+            .build();
 
         assertThat(canvas).isNotNull();
     }

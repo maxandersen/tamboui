@@ -22,8 +22,7 @@ public final class IdSelector implements Selector {
     /**
      * Creates an ID selector for the given identifier.
      *
-     * @param id
-     *            the element identifier
+     * @param id the element identifier
      */
     public IdSelector(String id) {
         this.id = Objects.requireNonNull(id);

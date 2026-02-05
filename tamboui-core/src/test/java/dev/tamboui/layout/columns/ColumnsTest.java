@@ -54,11 +54,16 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(charWidget("A"), charWidget("B")).columnCount(2).build()
-                .render(area, buffer);
+        Columns.builder()
+            .children(charWidget("A"), charWidget("B"))
+            .columnCount(2)
+            .build()
+            .render(area, buffer);
 
         // 2 columns in 20 wide = 10 per column
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(10, 0, "B");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(10, 0, "B");
     }
 
     @Test
@@ -68,12 +73,17 @@ class ColumnsTest {
         Buffer buffer = Buffer.empty(area);
 
         Columns.builder()
-                .children(charWidget("A"), charWidget("B"), charWidget("C"), charWidget("D"))
-                .columnCount(2).build().render(area, buffer);
+            .children(charWidget("A"), charWidget("B"), charWidget("C"), charWidget("D"))
+            .columnCount(2)
+            .build()
+            .render(area, buffer);
 
         // 2 cols of 10, 2 rows of 1
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(10, 0, "B")
-                .hasSymbolAt(0, 1, "C").hasSymbolAt(10, 1, "D");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(10, 0, "B")
+            .hasSymbolAt(0, 1, "C")
+            .hasSymbolAt(10, 1, "D");
     }
 
     @Test
@@ -82,8 +92,12 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(fillingWidget("A"), fillingWidget("B"), fillingWidget("C"))
-                .columnCount(3).spacing(2).build().render(area, buffer);
+        Columns.builder()
+            .children(fillingWidget("A"), fillingWidget("B"), fillingWidget("C"))
+            .columnCount(3)
+            .spacing(2)
+            .build()
+            .render(area, buffer);
 
         // 10 - 4 spacing = 6, 6/3 = 2 per col
         // col0: x=0,w=2; gap x=2,w=2; col1: x=4,w=2; gap x=6,w=2; col2: x=8,w=2
@@ -102,12 +116,18 @@ class ColumnsTest {
         Buffer buffer = Buffer.empty(area);
 
         Columns.builder()
-                .children(charWidget("A"), charWidget("B"), charWidget("C"), charWidget("D"))
-                .columnCount(2).order(ColumnOrder.COLUMN_FIRST).build().render(area, buffer);
+            .children(charWidget("A"), charWidget("B"), charWidget("C"), charWidget("D"))
+            .columnCount(2)
+            .order(ColumnOrder.COLUMN_FIRST)
+            .build()
+            .render(area, buffer);
 
         // column-first: col0=[A,B], col1=[C,D] -> row0=[A,C], row1=[B,D]
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(10, 0, "C")
-                .hasSymbolAt(0, 1, "B").hasSymbolAt(10, 1, "D");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(10, 0, "C")
+            .hasSymbolAt(0, 1, "B")
+            .hasSymbolAt(10, 1, "D");
     }
 
     @Test
@@ -117,11 +137,17 @@ class ColumnsTest {
         Buffer buffer = Buffer.empty(area);
 
         Columns.builder()
-                .children(charWidget("A"), charWidget("B"), charWidget("C"), charWidget("D"))
-                .columnCount(2).order(ColumnOrder.ROW_FIRST).build().render(area, buffer);
+            .children(charWidget("A"), charWidget("B"), charWidget("C"), charWidget("D"))
+            .columnCount(2)
+            .order(ColumnOrder.ROW_FIRST)
+            .build()
+            .render(area, buffer);
 
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(10, 0, "B")
-                .hasSymbolAt(0, 1, "C").hasSymbolAt(10, 1, "D");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(10, 0, "B")
+            .hasSymbolAt(0, 1, "C")
+            .hasSymbolAt(10, 1, "D");
     }
 
     @Test
@@ -130,8 +156,12 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(fillingWidget("A"), fillingWidget("B")).columnCount(2)
-                .columnWidths(Constraint.length(5), Constraint.fill()).build().render(area, buffer);
+        Columns.builder()
+            .children(fillingWidget("A"), fillingWidget("B"))
+            .columnCount(2)
+            .columnWidths(Constraint.length(5), Constraint.fill())
+            .build()
+            .render(area, buffer);
 
         // col0: 5 wide, col1: 15 wide
         Buffer expected = Buffer.empty(area);
@@ -150,9 +180,11 @@ class ColumnsTest {
         Buffer buffer = Buffer.empty(area);
 
         Columns.builder()
-                .children(fillingWidget("A"), fillingWidget("B"), fillingWidget("C"),
-                        fillingWidget("D"))
-                .columnCount(2).rowHeights(3, 2).build().render(area, buffer);
+            .children(fillingWidget("A"), fillingWidget("B"), fillingWidget("C"), fillingWidget("D"))
+            .columnCount(2)
+            .rowHeights(3, 2)
+            .build()
+            .render(area, buffer);
 
         // Row 0: height 3 (y=0..2), Row 1: height 2 (y=3..4)
         // Col0: x=0..4, Col1: x=5..9
@@ -173,8 +205,11 @@ class ColumnsTest {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 5));
 
         // Should not throw
-        Columns.builder().children(charWidget("A")).columnCount(1).build().render(emptyArea,
-                buffer);
+        Columns.builder()
+            .children(charWidget("A"))
+            .columnCount(1)
+            .build()
+            .render(emptyArea, buffer);
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(new Rect(0, 0, 10, 5)));
     }
@@ -185,7 +220,10 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().columnCount(2).build().render(area, buffer);
+        Columns.builder()
+            .columnCount(2)
+            .build()
+            .render(area, buffer);
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -196,12 +234,17 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 20, 2);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(charWidget("A"), charWidget("B"), charWidget("C")).columnCount(2)
-                .build().render(area, buffer);
+        Columns.builder()
+            .children(charWidget("A"), charWidget("B"), charWidget("C"))
+            .columnCount(2)
+            .build()
+            .render(area, buffer);
 
         // 3 children in 2x2 grid: A(0,0), B(1,0), C(0,1), empty(1,1)
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(10, 0, "B")
-                .hasSymbolAt(0, 1, "C");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(10, 0, "B")
+            .hasSymbolAt(0, 1, "C");
 
         // Position (10,1) should remain empty (space)
         assertThat(buffer.get(10, 1).symbol()).isEqualTo(" ");
@@ -213,11 +256,16 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 30, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(charWidget("A"), charWidget("B")).columnCount(5).build()
-                .render(area, buffer);
+        Columns.builder()
+            .children(charWidget("A"), charWidget("B"))
+            .columnCount(5)
+            .build()
+            .render(area, buffer);
 
         // Only 2 children, so effective cols = 2, 30/2 = 15 per col
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(15, 0, "B");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(15, 0, "B");
     }
 
     @Test
@@ -226,10 +274,15 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(Arrays.asList(charWidget("X"), charWidget("Y"))).columnCount(2)
-                .build().render(area, buffer);
+        Columns.builder()
+            .children(Arrays.asList(charWidget("X"), charWidget("Y")))
+            .columnCount(2)
+            .build()
+            .render(area, buffer);
 
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "X").hasSymbolAt(10, 0, "Y");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "X")
+            .hasSymbolAt(10, 0, "Y");
     }
 
     @Test
@@ -240,8 +293,12 @@ class ColumnsTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Columns.builder().children(charWidget("A")).columnCount(1).flex(Flex.START).build()
-                .render(area, buffer);
+        Columns.builder()
+            .children(charWidget("A"))
+            .columnCount(1)
+            .flex(Flex.START)
+            .build()
+            .render(area, buffer);
 
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A");
     }

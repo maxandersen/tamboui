@@ -61,9 +61,10 @@ final class TodoPanel extends PanelContent {
         }
 
         var inputStyle = selectedIndex == -1 && focused ? Color.WHITE : Color.GRAY;
-        elements.add(
-                row(text("> ").fg(selectedIndex == -1 ? Color.GREEN : Color.DARK_GRAY).length(2),
-                        text(displayText.toString()).fg(inputStyle)));
+        elements.add(row(
+            text("> ").fg(selectedIndex == -1 ? Color.GREEN : Color.DARK_GRAY).length(2),
+            text(displayText.toString()).fg(inputStyle)
+        ));
 
         elements.add(text("─".repeat(26)).dim());
 

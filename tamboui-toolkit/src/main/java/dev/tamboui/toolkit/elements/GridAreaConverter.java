@@ -18,12 +18,11 @@ import dev.tamboui.style.PropertyConverter;
  * <p>
  * Supports two formats:
  * <ul>
- * <li>Semicolon-separated rows: {@code "A A B; A A C; D D D"}</li>
- * <li>Quoted strings (CSS format): {@code "A A B" "A A C" "D D D"}</li>
+ *   <li>Semicolon-separated rows: {@code "A A B; A A C; D D D"}</li>
+ *   <li>Quoted strings (CSS format): {@code "A A B" "A A C" "D D D"}</li>
  * </ul>
  * <p>
  * Example CSS:
- * 
  * <pre>
  * .dashboard {
  *     grid-template-areas: "header header header; nav main main; footer footer footer";
@@ -59,7 +58,7 @@ public final class GridAreaConverter implements PropertyConverter<GridArea> {
             rows = parseQuotedStrings(trimmed);
         } else {
             // Single row
-            rows = new String[]{trimmed};
+            rows = new String[] { trimmed };
         }
 
         // Trim each row

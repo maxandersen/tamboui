@@ -85,8 +85,10 @@ class RenderThreadTest {
         otherThread.start();
         latch.await(1, TimeUnit.SECONDS);
 
-        assertThat(caught.get()).isInstanceOf(TuiException.class)
-                .hasMessageContaining("test-thread").hasMessageContaining("render thread");
+        assertThat(caught.get())
+            .isInstanceOf(TuiException.class)
+            .hasMessageContaining("test-thread")
+            .hasMessageContaining("render thread");
     }
 
     @Test

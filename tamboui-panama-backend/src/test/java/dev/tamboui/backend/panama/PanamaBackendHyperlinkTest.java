@@ -56,8 +56,10 @@ class PanamaBackendHyperlinkTest {
         PanamaBackend backend = new PanamaBackend(terminal);
 
         Style linkStyle = Style.EMPTY.hyperlink("https://example.com", "link-1");
-        List<CellUpdate> updates = Arrays.asList(new CellUpdate(0, 0, new Cell("A", linkStyle)),
-                new CellUpdate(1, 0, new Cell("B", Style.EMPTY)));
+        List<CellUpdate> updates = Arrays.asList(
+            new CellUpdate(0, 0, new Cell("A", linkStyle)),
+            new CellUpdate(1, 0, new Cell("B", Style.EMPTY))
+        );
 
         backend.draw(updates);
         backend.flush();

@@ -20,7 +20,9 @@ class SolverTest {
         Solver solver = new Solver();
         Variable x = new Variable("x");
 
-        solver.addConstraint(Expression.variable(x).equalTo(100, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(100, Strength.REQUIRED));
         solver.updateVariables();
 
         assertThat(solver.valueOf(x)).isEqualTo(Fraction.of(100));
@@ -34,10 +36,14 @@ class SolverTest {
         Variable right = new Variable("right");
 
         // right == left + 100
-        solver.addConstraint(Expression.variable(right).equalTo(Expression.variable(left).plus(100),
-                Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(right)
+                        .equalTo(Expression.variable(left).plus(100),
+                                Strength.REQUIRED));
         // left == 50
-        solver.addConstraint(Expression.variable(left).equalTo(50, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(left)
+                        .equalTo(50, Strength.REQUIRED));
         solver.updateVariables();
 
         assertThat(solver.valueOf(left)).isEqualTo(Fraction.of(50));
@@ -51,9 +57,13 @@ class SolverTest {
         Variable x = new Variable("x");
 
         // x >= 100 (required)
-        solver.addConstraint(Expression.variable(x).greaterThanOrEqual(100, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .greaterThanOrEqual(100, Strength.REQUIRED));
         // x == 50 (weak - should be overridden)
-        solver.addConstraint(Expression.variable(x).equalTo(50, Strength.WEAK));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(50, Strength.WEAK));
         solver.updateVariables();
 
         assertThat(solver.valueOf(x).compareTo(Fraction.of(100))).isGreaterThanOrEqualTo(0);
@@ -66,9 +76,13 @@ class SolverTest {
         Variable x = new Variable("x");
 
         // x <= 50 (required)
-        solver.addConstraint(Expression.variable(x).lessThanOrEqual(50, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .lessThanOrEqual(50, Strength.REQUIRED));
         // x == 100 (weak - should be overridden)
-        solver.addConstraint(Expression.variable(x).equalTo(100, Strength.WEAK));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(100, Strength.WEAK));
         solver.updateVariables();
 
         assertThat(solver.valueOf(x).compareTo(Fraction.of(50))).isLessThanOrEqualTo(0);
@@ -81,9 +95,13 @@ class SolverTest {
         Variable x = new Variable("x");
 
         // x == 100 (strong)
-        solver.addConstraint(Expression.variable(x).equalTo(100, Strength.STRONG));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(100, Strength.STRONG));
         // x == 200 (weak - should be ignored)
-        solver.addConstraint(Expression.variable(x).equalTo(200, Strength.WEAK));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(200, Strength.WEAK));
         solver.updateVariables();
 
         assertThat(solver.valueOf(x)).isEqualTo(Fraction.of(100));
@@ -95,10 +113,13 @@ class SolverTest {
         Solver solver = new Solver();
         Variable x = new Variable("x");
 
-        solver.addConstraint(Expression.variable(x).equalTo(100, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(100, Strength.REQUIRED));
 
-        assertThatThrownBy(
-                () -> solver.addConstraint(Expression.variable(x).equalTo(200, Strength.REQUIRED)))
+        assertThatThrownBy(() -> solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(200, Strength.REQUIRED)))
                 .isInstanceOf(UnsatisfiableConstraintException.class);
     }
 
@@ -108,7 +129,8 @@ class SolverTest {
         Solver solver = new Solver();
         Variable x = new Variable("x");
 
-        CassowaryConstraint c = Expression.variable(x).equalTo(100, Strength.REQUIRED);
+        CassowaryConstraint c = Expression.variable(x)
+                .equalTo(100, Strength.REQUIRED);
 
         solver.addConstraint(c);
 
@@ -122,8 +144,10 @@ class SolverTest {
         Solver solver = new Solver();
         Variable x = new Variable("x");
 
-        CassowaryConstraint c1 = Expression.variable(x).equalTo(100, Strength.REQUIRED);
-        CassowaryConstraint c2 = Expression.variable(x).equalTo(200, Strength.STRONG);
+        CassowaryConstraint c1 = Expression.variable(x)
+                .equalTo(100, Strength.REQUIRED);
+        CassowaryConstraint c2 = Expression.variable(x)
+                .equalTo(200, Strength.STRONG);
 
         solver.addConstraint(c1);
         solver.updateVariables();
@@ -142,7 +166,9 @@ class SolverTest {
         Variable x = new Variable("x");
 
         // Add constraint first
-        solver.addConstraint(Expression.variable(x).greaterThanOrEqual(0, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x)
+                        .greaterThanOrEqual(0, Strength.REQUIRED));
 
         // Edit variables can be added
         solver.addEditVariable(x, Strength.STRONG);
@@ -162,13 +188,16 @@ class SolverTest {
         Variable z = new Variable("z");
 
         // x == 10
-        solver.addConstraint(Expression.variable(x).equalTo(10, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x).equalTo(10, Strength.REQUIRED));
         // y == x + 20
         solver.addConstraint(
-                Expression.variable(y).equalTo(Expression.variable(x).plus(20), Strength.REQUIRED));
+                Expression.variable(y)
+                        .equalTo(Expression.variable(x).plus(20), Strength.REQUIRED));
         // z == y + 30
         solver.addConstraint(
-                Expression.variable(z).equalTo(Expression.variable(y).plus(30), Strength.REQUIRED));
+                Expression.variable(z)
+                        .equalTo(Expression.variable(y).plus(30), Strength.REQUIRED));
 
         solver.updateVariables();
 
@@ -186,13 +215,17 @@ class SolverTest {
         Variable z = new Variable("z");
 
         // x == 10
-        solver.addConstraint(Expression.variable(x).equalTo(10, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x).equalTo(10, Strength.REQUIRED));
         // y == 20
-        solver.addConstraint(Expression.variable(y).equalTo(20, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(y).equalTo(20, Strength.REQUIRED));
         // z == 2*x + 3*y (should be 2*10 + 3*20 = 80)
-        solver.addConstraint(Expression.variable(z).equalTo(
-                Expression.variable(x).times(2).plus(Expression.variable(y).times(3)),
-                Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(z)
+                        .equalTo(Expression.variable(x).times(2)
+                                        .plus(Expression.variable(y).times(3)),
+                                Strength.REQUIRED));
 
         solver.updateVariables();
 
@@ -205,7 +238,8 @@ class SolverTest {
         Solver solver = new Solver();
         Variable x = new Variable("x");
 
-        solver.addConstraint(Expression.variable(x).equalTo(100, Strength.REQUIRED));
+        solver.addConstraint(
+                Expression.variable(x).equalTo(100, Strength.REQUIRED));
         solver.updateVariables();
         assertThat(solver.valueOf(x)).isEqualTo(Fraction.of(100));
 
@@ -220,7 +254,8 @@ class SolverTest {
         Solver solver = new Solver();
         Variable x = new Variable("x");
 
-        CassowaryConstraint c = Expression.variable(x).equalTo(100, Strength.REQUIRED);
+        CassowaryConstraint c = Expression.variable(x)
+                .equalTo(100, Strength.REQUIRED);
 
         assertThat(solver.hasConstraint(c)).isFalse();
 

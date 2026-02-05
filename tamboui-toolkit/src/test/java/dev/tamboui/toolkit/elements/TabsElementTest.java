@@ -31,9 +31,13 @@ class TabsElementTest {
     @Test
     @DisplayName("TabsElement fluent API chains correctly")
     void fluentApiChaining() {
-        TabsElement element = tabs("Home", "Settings", "About").selected(0)
-                .highlightColor(Color.CYAN).divider(" | ").title("Navigation").rounded()
-                .borderColor(Color.GREEN);
+        TabsElement element = tabs("Home", "Settings", "About")
+            .selected(0)
+            .highlightColor(Color.CYAN)
+            .divider(" | ")
+            .title("Navigation")
+            .rounded()
+            .borderColor(Color.GREEN);
 
         assertThat(element).isInstanceOf(TabsElement.class);
     }
@@ -89,8 +93,11 @@ class TabsElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        tabs("Home", "Settings", "About").selected(0).title("Menu").rounded().render(frame, area,
-                RenderContext.empty());
+        tabs("Home", "Settings", "About")
+            .selected(0)
+            .title("Menu")
+            .rounded()
+            .render(frame, area, RenderContext.empty());
 
         // Check border is rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -103,8 +110,10 @@ class TabsElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        tabs("A", "B", "C").selected(0).highlightColor(Color.YELLOW).render(frame, area,
-                RenderContext.empty());
+        tabs("A", "B", "C")
+            .selected(0)
+            .highlightColor(Color.YELLOW)
+            .render(frame, area, RenderContext.empty());
 
         // First tab should have highlight
         assertThat(buffer).isNotNull();
@@ -128,7 +137,8 @@ class TabsElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        tabs("X", "Y", "Z").render(frame, area, RenderContext.empty());
+        tabs("X", "Y", "Z")
+            .render(frame, area, RenderContext.empty());
 
         // Should render without error
         assertThat(buffer).isNotNull();
@@ -159,7 +169,9 @@ class TabsElementTest {
 
         // Then divider should have red foreground
         // "A|B" - divider is at position 1
-        assertThat(buffer).at(1, 0).hasSymbol("|").hasForeground(Color.RED);
+        assertThat(buffer).at(1, 0)
+            .hasSymbol("|")
+            .hasForeground(Color.RED);
     }
 
     @Test
@@ -187,7 +199,9 @@ class TabsElementTest {
 
         // Then selected tab "B" should have cyan foreground
         // "A|B" - B is at position 2
-        assertThat(buffer).at(2, 0).hasSymbol("B").hasForeground(Color.CYAN);
+        assertThat(buffer).at(2, 0)
+            .hasSymbol("B")
+            .hasForeground(Color.CYAN);
     }
 
     @Test
@@ -215,16 +229,18 @@ class TabsElementTest {
 
         // Then unselected tab "A" should have gray foreground and red background
         // "A|B" - A is at position 0
-        assertThat(buffer).at(0, 0).hasSymbol("A").hasForeground(Color.GRAY)
-                .hasBackground(Color.RED);
+        assertThat(buffer).at(0, 0)
+            .hasSymbol("A")
+            .hasForeground(Color.GRAY)
+            .hasBackground(Color.RED);
     }
 
     @Test
     @DisplayName("divider inherits base style background via CSS")
     void dividerInheritsBackgroundViaCss() {
         // Given CSS that sets background on tabs and foreground on divider
-        String css = "TabsElement { background: blue; }\n"
-                + "TabsElement-divider { color: yellow; }";
+        String css = "TabsElement { background: blue; }\n" +
+                     "TabsElement-divider { color: yellow; }";
         StyleEngine styleEngine = StyleEngine.create();
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
@@ -244,8 +260,10 @@ class TabsElementTest {
         });
 
         // Then divider should have yellow foreground and blue background
-        assertThat(buffer).at(1, 0).hasSymbol("|").hasForeground(Color.YELLOW)
-                .hasBackground(Color.BLUE);
+        assertThat(buffer).at(1, 0)
+            .hasSymbol("|")
+            .hasForeground(Color.YELLOW)
+            .hasBackground(Color.BLUE);
     }
 
     @Test
@@ -304,8 +322,10 @@ class TabsElementTest {
     @Test
     @DisplayName("preferredWidth() with complex tabs")
     void preferredWidth_complex() {
-        TabsElement element = tabs("Home", "Settings", "About").divider(" | ").padding(" ", " ")
-                .rounded();
+        TabsElement element = tabs("Home", "Settings", "About")
+            .divider(" | ")
+            .padding(" ", " ")
+            .rounded();
         // " Home " + " | " + " Settings " + " | " + " About " = 6 + 3 + 10 + 3 + 7 = 29
         // Plus 2 for borders = 31
         assertThat(element.preferredWidth()).isEqualTo(31);
@@ -329,7 +349,11 @@ class TabsElementTest {
         Frame frame = Frame.forTesting(buffer);
 
         TabsElement tabsElement = tabs("App", "Logs").divider(" | ").addClass("tabs");
-        Row rowElement = row(text("Title"), tabsElement, text("Status"));
+        Row rowElement = row(
+            text("Title"),
+            tabsElement,
+            text("Status")
+        );
 
         // When rendering with flex
         context.withElement(rowElement, Style.EMPTY, () -> {
@@ -358,7 +382,53 @@ class TabsElementTest {
         // Programmatic constraint
         TabsElement tabsElement = tabs("Home", "About").divider(" | ");
 
-        assertThat(tabsElement.preferredWidth()).isEqualTo(12); // "Home" + " | " + "About" = 4 + 3
-                                                                // + 5 = 12
+        assertThat(tabsElement.preferredWidth()).isEqualTo(12); // "Home" + " | " + "About" = 4 + 3 + 5 = 12
+    }
+
+    @Test
+    @DisplayName("preferredHeight() returns 1 without borders")
+    void preferredHeight_noBorder() {
+        TabsElement element = tabs("A", "B", "C");
+        assertThat(element.preferredHeight()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("preferredHeight() returns 3 with borders")
+    void preferredHeight_withBorder() {
+        TabsElement element = tabs("A", "B", "C").rounded();
+        assertThat(element.preferredHeight()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("preferredHeight() returns 3 with title")
+    void preferredHeight_withTitle() {
+        TabsElement element = tabs("A", "B", "C").title("Nav");
+        assertThat(element.preferredHeight()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("preferredHeight() returns 1 for tabs without border")
+    void preferredHeight_noBorderNoTitle() {
+        TabsElement element = tabs("A");
+        assertThat(element.preferredHeight()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("tabs render at preferred size with correct content")
+    void rendersAtPreferredSize() {
+        TabsElement element = tabs("A", "B").divider("|").selected(0);
+
+        int w = element.preferredWidth();
+        int h = element.preferredHeight();
+        Rect area = new Rect(0, 0, w, h);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        element.render(frame, area, RenderContext.empty());
+
+        // "A|B" = 3 chars wide, 1 row
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("|");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("B");
     }
 }

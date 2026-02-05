@@ -47,8 +47,14 @@ class RectTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"0, 0, true", "5, 5, true", "9, 9, true", "10, 10, false", "-1, 0, false",
-            "0, -1, false"})
+    @CsvSource({
+        "0, 0, true",
+        "5, 5, true",
+        "9, 9, true",
+        "10, 10, false",
+        "-1, 0, false",
+        "0, -1, false"
+    })
     @DisplayName("Rect contains position")
     void containsPosition(int x, int y, boolean expected) {
         Rect rect = new Rect(0, 0, 10, 10);
@@ -113,7 +119,7 @@ class RectTest {
     void factoryMethods() {
         assertThat(Rect.of(10, 20)).isEqualTo(new Rect(0, 0, 10, 20));
         assertThat(Rect.of(new Position(5, 10), new Size(15, 25)))
-                .isEqualTo(new Rect(5, 10, 15, 25));
+            .isEqualTo(new Rect(5, 10, 15, 25));
     }
 
     @Test

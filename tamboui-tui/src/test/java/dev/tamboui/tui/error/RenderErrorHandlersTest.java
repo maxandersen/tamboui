@@ -44,7 +44,9 @@ class RenderErrorHandlersTest {
 
         assertThat(action).isEqualTo(ErrorAction.QUIT_IMMEDIATELY);
         String logged = output.toString();
-        assertThat(logged).contains("TamboUI Render Error").contains("RuntimeException")
+        assertThat(logged)
+                .contains("TamboUI Render Error")
+                .contains("RuntimeException")
                 .contains("Test error message");
     }
 
@@ -61,7 +63,9 @@ class RenderErrorHandlersTest {
         assertThat(action).isEqualTo(ErrorAction.DISPLAY_AND_QUIT);
         assertThat(logFile).exists();
         String content = new String(Files.readAllBytes(logFile), StandardCharsets.UTF_8);
-        assertThat(content).contains("TamboUI Render Error").contains("RuntimeException")
+        assertThat(content)
+                .contains("TamboUI Render Error")
+                .contains("RuntimeException")
                 .contains("File test error");
     }
 

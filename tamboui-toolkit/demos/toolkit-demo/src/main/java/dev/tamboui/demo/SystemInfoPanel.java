@@ -30,9 +30,11 @@ final class SystemInfoPanel extends PanelContent {
         var cpus = rt.availableProcessors();
         var javaVersion = System.getProperty("java.version");
 
-        return column(row(text("Java:   ").dim(), text(javaVersion).green()),
-                row(text("CPUs:   ").dim(), text(String.valueOf(cpus)).cyan()),
-                row(text("Memory: ").dim(), text(usedMb + "/" + maxMb + " MB").yellow()),
-                row(text("Uptime: ").dim(), text(uptimeSupplier.get()).magenta()));
+        return column(
+            row(text("Java:   ").dim(), text(javaVersion).green()),
+            row(text("CPUs:   ").dim(), text(String.valueOf(cpus)).cyan()),
+            row(text("Memory: ").dim(), text(usedMb + "/" + maxMb + " MB").yellow()),
+            row(text("Uptime: ").dim(), text(uptimeSupplier.get()).magenta())
+        );
     }
 }

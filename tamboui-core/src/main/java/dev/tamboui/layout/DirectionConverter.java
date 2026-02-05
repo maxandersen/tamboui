@@ -13,8 +13,8 @@ import dev.tamboui.style.PropertyConverter;
  * <p>
  * Supported values (case-insensitive):
  * <ul>
- * <li>{@code horizontal} or {@code row} - horizontal layout</li>
- * <li>{@code vertical} or {@code column} - vertical layout</li>
+ *   <li>{@code horizontal} or {@code row} - horizontal layout</li>
+ *   <li>{@code vertical} or {@code column} - vertical layout</li>
  * </ul>
  */
 public final class DirectionConverter implements PropertyConverter<Direction> {
@@ -36,13 +36,13 @@ public final class DirectionConverter implements PropertyConverter<Direction> {
         String normalized = value.trim().toLowerCase();
 
         switch (normalized) {
-            case "horizontal" :
-            case "row" :
+            case "horizontal":
+            case "row":
                 return Optional.of(Direction.HORIZONTAL);
-            case "vertical" :
-            case "column" :
+            case "vertical":
+            case "column":
                 return Optional.of(Direction.VERTICAL);
-            default :
+            default:
                 return Optional.empty();
         }
     }

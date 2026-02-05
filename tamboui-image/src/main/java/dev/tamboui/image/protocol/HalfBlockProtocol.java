@@ -16,11 +16,11 @@ import dev.tamboui.style.Style;
 /**
  * Renders images using Unicode half-block characters.
  * <p>
- * Each terminal cell can display two vertical half-blocks (▀▄█), providing 1x2
- * virtual pixel resolution per cell.
+ * Each terminal cell can display two vertical half-blocks (▀▄█),
+ * providing 1x2 virtual pixel resolution per cell.
  * <p>
- * The top half uses the foreground color and the bottom half uses the
- * background color, allowing two independent colors per cell.
+ * The top half uses the foreground color and the bottom half uses the background color,
+ * allowing two independent colors per cell.
  */
 public final class HalfBlockProtocol implements ImageProtocol {
 

@@ -19,17 +19,17 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
 /**
- * An element that displays an error placeholder when another element fails to
- * render.
+ * An element that displays an error placeholder when another element fails to render.
  * <p>
  * Used by fault-tolerant rendering to show a visual indication that an element
- * encountered an error during rendering, while allowing the rest of the UI to
- * continue.
+ * encountered an error during rendering, while allowing the rest of the UI to continue.
  *
  * <pre>{@code
  * // Typically created automatically during fault-tolerant rendering
- * ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("Widget failed"),
- *         "my-widget");
+ * ErrorPlaceholder placeholder = ErrorPlaceholder.from(
+ *     new RuntimeException("Widget failed"),
+ *     "my-widget"
+ * );
  * }</pre>
  */
 public final class ErrorPlaceholder implements Element {
@@ -45,10 +45,8 @@ public final class ErrorPlaceholder implements Element {
     /**
      * Creates an ErrorPlaceholder for the given exception.
      *
-     * @param cause
-     *            the exception that occurred
-     * @param elementId
-     *            the ID of the element that failed, may be null
+     * @param cause the exception that occurred
+     * @param elementId the ID of the element that failed, may be null
      * @return a new ErrorPlaceholder
      */
     public static ErrorPlaceholder from(Throwable cause, String elementId) {
@@ -58,12 +56,33 @@ public final class ErrorPlaceholder implements Element {
     /**
      * Creates an ErrorPlaceholder for the given exception.
      *
-     * @param cause
-     *            the exception that occurred
+     * @param cause the exception that occurred
      * @return a new ErrorPlaceholder
      */
     public static ErrorPlaceholder from(Throwable cause) {
         return from(cause, null);
+    }
+
+    @Override
+    public int preferredWidth() {
+        // Title + error message + borders
+        String titleText = elementId != null ? " Error: " + elementId + " " : " Error ";
+        String message = cause.getClass().getSimpleName();
+        if (cause.getMessage() != null) {
+            String shortMessage = cause.getMessage();
+            if (shortMessage.length() > 30) {
+                shortMessage = shortMessage.substring(0, 27) + "...";
+            }
+            message = message + ": " + shortMessage;
+        }
+        // "! " prefix + message inside borders
+        return Math.max(titleText.length(), message.length() + 2) + 2;
+    }
+
+    @Override
+    public int preferredHeight() {
+        // Border top + content line + border bottom
+        return 3;
     }
 
     @Override
@@ -88,8 +107,12 @@ public final class ErrorPlaceholder implements Element {
         }
 
         // Create a minimal block with the error info
-        Block block = Block.builder().title(title).borders(Borders.ALL).borderType(BorderType.PLAIN)
-                .borderColor(Color.RED).build();
+        Block block = Block.builder()
+                .title(title)
+                .borders(Borders.ALL)
+                .borderType(BorderType.PLAIN)
+                .borderColor(Color.RED)
+                .build();
 
         block.render(area, buffer);
         Rect inner = block.inner(area);
@@ -97,8 +120,7 @@ public final class ErrorPlaceholder implements Element {
         if (!inner.isEmpty()) {
             // Show error icon and message
             // Tag error output so StyledAreaRegistry can target it (e.g. for effects/CSS).
-            Style errorStyle = Style.EMPTY.fg(Color.RED).withExtension(Tags.class,
-                    Tags.of("error"));
+            Style errorStyle = Style.EMPTY.fg(Color.RED).withExtension(Tags.class, Tags.of("error"));
             Line errorLine = Line.from(new Span("!", errorStyle.bold()), Span.raw(" " + message));
 
             // Truncate if needed

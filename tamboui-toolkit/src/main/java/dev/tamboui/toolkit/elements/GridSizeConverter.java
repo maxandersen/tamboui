@@ -13,8 +13,8 @@ import dev.tamboui.style.PropertyConverter;
  * <p>
  * Supported formats:
  * <ul>
- * <li>{@code "3"} — 3 columns, auto rows</li>
- * <li>{@code "3 4"} — 3 columns, 4 rows</li>
+ *   <li>{@code "3"} — 3 columns, auto rows</li>
+ *   <li>{@code "3 4"} — 3 columns, 4 rows</li>
  * </ul>
  */
 public final class GridSizeConverter implements PropertyConverter<GridSize> {

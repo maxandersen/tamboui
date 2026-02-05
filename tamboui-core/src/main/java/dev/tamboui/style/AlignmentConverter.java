@@ -15,9 +15,9 @@ import dev.tamboui.layout.Alignment;
  * <p>
  * Supported values (case-insensitive):
  * <ul>
- * <li>{@code left} - left alignment</li>
- * <li>{@code center} - center alignment</li>
- * <li>{@code right} - right alignment</li>
+ *   <li>{@code left} - left alignment</li>
+ *   <li>{@code center} - center alignment</li>
+ *   <li>{@code right} - right alignment</li>
  * </ul>
  */
 public final class AlignmentConverter implements PropertyConverter<Alignment> {

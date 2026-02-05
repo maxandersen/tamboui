@@ -26,6 +26,9 @@ final class ClockPanel extends PanelContent {
     Element render(boolean focused) {
         var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         var date = LocalDate.now().format(DateTimeFormatter.ofPattern("EEE, MMM d"));
-        return column(text(time).bold().cyan(), text(date).dim());
+        return column(
+            text(time).bold().cyan(),
+            text(date).dim()
+        );
     }
 }

@@ -13,8 +13,8 @@ import dev.tamboui.style.PropertyConverter;
  * <p>
  * Supported formats:
  * <ul>
- * <li>{@code "2"} — uniform gutter of 2</li>
- * <li>{@code "1 2"} — horizontal 1, vertical 2</li>
+ *   <li>{@code "2"} — uniform gutter of 2</li>
+ *   <li>{@code "1 2"} — horizontal 1, vertical 2</li>
  * </ul>
  */
 public final class GutterConverter implements PropertyConverter<Gutter> {

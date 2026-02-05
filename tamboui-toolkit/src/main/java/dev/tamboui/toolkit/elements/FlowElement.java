@@ -25,27 +25,28 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widget.Widget;
 
 /**
- * A wrap layout element where children flow left-to-right and wrap to the next
- * line when exceeding the available width.
+ * A wrap layout element where children flow left-to-right and wrap to the
+ * next line when exceeding the available width.
  * <p>
  * Unlike the widget-level {@link Flow} which requires explicit item widths,
  * this element auto-measures children via {@code Element.preferredWidth()}.
  * <p>
- * All layout properties can be set via CSS or programmatically. Programmatic
- * values override CSS values when both are set.
+ * All layout properties can be set via CSS or programmatically.
+ * Programmatic values override CSS values when both are set.
  * <p>
  * Supported CSS properties:
  * <ul>
- * <li>{@code spacing} — horizontal spacing between items on the same row</li>
- * <li>{@code flow-row-spacing} — vertical spacing between wrapped rows</li>
- * <li>{@code margin} — margin around the flow layout</li>
- * <li>{@code background} — background color fill</li>
+ *   <li>{@code spacing} — horizontal spacing between items on the same row</li>
+ *   <li>{@code flow-row-spacing} — vertical spacing between wrapped rows</li>
+ *   <li>{@code margin} — margin around the flow layout</li>
+ *   <li>{@code background} — background color fill</li>
  * </ul>
  * <p>
  * Example usage:
- * 
  * <pre>
- * flow(text("Tag1"), text("Tag2"), text("Tag3")).spacing(1).rowSpacing(1)
+ * flow(text("Tag1"), text("Tag2"), text("Tag3"))
+ *     .spacing(1)
+ *     .rowSpacing(1)
  * </pre>
  */
 public final class FlowElement extends ContainerElement<FlowElement> {
@@ -53,8 +54,8 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * CSS property definition for vertical spacing between rows.
      */
-    public static final PropertyDefinition<Integer> FLOW_ROW_SPACING = PropertyDefinition
-            .of("flow-row-spacing", IntegerConverter.INSTANCE);
+    public static final PropertyDefinition<Integer> FLOW_ROW_SPACING =
+        PropertyDefinition.of("flow-row-spacing", IntegerConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(FLOW_ROW_SPACING);
@@ -73,8 +74,7 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * Creates a flow layout with the given children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public FlowElement(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -83,8 +83,7 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * Creates a flow layout with the given children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public FlowElement(Collection<? extends Element> children) {
         this.children.addAll(children);
@@ -93,8 +92,7 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * Sets the horizontal spacing between items on the same row.
      *
-     * @param spacing
-     *            the horizontal spacing in cells
+     * @param spacing the horizontal spacing in cells
      * @return this flow for method chaining
      */
     public FlowElement spacing(int spacing) {
@@ -105,8 +103,7 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * Sets the vertical spacing between wrapped rows.
      *
-     * @param rowSpacing
-     *            the row spacing in cells
+     * @param rowSpacing the row spacing in cells
      * @return this flow for method chaining
      */
     public FlowElement rowSpacing(int rowSpacing) {
@@ -117,8 +114,7 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * Sets the margin around the flow layout.
      *
-     * @param margin
-     *            the margin
+     * @param margin the margin
      * @return this flow for method chaining
      */
     public FlowElement margin(Margin margin) {
@@ -129,8 +125,7 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     /**
      * Sets uniform margin around the flow layout.
      *
-     * @param value
-     *            the margin value for all sides
+     * @param value the margin value for all sides
      * @return this flow for method chaining
      */
     public FlowElement margin(int value) {
@@ -160,6 +155,22 @@ public final class FlowElement extends ContainerElement<FlowElement> {
         }
 
         return totalWidth;
+    }
+
+    @Override
+    public int preferredHeight() {
+        if (children.isEmpty()) {
+            return 0;
+        }
+        // Without available width, assume single row (max height of children)
+        int maxHeight = 1;
+        for (Element child : children) {
+            maxHeight = Math.max(maxHeight, child.preferredHeight());
+        }
+        if (margin != null) {
+            maxHeight += margin.verticalTotal();
+        }
+        return maxHeight;
     }
 
     @Override
@@ -255,8 +266,11 @@ public final class FlowElement extends ContainerElement<FlowElement> {
         }
 
         // Build and render the Flow widget
-        Flow flow = Flow.builder().items(flowItems).horizontalSpacing(effectiveSpacing)
-                .verticalSpacing(effectiveRowSpacing).build();
+        Flow flow = Flow.builder()
+            .items(flowItems)
+            .horizontalSpacing(effectiveSpacing)
+            .verticalSpacing(effectiveRowSpacing)
+            .build();
 
         frame.renderWidget(flow, effectiveArea);
     }

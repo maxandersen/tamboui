@@ -14,11 +14,11 @@ import dev.tamboui.style.Width;
  * <p>
  * Supports the following values:
  * <ul>
- * <li>{@code fill} - element fills container width (default)</li>
- * <li>{@code fit} - element width fits its content</li>
- * <li>Percentage values: {@code 50%}, {@code 100%}</li>
- * <li>Decimal percentages: {@code 0.5}, {@code 0.25}</li>
- * <li>Fixed character counts: {@code 20}, {@code 20ch}</li>
+ *   <li>{@code fill} - element fills container width (default)</li>
+ *   <li>{@code fit} - element width fits its content</li>
+ *   <li>Percentage values: {@code 50%}, {@code 100%}</li>
+ *   <li>Decimal percentages: {@code 0.5}, {@code 0.25}</li>
+ *   <li>Fixed character counts: {@code 20}, {@code 20ch}</li>
  * </ul>
  */
 public final class WidthConverter implements PropertyConverter<Width> {
@@ -39,9 +39,9 @@ public final class WidthConverter implements PropertyConverter<Width> {
 
         // Named values
         switch (resolved) {
-            case "fill" :
+            case "fill":
                 return Optional.of(Width.FILL);
-            case "fit" :
+            case "fit":
                 return Optional.of(Width.FIT);
         }
 

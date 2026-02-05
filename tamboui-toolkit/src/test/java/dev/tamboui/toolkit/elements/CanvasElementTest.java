@@ -33,8 +33,7 @@ class CanvasElementTest {
     @DisplayName("Attribute selector [title] affects Canvas border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "CanvasElement[title=\"Drawing\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test", "CanvasElement[title=\"Drawing\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

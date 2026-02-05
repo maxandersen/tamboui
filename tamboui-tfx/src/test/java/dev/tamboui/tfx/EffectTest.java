@@ -81,7 +81,7 @@ class EffectTest {
         void copyPreservesArea() {
             Rect customArea = new Rect(5, 5, 20, 10);
             Effect original = Fx.fadeToFg(Color.CYAN, 500, Interpolation.Linear)
-                    .withArea(customArea);
+                .withArea(customArea);
 
             Effect copy = original.copy();
 

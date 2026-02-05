@@ -125,7 +125,9 @@ class InlineDisplayTest {
         InlineDisplay display = new InlineDisplay(2, 40, mockBackend, printWriter);
         display.setLine(0, "Status");
 
-        display.println(Text.from(Line.from(Span.styled("colored", Style.EMPTY.fg(Color.RED)))));
+        display.println(Text.from(Line.from(
+            Span.styled("colored", Style.EMPTY.fg(Color.RED))
+        )));
 
         String output = stringWriter.toString();
         // Should contain ANSI color code for red
@@ -179,8 +181,9 @@ class InlineDisplayTest {
     void setLineTextRendersStyledText() {
         InlineDisplay display = new InlineDisplay(2, 40, mockBackend, printWriter);
 
-        display.setLine(0,
-                Text.from(Line.from(Span.styled("styled", Style.EMPTY.fg(Color.GREEN)))));
+        display.setLine(0, Text.from(Line.from(
+            Span.styled("styled", Style.EMPTY.fg(Color.GREEN))
+        )));
 
         String output = stringWriter.toString();
         assertThat(output).contains("styled");

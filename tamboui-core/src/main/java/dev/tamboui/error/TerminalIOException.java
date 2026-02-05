@@ -4,6 +4,8 @@
  */
 package dev.tamboui.error;
 
+
+
 /**
  * Exception thrown when a terminal I/O operation fails.
  * <p>
@@ -18,8 +20,7 @@ public class TerminalIOException extends TamboUIException {
     /**
      * Creates a new terminal I/O exception with the given message.
      *
-     * @param message
-     *            the error message
+     * @param message the error message
      */
     public TerminalIOException(String message) {
         super(message);
@@ -28,13 +29,12 @@ public class TerminalIOException extends TamboUIException {
     /**
      * Creates a new terminal I/O exception with the given message and cause.
      *
-     * @param message
-     *            the error message
-     * @param cause
-     *            the underlying IOException
+     * @param message the error message
+     * @param cause   the underlying IOException
      */
     public TerminalIOException(String message, Throwable cause) {
         super(message, cause);
     }
 
+   
 }

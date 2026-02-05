@@ -38,8 +38,7 @@ final class FloatingPanelsArea implements Element {
     private void createInitialPanels() {
         panels.add(new FloatingPanel(nextPanelId++, new ClockPanel(), 50, 1));
         panels.add(new FloatingPanel(nextPanelId++, new SystemInfoPanel(this::formatUptime), 2, 1));
-        panels.add(new FloatingPanel(nextPanelId++, new TodoPanel("Learn TamboUI DSL",
-                "Build awesome TUI apps", "Share with the world"), 2, 9));
+        panels.add(new FloatingPanel(nextPanelId++, new TodoPanel("Learn TamboUI DSL", "Build awesome TUI apps", "Share with the world"), 2, 9));
         panels.add(new FloatingPanel(nextPanelId++, new CounterPanel(), 35, 9));
         panels.add(new FloatingPanel(nextPanelId++, new ProgressPanel(), 50, 9));
     }
@@ -72,13 +71,11 @@ final class FloatingPanelsArea implements Element {
         }
     }
 
-    private void renderFloatingPanel(Frame frame, Rect area, RenderContext context,
-            FloatingPanel fp) {
+    private void renderFloatingPanel(Frame frame, Rect area, RenderContext context, FloatingPanel fp) {
         var content = fp.content;
         var relX = Math.max(0, Math.min(fp.x, area.width() - content.width()));
         var relY = Math.max(0, Math.min(fp.y, area.height() - content.height()));
-        var panelArea = new Rect(area.x() + relX, area.y() + relY, content.width(),
-                content.height());
+        var panelArea = new Rect(area.x() + relX, area.y() + relY, content.width(), content.height());
 
         // Clear the panel area to properly occlude content from panels behind this one
         frame.buffer().clear(panelArea);
@@ -86,9 +83,14 @@ final class FloatingPanelsArea implements Element {
         var focused = context.isFocused(fp.panelId());
         var borderColor = focused ? Color.WHITE : content.color();
 
-        var p = panel(content.title(), () -> content.render(focused)).id(fp.panelId()).rounded()
-                .borderColor(borderColor).focusedBorderColor(Color.WHITE).focusable()
-                .onKeyEvent(event -> handlePanelKey(fp, event)).draggable((deltaX, deltaY) -> {
+        var p = panel(content.title(), () -> content.render(focused))
+                .id(fp.panelId())
+                .rounded()
+                .borderColor(borderColor)
+                .focusedBorderColor(Color.WHITE)
+                .focusable()
+                .onKeyEvent(event -> handlePanelKey(fp, event))
+                .draggable((deltaX, deltaY) -> {
                     fp.x += deltaX;
                     fp.y += deltaY;
                 });
@@ -130,6 +132,16 @@ final class FloatingPanelsArea implements Element {
     }
 
     @Override
+    public int preferredWidth() {
+        return 0;
+    }
+
+    @Override
+    public int preferredHeight() {
+        return 0;
+    }
+
+    @Override
     public Constraint constraint() {
         return Constraint.fill();
     }
@@ -138,24 +150,12 @@ final class FloatingPanelsArea implements Element {
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (event.code() == KeyCode.CHAR) {
             switch (event.character()) {
-                case '1' :
-                    createPanel(new ClockPanel());
-                    return EventResult.HANDLED;
-                case '2' :
-                    createPanel(new CounterPanel());
-                    return EventResult.HANDLED;
-                case '3' :
-                    createPanel(new SystemInfoPanel(this::formatUptime));
-                    return EventResult.HANDLED;
-                case '4' :
-                    createPanel(new QuotePanel());
-                    return EventResult.HANDLED;
-                case '5' :
-                    createPanel(new ProgressPanel());
-                    return EventResult.HANDLED;
-                case '6' :
-                    createPanel(new TodoPanel());
-                    return EventResult.HANDLED;
+                case '1': createPanel(new ClockPanel()); return EventResult.HANDLED;
+                case '2': createPanel(new CounterPanel()); return EventResult.HANDLED;
+                case '3': createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED;
+                case '4': createPanel(new QuotePanel()); return EventResult.HANDLED;
+                case '5': createPanel(new ProgressPanel()); return EventResult.HANDLED;
+                case '6': createPanel(new TodoPanel()); return EventResult.HANDLED;
             }
         }
         return EventResult.UNHANDLED;

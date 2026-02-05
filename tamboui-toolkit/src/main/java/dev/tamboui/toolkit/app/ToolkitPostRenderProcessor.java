@@ -28,17 +28,11 @@ public interface ToolkitPostRenderProcessor {
     /**
      * Processes the frame after rendering.
      *
-     * @param frame
-     *            the rendered frame
-     * @param elementRegistry
-     *            the registry of rendered element areas
-     * @param styledAreaRegistry
-     *            the registry of styled areas (for CSS targeting)
-     * @param focusManager
-     *            the focus manager for pseudo-class state
-     * @param elapsed
-     *            the time elapsed since the last frame (from TickEvent)
+     * @param frame the rendered frame
+     * @param elementRegistry the registry of rendered element areas
+     * @param styledAreaRegistry the registry of styled areas (for CSS targeting)
+     * @param focusManager the focus manager for pseudo-class state
+     * @param elapsed the time elapsed since the last frame (from TickEvent)
      */
-    void process(Frame frame, ElementRegistry elementRegistry,
-            StyledAreaRegistry styledAreaRegistry, FocusManager focusManager, Duration elapsed);
+    void process(Frame frame, ElementRegistry elementRegistry, StyledAreaRegistry styledAreaRegistry, FocusManager focusManager, Duration elapsed);
 }

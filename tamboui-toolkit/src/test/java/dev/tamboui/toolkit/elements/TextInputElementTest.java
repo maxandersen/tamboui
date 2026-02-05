@@ -25,15 +25,13 @@ class TextInputElementTest {
     @Test
     @DisplayName("styleAttributes exposes title")
     void styleAttributes_exposesTitle() {
-        assertThat(textInput().title("Username").styleAttributes()).containsEntry("title",
-                "Username");
+        assertThat(textInput().title("Username").styleAttributes()).containsEntry("title", "Username");
     }
 
     @Test
     @DisplayName("styleAttributes exposes placeholder")
     void styleAttributes_exposesPlaceholder() {
-        assertThat(textInput().placeholder("Enter...").styleAttributes())
-                .containsEntry("placeholder", "Enter...");
+        assertThat(textInput().placeholder("Enter...").styleAttributes()).containsEntry("placeholder", "Enter...");
     }
 
     @Test
@@ -46,8 +44,7 @@ class TextInputElementTest {
     @DisplayName("Attribute selector [title] affects TextInput border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "TextInputElement[title=\"Username\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test", "TextInputElement[title=\"Username\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();
@@ -66,8 +63,7 @@ class TextInputElementTest {
     @DisplayName("Attribute selector [placeholder] affects TextInput border color")
     void attributeSelector_placeholder_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "TextInputElement[placeholder=\"Enter...\"] { border-color: yellow; }");
+        styleEngine.addStylesheet("test", "TextInputElement[placeholder=\"Enter...\"] { border-color: yellow; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

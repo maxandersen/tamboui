@@ -13,14 +13,12 @@ import dev.tamboui.layout.ConstraintConverter;
 import dev.tamboui.style.PropertyConverter;
 
 /**
- * Converts a space-separated string of constraint tokens to a
- * {@code List<Constraint>}.
+ * Converts a space-separated string of constraint tokens to a {@code List<Constraint>}.
  * <p>
- * Each token is delegated to {@link ConstraintConverter} for parsing. Returns
- * {@link Optional#empty()} if any token fails to parse.
+ * Each token is delegated to {@link ConstraintConverter} for parsing.
+ * Returns {@link Optional#empty()} if any token fails to parse.
  * <p>
- * Example: {@code "fill fill(2) 20"} →
- * {@code [Constraint.fill(), Constraint.fill(2), Constraint.length(20)]}
+ * Example: {@code "fill fill(2) 20"} → {@code [Constraint.fill(), Constraint.fill(2), Constraint.length(20)]}
  */
 public final class ConstraintListConverter implements PropertyConverter<List<Constraint>> {
 

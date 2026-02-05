@@ -167,8 +167,7 @@ class AttributeSelectorRenderingTest {
         Panel panel = panel("Output Test");
         panel.render(frame, area, context);
 
-        assertThat(buffer.get(0, 0).style().fg())
-                .isNotEqualTo(java.util.Optional.of(Color.MAGENTA));
+        assertThat(buffer.get(0, 0).style().fg()).isNotEqualTo(java.util.Optional.of(Color.MAGENTA));
     }
 
     // ═══════════════════════════════════════════════════════════════

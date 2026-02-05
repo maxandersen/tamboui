@@ -34,17 +34,14 @@ class TickEventTest {
     void frameCountValues() {
         assertThat(TickEvent.of(0, Duration.ZERO).frameCount()).isEqualTo(0);
         assertThat(TickEvent.of(1000, Duration.ZERO).frameCount()).isEqualTo(1000);
-        assertThat(TickEvent.of(Long.MAX_VALUE, Duration.ZERO).frameCount())
-                .isEqualTo(Long.MAX_VALUE);
+        assertThat(TickEvent.of(Long.MAX_VALUE, Duration.ZERO).frameCount()).isEqualTo(Long.MAX_VALUE);
     }
 
     @Test
     @DisplayName("elapsed time can vary")
     void elapsedTimeVariations() {
         assertThat(TickEvent.of(1, Duration.ZERO).elapsed()).isEqualTo(Duration.ZERO);
-        assertThat(TickEvent.of(1, Duration.ofSeconds(1)).elapsed())
-                .isEqualTo(Duration.ofSeconds(1));
-        assertThat(TickEvent.of(1, Duration.ofNanos(100)).elapsed())
-                .isEqualTo(Duration.ofNanos(100));
+        assertThat(TickEvent.of(1, Duration.ofSeconds(1)).elapsed()).isEqualTo(Duration.ofSeconds(1));
+        assertThat(TickEvent.of(1, Duration.ofNanos(100)).elapsed()).isEqualTo(Duration.ofNanos(100));
     }
 }

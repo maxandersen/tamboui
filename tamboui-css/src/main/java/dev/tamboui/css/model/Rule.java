@@ -25,12 +25,9 @@ public final class Rule {
     /**
      * Creates a new rule.
      *
-     * @param selector
-     *            the selector that determines which elements this rule applies to
-     * @param declarations
-     *            the property declarations (property name -> value)
-     * @param sourceOrder
-     *            the order in which this rule appeared in the stylesheet
+     * @param selector     the selector that determines which elements this rule applies to
+     * @param declarations the property declarations (property name -> value)
+     * @param sourceOrder  the order in which this rule appeared in the stylesheet
      */
     public Rule(Selector selector, Map<String, PropertyValue> declarations, int sourceOrder) {
         this.selector = Objects.requireNonNull(selector);
@@ -83,8 +80,9 @@ public final class Rule {
             return false;
         }
         Rule rule = (Rule) o;
-        return sourceOrder == rule.sourceOrder && selector.equals(rule.selector)
-                && declarations.equals(rule.declarations);
+        return sourceOrder == rule.sourceOrder &&
+                selector.equals(rule.selector) &&
+                declarations.equals(rule.declarations);
     }
 
     @Override
@@ -97,8 +95,7 @@ public final class Rule {
         StringBuilder sb = new StringBuilder();
         sb.append(selector.toCss()).append(" {\n");
         for (Map.Entry<String, PropertyValue> entry : declarations.entrySet()) {
-            sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue())
-                    .append(";\n");
+            sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append(";\n");
         }
         sb.append("}");
         return sb.toString();

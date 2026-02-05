@@ -20,11 +20,8 @@ public class HelloWorldDemo {
 
     /**
      * Demo entry point.
-     * 
-     * @param args
-     *            the CLI arguments
-     * @throws Exception
-     *             on unexpected error
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
         try (Backend backend = BackendFactory.create()) {
@@ -61,8 +58,9 @@ public class HelloWorldDemo {
     }
 
     private static void render(Frame frame) {
-        var paragraph = Paragraph.builder().text(Text.from("Hello, TamboUI! Press 'q' to quit."))
-                .build();
+        var paragraph = Paragraph.builder()
+            .text(Text.from("Hello, TamboUI! Press 'q' to quit."))
+            .build();
         frame.renderWidget(paragraph, frame.area());
     }
 }

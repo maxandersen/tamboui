@@ -20,9 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test that verifies CSS can override programmatic named colors.
  * <p>
- * When code uses {@code .red()} or {@code .fg(Color.RED)}, a CSS class "red" is
- * added. Theme stylesheets should be able to override the color via {@code .red
- * { color: #FF5555; }}.
+ * When code uses {@code .red()} or {@code .fg(Color.RED)}, a CSS class "red" is added.
+ * Theme stylesheets should be able to override the color via {@code .red { color: #FF5555; }}.
  */
 class NamedColorCssOverrideTest {
 
