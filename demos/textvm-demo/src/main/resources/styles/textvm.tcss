@@ -1,0 +1,111 @@
+/* TextVM demo stylesheet */
+
+:root {
+    --bg: #0f141b;
+    --panel: #151b24;
+    --border: #2a3140;
+    --accent: #4fb3d9;
+    --accent-2: #7fc97f;
+    --dim: #8693a5;
+    --text: #e6edf3;
+}
+
+* {
+    color: var(--text);
+}
+
+Row, Column {
+    background: var(--bg);
+}
+
+#textvm Panel {
+    background: var(--panel);
+    border-color: var(--border);
+    border-type: rounded;
+}
+
+#header {
+    background: #1b2230;
+}
+
+#header .title {
+    color: var(--accent);
+    text-style: bold;
+}
+
+#header .subtitle {
+    color: var(--text);
+}
+
+#header .status {
+    color: var(--accent-2);
+}
+
+#footer {
+    background: #1b2230;
+}
+
+#footer .hint {
+    color: var(--dim);
+}
+
+#footer .status {
+    color: var(--accent);
+}
+
+ListElement {
+    background: var(--panel);
+    border-color: var(--border);
+    highlight-symbol: "> ";
+    scrollbar-policy: as-needed;
+}
+
+ListElement-item:selected {
+    background: #222b3c;
+    color: var(--text);
+    text-style: bold;
+}
+
+TabsElement {
+    background: var(--panel);
+    border-color: var(--border);
+    border-type: rounded;
+}
+
+TabsElement-tab:selected {
+    color: var(--accent);
+    text-style: bold;
+}
+
+TabsElement-divider {
+    color: var(--dim);
+}
+
+.process-pid {
+    color: var(--dim);
+}
+
+.process-self {
+    color: var(--accent-2);
+    text-style: bold;
+}
+
+.kv-key {
+    color: var(--dim);
+}
+
+.kv-value {
+    color: var(--text);
+}
+
+.empty {
+    color: var(--dim);
+}
+
+GaugeElement-filled {
+    color: var(--accent-2);
+}
+
+SparklineElement {
+    color: var(--accent);
+}
