@@ -31,6 +31,9 @@
     "rflex-demo": {
       "script-ref": "demos/rflex-demo/src/main/java/dev/tamboui/demo/flex/RFlexDemo.java"
     },
+    "textvm-demo": {
+      "script-ref": "demos/textvm-demo/src/main/java/dev/tamboui/demo/textvm/TextVmDemo.java"
+    },
     "toolkit-export-demo": {
       "script-ref": "demos/toolkit-export-demo/src/main/java/dev/tamboui/demo/ToolkitExportDemo.java"
     },
