@@ -6,6 +6,7 @@ package dev.tamboui.demo.textvm;
 
 import java.time.Duration;
 import java.util.Locale;
+import java.util.Objects;
 
 final class TextVmFormatting {
 
@@ -34,6 +35,11 @@ final class TextVmFormatting {
     }
 
     static String findMainCandidate(String[] args, String commandLine) {
+        // Special-case jcmd: its command line is the tool, not the target main
+        if (commandLine != null && commandLine.endsWith("/jcmd")) {
+            return "jcmd";
+        }
+
         String main = findMainFromArgs(args);
         if (!main.isBlank()) {
             return main;
@@ -101,8 +107,23 @@ final class TextVmFormatting {
             if ("-jar".equals(arg) && i + 1 < args.length) {
                 return args[i + 1];
             }
+            // Flags that take a separate argument we should skip as a pair
             if ("-cp".equals(arg) || "-classpath".equals(arg)) {
                 i++;
+                continue;
+            }
+            if ("--add-opens".equals(arg)
+                    || "--add-exports".equals(arg)
+                    || "--add-reads".equals(arg)
+                    || "--patch-module".equals(arg)) {
+                i++;
+                continue;
+            }
+            // Flags that embed their value with '='
+            if (arg.startsWith("--add-opens=")
+                    || arg.startsWith("--add-exports=")
+                    || arg.startsWith("--add-reads=")
+                    || arg.startsWith("--patch-module=")) {
                 continue;
             }
             if (arg.startsWith("-")) {
