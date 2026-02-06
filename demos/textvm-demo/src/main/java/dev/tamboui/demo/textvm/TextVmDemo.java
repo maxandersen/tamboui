@@ -1,6 +1,7 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-css:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
+//SOURCES TextVmFormatting.java
 //FILES styles/textvm.tcss=../../../../../resources/styles/textvm.tcss
 /*
  * Copyright TamboUI Contributors
@@ -10,6 +11,8 @@ package dev.tamboui.demo.textvm;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -21,15 +24,7 @@ import java.lang.management.ThreadMXBean;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -46,6 +41,8 @@ import com.sun.tools.attach.VirtualMachine;
 
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
@@ -54,6 +51,10 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
+
+import dev.tamboui.widgets.chart.Axis;
+import dev.tamboui.widgets.chart.Dataset;
+import dev.tamboui.widgets.chart.GraphType;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -73,6 +74,7 @@ public final class TextVmDemo {
     private static final int MAX_THREADS = 80;
     private static final int MAX_PROPERTIES = 24;
     private static final int PROCESS_PANEL_WIDTH = 38;
+    private static final int MAX_ERROR_LOG_ENTRIES = 200;
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final List<String> TAB_TITLES = List.of("Overview", "Monitor", "Threads", "GC", "Properties");
 
@@ -96,6 +98,25 @@ public final class TextVmDemo {
     private final MetricsCollector metricsCollector = new MetricsCollector();
     private ToolkitRunner runner;
     private String statusMessage = "Ready";
+    private final Deque<ErrorEntry> errorLog = new ArrayDeque<>();
+    private boolean showErrorPopup;
+
+    private record ErrorEntry(String timestamp, String message, List<String> stackTraceLines) {
+    }
+
+    private static Element withFill(Element element) {
+        if (element instanceof StyledElement) {
+            ((StyledElement<?>) element).fill();
+        }
+        return element;
+    }
+
+    private static Element withLength(Element element, int length) {
+        if (element instanceof StyledElement) {
+            ((StyledElement<?>) element).length(length);
+        }
+        return element;
+    }
 
     private TextVmDemo() {
     }
@@ -139,8 +160,7 @@ public final class TextVmDemo {
                 var updated = ProcessCollector.collect();
                 runner.runOnRenderThread(() -> updateProcessList(updated));
             } catch (Exception e) {
-                runner.runOnRenderThread(
-                        () -> statusMessage = "Process scan failed: " + safeMessage(e));
+                runner.runOnRenderThread(() -> logError("Process scan failed", e));
             }
         }, PROCESS_REFRESH_INTERVAL);
 
@@ -150,6 +170,25 @@ public final class TextVmDemo {
             MetricsSnapshot snapshot = metricsCollector.collect(process);
             runner.runOnRenderThread(() -> applySnapshot(snapshot));
         }, METRICS_REFRESH_INTERVAL);
+    }
+
+    private void logError(String context, Exception e) {
+        String message = context + ": " + safeMessage(e);
+        String timestamp = TIME_FORMAT.format(Instant.now().atZone(java.time.ZoneId.systemDefault()));
+
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        List<String> stackLines = sw.toString().lines().collect(Collectors.toList());
+        if (stackLines.isEmpty()) {
+            stackLines = List.of(message);
+        }
+
+        errorLog.addLast(new ErrorEntry(timestamp, message, stackLines));
+        while (errorLog.size() > MAX_ERROR_LOG_ENTRIES) {
+            errorLog.removeFirst();
+        }
+        statusMessage = message;
+        showErrorPopup = true;
     }
 
     private void updateProcessList(List<JavaProcess> updated) {
@@ -209,13 +248,57 @@ public final class TextVmDemo {
         Element content = renderContent(selected);
         Element footer = renderFooter();
 
-        return dock()
+        Element base = dock()
                 .top(header, Constraint.length(1))
                 .center(content)
                 .bottom(footer, Constraint.length(1))
                 .id("textvm")
                 .focusable()
                 .onKeyEvent(this::handleKey);
+        if (!showErrorPopup) {
+            return base;
+        }
+        return stack(
+                base,
+                renderErrorPopup());
+    }
+
+    private Element renderErrorPopup() {
+        ErrorEntry last = errorLog.peekLast();
+        if (last == null) {
+            return dialog("Errors", text("No errors logged."))
+                    .rounded()
+                    .onCancel(() -> showErrorPopup = false)
+                    .onConfirm(() -> showErrorPopup = false);
+        }
+
+        Element header = row(
+                text(last.timestamp()).addClass("error-timestamp"),
+                spacer(),
+                text("[Esc] close").addClass("hint"))
+                .spacing(1)
+                .length(1);
+
+        Element message = text(last.message()).addClass("error-message");
+
+        Element trace = list()
+                .data(last.stackTraceLines(), line -> text(line).addClass("error-trace").ellipsis())
+                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .id("error-trace")
+                .focusable()
+                .fill();
+
+        return dialog("Errors",
+                column(
+                        header,
+                        withLength(message, 2),
+                        trace)
+                        .spacing(1))
+                .rounded()
+                .width(110)
+                .height(24)
+                .onCancel(() -> showErrorPopup = false)
+                .onConfirm(() -> showErrorPopup = false);
     }
 
     private JavaProcess selectedProcess() {
@@ -249,9 +332,8 @@ public final class TextVmDemo {
     }
 
     private Element renderContent(JavaProcess selected) {
-        Element processPanel = renderProcessPanel()
-                .length(PROCESS_PANEL_WIDTH);
-        Element mainPanel = renderMainPanel(selected).fill();
+        Element processPanel = withLength(renderProcessPanel(), PROCESS_PANEL_WIDTH);
+        Element mainPanel = withFill(renderMainPanel(selected));
 
         return row(processPanel, mainPanel)
                 .spacing(1)
@@ -290,13 +372,13 @@ public final class TextVmDemo {
     private Element renderMainPanel(JavaProcess selected) {
         Element tabBar = tabs(TAB_TITLES)
                 .selected(selectedTabIndex)
+                .highlightStyle(Style.EMPTY.fg(Color.LIGHT_YELLOW).bold().underlined())
                 .divider(" | ")
-                .padding(" ", " ")
+                .padding("", "")
                 .id("tabs")
                 .length(1);
 
-        Element content = renderTabContent(selected)
-                .fill();
+        Element content = withFill(renderTabContent(selected));
 
         return column(tabBar, content)
                 .spacing(1)
@@ -355,26 +437,47 @@ public final class TextVmDemo {
                         Math.max(0, metrics.gcTimeMs()))
                 : "n/a";
 
+        // Split command and args for list display
+        String commandLines = selected.commandLine();
+        List<String> argLines = Arrays.asList(selected.arguments());
+        
         Element processPanel = panel(() -> column(
-                keyValueRow("PID", String.valueOf(selected.pid())),
-                keyValueRow("Name", selected.fullName()),
-                keyValueRow("User", selected.user()),
-                keyValueRow("Start", formatInstant(startTime)),
-                keyValueRow("Uptime", TextVmFormatting.formatDuration(uptime)),
-                keyValueRow("Command", selected.commandLine()),
-                keyValueRow("Args", selected.arguments()),
-                keyValueRow("JMX", metrics.jmxStatus())))
+                // Simple fields in a table
+                table()
+                        .widths(Constraint.length(10), Constraint.fill())
+                        .columnSpacing(1)
+                        .row("PID", String.valueOf(selected.pid()))
+                        .row("Name", selected.fullName())
+                        .row("User", selected.user())
+                        .row("Start", formatInstant(startTime))
+                        .row("Uptime", TextVmFormatting.formatDuration(uptime))
+                        .row("JMX", metrics.jmxStatus())
+                        .fill(),
+                // Command as a list
+                text("Command:").addClass("kv-key").length(1),
+                list(commandLines)
+                        .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED),
+                // Args as a list
+                text("Args:").addClass("kv-key").length(1),
+                list(argLines)
+                        .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                        .fill())
+                        .spacing(0)
+                        .fill())
                 .title("Process")
                 .fill();
 
-        Element runtimePanel = panel(() -> column(
-                keyValueRow("CPU", TextVmFormatting.formatPercent(metrics.processCpuLoad())),
-                keyValueRow("System CPU", TextVmFormatting.formatPercent(metrics.systemCpuLoad())),
-                keyValueRow("Heap", heapSummary),
-                keyValueRow("Non-Heap", TextVmFormatting.formatBytes(metrics.nonHeapUsed())),
-                keyValueRow("Threads", threadSummary),
-                keyValueRow("Classes", classSummary),
-                keyValueRow("GC", gcSummary)))
+        Element runtimePanel = panel(() -> table()
+                .widths(Constraint.length(10), Constraint.fill())
+                .columnSpacing(1)
+                .row("CPU", TextVmFormatting.formatPercent(metrics.processCpuLoad()))
+                .row("System CPU", TextVmFormatting.formatPercent(metrics.systemCpuLoad()))
+                .row("Heap", heapSummary)
+                .row("Non-Heap", TextVmFormatting.formatBytes(metrics.nonHeapUsed()))
+                .row("Threads", threadSummary)
+                .row("Classes", classSummary)
+                .row("GC", gcSummary)
+                .fill())
                 .title("Runtime")
                 .fill();
 
@@ -409,7 +512,7 @@ public final class TextVmDemo {
                 gauge(Math.max(0, metrics.heapPercent()))
                         .label(formatHeapPercent())
                         .useUnicode(false),
-                sparkline(heapSeries.values()).max(100)))
+                metricLineChart("Heap %", heapSeries.values(), 100)))
                 .title("Heap")
                 .fill();
 
@@ -418,7 +521,7 @@ public final class TextVmDemo {
                 gauge(threadPercent())
                         .label(threadLabel)
                         .useUnicode(false),
-                sparkline(threadSeries.values()).max(threadSeriesMax())))
+                metricLineChart("Threads", threadSeries.values(), threadSeriesMax())))
                 .title("Threads")
                 .fill();
 
@@ -427,7 +530,7 @@ public final class TextVmDemo {
                 gauge(classPercent())
                         .label(classLabel)
                         .useUnicode(false),
-                sparkline(classSeries.values()).max(classSeriesMax())))
+                metricLineChart("Classes", classSeries.values(), classSeriesMax())))
                 .title("Classes")
                 .fill();
 
@@ -561,6 +664,29 @@ public final class TextVmDemo {
                 .length(1);
     }
 
+    private static List<String> splitIntoLines(String text, int maxWidth) {
+        if (text == null || text.isBlank()) {
+            return List.of("n/a");
+        }
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split("\\s+");
+        StringBuilder currentLine = new StringBuilder();
+        for (String word : words) {
+            if (currentLine.length() + word.length() + 1 > maxWidth && currentLine.length() > 0) {
+                lines.add(currentLine.toString());
+                currentLine.setLength(0);
+            }
+            if (currentLine.length() > 0) {
+                currentLine.append(' ');
+            }
+            currentLine.append(word);
+        }
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+        return lines.isEmpty() ? List.of("n/a") : lines;
+    }
+
     private Element metricHeader(String label, String value) {
         return row(
                 text(label).addClass("kv-key"),
@@ -593,6 +719,44 @@ public final class TextVmDemo {
         return Math.max(1, metrics.loadedClassCount());
     }
 
+    private Element metricLineChart(String name, List<Long> series, long maxY) {
+        if (series == null || series.isEmpty()) {
+            return text("no data").dim();
+        }
+        int n = series.size();
+        double[][] data = new double[n][2];
+        long localMax = 0;
+        for (int i = 0; i < n; i++) {
+            long v = series.get(i);
+            data[i][0] = i;
+            data[i][1] = v;
+            if (v > localMax) {
+                localMax = v;
+            }
+        }
+        double yMax = Math.max(1, maxY > 0 ? maxY : localMax);
+
+        Dataset dataset = Dataset.builder()
+                .name(name)
+                .data(data)
+                .graphType(GraphType.LINE)
+                .style(Style.EMPTY.fg(Color.CYAN))
+                .build();
+
+        Axis xAxis = Axis.builder()
+                .bounds(0, Math.max(1, n - 1))
+                .build();
+        Axis yAxis = Axis.builder()
+                .bounds(0, yMax)
+                .build();
+
+        return chart()
+                .datasets(dataset)
+                .xAxis(xAxis)
+                .yAxis(yAxis)
+                .hideLegend();
+    }
+
     private String formatHeapPercent() {
         if (metrics.heapPercent() < 0) {
             return "n/a";
@@ -615,6 +779,8 @@ public final class TextVmDemo {
     }
 
     private EventResult handleKey(KeyEvent event) {
+        // Only handle Up/Down for process selection when wrapper is focused
+        // Lists will handle Up/Down when they are focused
         if (event.matches(Actions.MOVE_UP)) {
             selectProcess(selectedProcessIndex - 1);
             return EventResult.HANDLED;
@@ -623,6 +789,7 @@ public final class TextVmDemo {
             selectProcess(selectedProcessIndex + 1);
             return EventResult.HANDLED;
         }
+        // Always handle Left/Right for tabs and number keys for tab jumping
         if (event.matches(Actions.MOVE_LEFT)) {
             selectTab(selectedTabIndex - 1);
             return EventResult.HANDLED;
@@ -719,7 +886,7 @@ public final class TextVmDemo {
                                String displayName,
                                String fullName,
                                String commandLine,
-                               String arguments,
+                               String[] arguments,
                                String user,
                                Instant startTime,
                                boolean isSelf,
@@ -729,10 +896,10 @@ public final class TextVmDemo {
             try {
                 ProcessHandle.Info info = handle.info();
                 boolean isSelf = handle.pid() == selfPid;
-                String commandLine = info.commandLine().orElse("");
+                String commandLine = info.command().orElse("");
                 String[] args = info.arguments().orElse(new String[0]);
 
-                boolean isJava = isSelf || isJavaCommand(info.command().orElse(""), commandLine, args);
+                boolean isJava = isSelf || isJavaCommand(info.command().orElse(""), args);
                 if (!isJava) {
                     return null;
                 }
@@ -742,13 +909,12 @@ public final class TextVmDemo {
                 String fullName = mainCandidate.isBlank() ? "Unknown" : mainCandidate;
                 String user = info.user().orElse("unknown");
                 Instant startTime = info.startInstant().orElse(null);
-                String arguments = TextVmFormatting.joinArgs(args);
                 String effectiveCommandLine = commandLine.isBlank()
                         ? buildCommandLine(info.command().orElse(""), args)
                         : commandLine;
 
                 return new JavaProcess(handle.pid(), displayName, fullName, effectiveCommandLine,
-                        arguments, user, startTime, isSelf, handle);
+                        args, user, startTime, isSelf, handle);
             } catch (Exception e) {
                 return null;
             }
@@ -767,9 +933,9 @@ public final class TextVmDemo {
             return command + " " + TextVmFormatting.joinArgs(args);
         }
 
-        private static boolean isJavaCommand(String command, String commandLine, String[] args) {
+        private static boolean isJavaCommand(String command, String[] args) {
             StringBuilder buffer = new StringBuilder();
-            buffer.append(command).append(' ').append(commandLine);
+            buffer.append(command);
             if (args != null) {
                 for (String arg : args) {
                     buffer.append(' ').append(arg);
@@ -921,7 +1087,7 @@ public final class TextVmDemo {
                 long nonHeapUsed = nonHeap != null ? nonHeap.getUsed() : -1;
 
                 double processCpu = os != null ? normalizeCpuLoad(os.getProcessCpuLoad()) : -1;
-                double systemCpu = os != null ? normalizeCpuLoad(os.getSystemCpuLoad()) : -1;
+                double systemCpu = os != null ? normalizeCpuLoad(systemCpuLoad(os)) : -1;
 
                 int threadCount = threads != null ? threads.getThreadCount() : -1;
                 int daemonThreads = threads != null ? threads.getDaemonThreadCount() : -1;
@@ -1108,10 +1274,13 @@ public final class TextVmDemo {
             try {
                 return RemoteJmxAccess.connect(pid);
             } catch (AttachNotSupportedException e) {
+                logError("Attach not supported (pid " + pid + ")", e);
                 return null;
             } catch (IOException e) {
+                logError("Attach I/O failure (pid " + pid + ")", e);
                 return null;
             } catch (Exception e) {
+                logError("Attach failure (pid " + pid + ")", e);
                 return null;
             }
         }
@@ -1137,6 +1306,11 @@ public final class TextVmDemo {
             return -1;
         }
         return Math.max(0, Math.min(1, value));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static double systemCpuLoad(OperatingSystemMXBean os) {
+        return os.getSystemCpuLoad();
     }
 
     private interface JmxAccess extends AutoCloseable {
@@ -1251,6 +1425,16 @@ public final class TextVmDemo {
             try {
                 Properties props = vm.getAgentProperties();
                 String address = props.getProperty("com.sun.management.jmxremote.localConnectorAddress");
+                if (address == null) {
+                    // Modern JDKs provide a supported API for starting the local management agent.
+                    // This avoids relying on management-agent.jar, which may not exist in modular JDKs
+                    // or may not be a valid Java agent in some distributions.
+                    try {
+                        address = vm.startLocalManagementAgent();
+                    } catch (Exception ignored) {
+                        // Fall back to legacy agent jar loading below.
+                    }
+                }
                 if (address == null) {
                     String javaHome = vm.getSystemProperties().getProperty("java.home");
                     String agentPath = javaHome + File.separator + "lib"
