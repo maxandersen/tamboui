@@ -21,6 +21,7 @@ import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.event.ElementEventBus;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
@@ -67,6 +68,7 @@ public final class InlineToolkitRunner implements AutoCloseable {
     private final InlineTuiRunner tuiRunner;
     private final FocusManager focusManager;
     private final EventRouter eventRouter;
+    private final ElementEventBus elementEventBus;
     private final ElementRegistry elementRegistry;
     private final DefaultRenderContext renderContext;
     private final ScheduledExecutorService scheduler;
@@ -77,7 +79,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
         this.focusManager = new FocusManager();
         this.elementRegistry = new ElementRegistry();
         this.eventRouter = new EventRouter(focusManager, elementRegistry);
-        this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
+        this.elementEventBus = new ElementEventBus();
+        this.renderContext = new DefaultRenderContext(focusManager, eventRouter, elementEventBus);
         this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
             Thread t = new Thread(r, "inline-toolkit-scheduler");
             t.setDaemon(true);
@@ -145,6 +148,7 @@ public final class InlineToolkitRunner implements AutoCloseable {
                 focusManager.clearFocusables();
                 eventRouter.clear();
                 elementRegistry.clear();
+                elementEventBus.clearFrameHandlers();
 
                 // Get the current element tree
                 Element root = elementSupplier.get();
@@ -313,6 +317,15 @@ public final class InlineToolkitRunner implements AutoCloseable {
      */
     public ElementRegistry elementRegistry() {
         return elementRegistry;
+    }
+
+    /**
+     * Returns the element event bus for typed element events.
+     *
+     * @return the element event bus
+     */
+    public ElementEventBus elementEventBus() {
+        return elementEventBus;
     }
 
     /**

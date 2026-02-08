@@ -18,8 +18,13 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.event.ElementEventBus;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.event.EventRouter;
+import dev.tamboui.toolkit.event.TextAreaChangedEvent;
+import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
@@ -396,6 +401,35 @@ class TextAreaElementTest {
     }
 
     @Nested
+    @DisplayName("Element Events")
+    class ElementEvents {
+
+        @Test
+        @DisplayName("Emits TextAreaChangedEvent when text changes")
+        void emitsTextAreaChangedEvent() {
+            ElementEventBus bus = new ElementEventBus();
+            DefaultRenderContext context = createContext(bus);
+            AtomicReference<TextAreaChangedEvent> captured = new AtomicReference<>();
+
+            bus.subscribe(TextAreaChangedEvent.class, event -> {
+                captured.set(event);
+                return EventResult.HANDLED;
+            });
+
+            Rect area = new Rect(0, 0, 10, 3);
+            Frame frame = Frame.forTesting(Buffer.empty(area));
+            TextAreaElement element = textArea().id("area");
+
+            element.render(frame, area, context);
+            element.handleKeyEvent(new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, 'H'), true);
+
+            assertThat(captured.get()).isNotNull();
+            assertThat(captured.get().sourceId()).isEqualTo("area");
+            assertThat(captured.get().text()).isEqualTo("H");
+        }
+    }
+
+    @Nested
     @DisplayName("Rendering")
     class Rendering {
 
@@ -543,5 +577,12 @@ class TextAreaElementTest {
 
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.YELLOW);
         }
+    }
+
+    private DefaultRenderContext createContext(ElementEventBus bus) {
+        FocusManager focusManager = new FocusManager();
+        ElementRegistry registry = new ElementRegistry();
+        EventRouter router = new EventRouter(focusManager, registry);
+        return new DefaultRenderContext(focusManager, router, bus);
     }
 }

@@ -12,6 +12,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.event.ElementEventScope;
 
 /**
  * Context provided during rendering, giving access to focus state and CSS styling.
@@ -173,6 +174,18 @@ public interface RenderContext {
      */
     default Style childStyle(String childName, ChildPosition position, dev.tamboui.css.cascade.PseudoClassState state) {
         return currentStyle();  // fallback when no CSS engine
+    }
+
+    /**
+     * Returns the element event scope for this render cycle.
+     * <p>
+     * Handlers registered on this scope are cleared at the start of each render cycle.
+     * Use this to register element event handlers or to emit element events.
+     *
+     * @return the event scope for this render cycle
+     */
+    default ElementEventScope events() {
+        return ElementEventScope.noop();
     }
 
     /**

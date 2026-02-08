@@ -24,6 +24,8 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.elements.ErrorPlaceholder;
+import dev.tamboui.toolkit.event.ElementEventBus;
+import dev.tamboui.toolkit.event.ElementEventScope;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.bindings.BindingSets;
@@ -49,6 +51,8 @@ public final class DefaultRenderContext implements RenderContext {
     private final FocusManager focusManager;
     private final EventRouter eventRouter;
     private final ElementRegistry elementRegistry;
+    private final ElementEventBus eventBus;
+    private final ElementEventScope eventScope;
     private final Deque<Style> styleStack = new ArrayDeque<>();
     private final Deque<Styleable> elementStack = new ArrayDeque<>();
     private final Deque<CssStyleResolver> resolverStack = new ArrayDeque<>();
@@ -63,11 +67,16 @@ public final class DefaultRenderContext implements RenderContext {
      *
      * @param focusManager the focus manager
      * @param eventRouter  the event router (must have an ElementRegistry)
+     * @param eventBus     the element event bus
      */
-    public DefaultRenderContext(FocusManager focusManager, EventRouter eventRouter) {
+    public DefaultRenderContext(FocusManager focusManager,
+                                EventRouter eventRouter,
+                                ElementEventBus eventBus) {
         this.focusManager = focusManager;
         this.eventRouter = eventRouter;
         this.elementRegistry = eventRouter.elementRegistry();
+        this.eventBus = eventBus;
+        this.eventScope = eventBus.frameScope();
     }
 
     /**
@@ -78,7 +87,7 @@ public final class DefaultRenderContext implements RenderContext {
     public static DefaultRenderContext createEmpty() {
         FocusManager fm = new FocusManager();
         ElementRegistry registry = new ElementRegistry();
-        return new DefaultRenderContext(fm, new EventRouter(fm, registry));
+        return new DefaultRenderContext(fm, new EventRouter(fm, registry), new ElementEventBus());
     }
 
     /**
@@ -235,6 +244,11 @@ public final class DefaultRenderContext implements RenderContext {
             return Optional.empty();
         }
         return styleEngine.parseColor(colorValue);
+    }
+
+    @Override
+    public ElementEventScope events() {
+        return eventScope;
     }
 
     @Override
@@ -397,6 +411,17 @@ public final class DefaultRenderContext implements RenderContext {
      */
     public EventRouter eventRouter() {
         return eventRouter;
+    }
+
+    /**
+     * Returns the element event bus.
+     * <p>
+     * Internal use only.
+     *
+     * @return the element event bus
+     */
+    public ElementEventBus eventBus() {
+        return eventBus;
     }
 
     /**

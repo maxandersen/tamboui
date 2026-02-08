@@ -694,6 +694,28 @@ panel("Interactive")
 
 Return `EventResult.HANDLED` to stop propagation, `UNHANDLED` to let it bubble up.
 
+=== Element Events
+
+Elements can emit typed events through the element event bus:
+
+[source,java]
+----
+try (var runner = ToolkitRunner.create()) {
+    runner.elementEventBus().subscribe(TextInputSubmittedEvent.class, event -> {
+        if ("search".equals(event.sourceId())) {
+            performSearch(event.text());
+            return EventResult.HANDLED;
+        }
+        return EventResult.UNHANDLED;
+    });
+
+    runner.run(() -> textInput(inputState).id("search"));
+}
+----
+
+Built-in elements emit typed events such as `TextInputChangedEvent`,
+`TextInputSubmittedEvent`, and `TextAreaChangedEvent`.
+
 === Focus
 
 For Tab/Shift+Tab navigation, elements need both an ID and the focusable flag:

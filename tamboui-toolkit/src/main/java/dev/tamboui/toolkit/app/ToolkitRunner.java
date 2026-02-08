@@ -21,6 +21,7 @@ import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
+import dev.tamboui.toolkit.event.ElementEventBus;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
@@ -76,6 +77,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private final TuiRunner tuiRunner;
     private final FocusManager focusManager;
     private final EventRouter eventRouter;
+    private final ElementEventBus elementEventBus;
     private final ElementRegistry elementRegistry;
     private final StyledAreaRegistry styledAreaRegistry;
     private final DefaultRenderContext renderContext;
@@ -93,7 +95,8 @@ public final class ToolkitRunner implements AutoCloseable {
         this.elementRegistry = new ElementRegistry();
         this.styledAreaRegistry = StyledAreaRegistry.create();
         this.eventRouter = new EventRouter(focusManager, elementRegistry);
-        this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
+        this.elementEventBus = new ElementEventBus();
+        this.renderContext = new DefaultRenderContext(focusManager, eventRouter, elementEventBus);
         this.renderContext.setFaultTolerant(faultTolerant);
         this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
             Thread t = new Thread(r, "toolkit-scheduler");
@@ -154,6 +157,7 @@ public final class ToolkitRunner implements AutoCloseable {
                 eventRouter.clear();
                 elementRegistry.clear();
                 styledAreaRegistry.clear();
+                elementEventBus.clearFrameHandlers();
 
                 // Configure frame with styled area registry for auto-registration
                 frame.setStyledAreaRegistry(styledAreaRegistry);
@@ -359,6 +363,15 @@ public final class ToolkitRunner implements AutoCloseable {
      */
     public EventRouter eventRouter() {
         return eventRouter;
+    }
+
+    /**
+     * Returns the element event bus for typed element events.
+     *
+     * @return the element event bus
+     */
+    public ElementEventBus elementEventBus() {
+        return elementEventBus;
     }
 
     /**
