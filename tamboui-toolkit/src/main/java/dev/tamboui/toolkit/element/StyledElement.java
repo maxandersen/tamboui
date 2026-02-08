@@ -4,10 +4,13 @@
  */
 package dev.tamboui.toolkit.element;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -22,6 +25,9 @@ import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.event.DragHandler;
+import dev.tamboui.toolkit.event.ElementEvent;
+import dev.tamboui.toolkit.event.ElementEventHandler;
+import dev.tamboui.toolkit.event.ElementEventScope;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.toolkit.event.MouseEventHandler;
@@ -69,6 +75,10 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     protected boolean focusable;
     /** The last area this element was rendered in. */
     protected Rect lastRenderedArea;
+    /** The event handlers registered for this element. */
+    protected final List<ElementEventListener<?>> eventListeners = new ArrayList<>();
+    /** The current event scope for emitting events. */
+    protected ElementEventScope eventScope = ElementEventScope.noop();
 
     /**
      * Returns this element cast to the concrete type for method chaining.
@@ -371,6 +381,12 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
             return;
         }
         this.lastRenderedArea = area;
+        this.eventScope = context.events();
+
+        boolean needsAutoId = elementId == null && (isFocusable() || !eventListeners.isEmpty());
+        if (needsAutoId) {
+            elementId = IdGenerator.newId(this);
+        }
 
         // Resolve CSS for this element
         CssStyleResolver cssResolver = context.resolveStyle(this).orElse(null);
@@ -392,16 +408,23 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
 
         if (context instanceof DefaultRenderContext) {
             DefaultRenderContext ctx = (DefaultRenderContext) context;
-            // Auto-generate ID for focusable elements that don't have one
-            // Must happen BEFORE renderContent so focus checks work
-            if (isFocusable() && elementId == null) {
-                elementId = IdGenerator.newId(this);
-            }
             ctx.withElement(this, effectiveStyle, cssResolver, () -> renderContent(frame, area, context));
             ctx.registerElement(this, area);
         } else {
             // Fallback for non-default contexts (e.g., testing)
             renderContent(frame, area, context);
+        }
+
+        registerEventHandlers();
+    }
+
+    private void registerEventHandlers() {
+        if (eventListeners.isEmpty() || elementId == null) {
+            return;
+        }
+        ElementEventScope scope = eventScope != null ? eventScope : ElementEventScope.noop();
+        for (ElementEventListener<?> listener : eventListeners) {
+            listener.register(scope, elementId);
         }
     }
 
@@ -837,6 +860,45 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     }
 
     /**
+     * Registers a handler for element events targeted at this element.
+     * <p>
+     * Handlers are registered each render cycle and cleared on the next frame.
+     * If this element does not yet have an ID, one will be auto-generated.
+     *
+     * @param type the event type
+     * @param handler the handler
+     * @param <E> the event type
+     * @return this element for chaining
+     */
+    public <E extends ElementEvent> T onEvent(Class<E> type, ElementEventHandler<E> handler) {
+        Objects.requireNonNull(type, "type");
+        Objects.requireNonNull(handler, "handler");
+        eventListeners.add(new ElementEventListener<>(type, handler));
+        return self();
+    }
+
+    /**
+     * Emits an element event.
+     *
+     * @param event the event to emit
+     * @return HANDLED if any handler handled the event, UNHANDLED otherwise
+     */
+    protected final EventResult emit(ElementEvent event) {
+        return eventScope.emit(event);
+    }
+
+    /**
+     * Emits an element event to a specific target.
+     *
+     * @param targetId the target element ID
+     * @param event the event to emit
+     * @return HANDLED if any handler handled the event, UNHANDLED otherwise
+     */
+    protected final EventResult emitTo(String targetId, ElementEvent event) {
+        return eventScope.emitTo(targetId, event);
+    }
+
+    /**
      * Makes this element draggable with the given handler.
      *
      * @param handler the drag handler
@@ -916,6 +978,20 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
             return mouseHandler.handle(event);
         }
         return EventResult.UNHANDLED;
+    }
+
+    private static final class ElementEventListener<E extends ElementEvent> {
+        private final Class<E> type;
+        private final ElementEventHandler<E> handler;
+
+        private ElementEventListener(Class<E> type, ElementEventHandler<E> handler) {
+            this.type = type;
+            this.handler = handler;
+        }
+
+        private void register(ElementEventScope scope, String targetId) {
+            scope.on(targetId, type, handler);
+        }
     }
 
     /**

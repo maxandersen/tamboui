@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -14,6 +15,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.toolkit.event.TextAreaChangedEvent;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
@@ -309,9 +311,13 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         if (!focused) {
             return EventResult.UNHANDLED;
         }
+        String before = state.text();
         boolean handled = handleTextAreaKey(state, event);
-        if (handled && changeListener != null) {
-            changeListener.onTextChange(state.text());
+        if (handled && !Objects.equals(before, state.text())) {
+            if (changeListener != null) {
+                changeListener.onTextChange(state.text());
+            }
+            emit(new TextAreaChangedEvent(elementId, state.text()));
         }
         return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
     }

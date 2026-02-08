@@ -17,6 +17,7 @@ import dev.tamboui.style.StyledAreaInfo;
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.style.Tags;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.event.ElementEventBus;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 
@@ -35,7 +36,7 @@ class FaultTolerantRenderingTest {
     void setUp() {
         FocusManager focusManager = new FocusManager();
         ElementRegistry registry = new ElementRegistry();
-        context = new DefaultRenderContext(focusManager, new EventRouter(focusManager, registry));
+        context = new DefaultRenderContext(focusManager, new EventRouter(focusManager, registry), new ElementEventBus());
         Buffer buffer = Buffer.empty(new Rect(0, 0, 40, 10));
         frame = Frame.forTesting(buffer);
         area = new Rect(0, 0, 40, 10);
@@ -152,7 +153,7 @@ class FaultTolerantRenderingTest {
         void faultTolerantDisabledByDefault() {
             FocusManager fm = new FocusManager();
             ElementRegistry registry = new ElementRegistry();
-            DefaultRenderContext newContext = new DefaultRenderContext(fm, new EventRouter(fm, registry));
+            DefaultRenderContext newContext = new DefaultRenderContext(fm, new EventRouter(fm, registry), new ElementEventBus());
 
             assertThat(newContext.isFaultTolerant()).isFalse();
         }

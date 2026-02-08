@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -14,6 +15,8 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.toolkit.event.TextInputChangedEvent;
+import dev.tamboui.toolkit.event.TextInputSubmittedEvent;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
@@ -315,11 +318,19 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
             return EventResult.UNHANDLED;
         }
         // Handle Enter key - call onSubmit callback if set
-        if (event.isConfirm() && onSubmit != null) {
-            onSubmit.run();
-            return EventResult.HANDLED;
+        if (event.isConfirm()) {
+            if (onSubmit != null) {
+                onSubmit.run();
+            }
+            EventResult eventResult = emit(new TextInputSubmittedEvent(elementId, state.text()));
+            return onSubmit != null ? EventResult.HANDLED : eventResult;
         }
-        return handleTextInputKey(state, event) ? EventResult.HANDLED : EventResult.UNHANDLED;
+        String before = state.text();
+        boolean handled = handleTextInputKey(state, event);
+        if (handled && !Objects.equals(before, state.text())) {
+            emit(new TextInputChangedEvent(elementId, state.text()));
+        }
+        return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
     }
 
     @Override
