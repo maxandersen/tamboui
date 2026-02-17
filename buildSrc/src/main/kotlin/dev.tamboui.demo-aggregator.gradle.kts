@@ -95,7 +95,8 @@ val generateDemoManifest = tasks.register<GenerateDemoManifestTask>("generateDem
                     info.description,
                     info.module,
                     info.mainClass,
-                    info.tags
+                    info.tags,
+                    info.projectPath
                 )
             }
     })

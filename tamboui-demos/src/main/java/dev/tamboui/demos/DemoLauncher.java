@@ -72,6 +72,7 @@ public class DemoLauncher {
     static final class DemoEntry {
         private final String id;
         private final String displayName;
+        private final String projectPath;
         private final String description;
         private final String module;
         private final String mainClass;
@@ -86,9 +87,10 @@ public class DemoLauncher {
          * @param mainClass   the fully qualified main class to launch for this demo
          * @param tags        the tags associated with this demo
          */
-        DemoEntry(String id, String displayName, String description, String module, String mainClass, Set<String> tags) {
+        DemoEntry(String id, String displayName, String projectPath, String description, String module, String mainClass, Set<String> tags) {
             this.id = id;
             this.displayName = displayName;
+            this.projectPath = projectPath;
             this.description = description;
             this.module = module;
             this.mainClass = mainClass;
@@ -119,6 +121,10 @@ public class DemoLauncher {
             return tags;
         }
 
+        public String projectPath() {
+            return projectPath;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == this) {
@@ -129,6 +135,7 @@ public class DemoLauncher {
             }
             DemoEntry that = (DemoEntry) obj;
             return Objects.equals(this.id, that.id) &&
+                    Objects.equals(this.projectPath, that.projectPath) &&
                     Objects.equals(this.displayName, that.displayName) &&
                     Objects.equals(this.description, that.description) &&
                     Objects.equals(this.module, that.module) &&
@@ -137,17 +144,23 @@ public class DemoLauncher {
 
         @Override
         public int hashCode() {
-            return Objects.hash(id, displayName, description, module, mainClass);
+            return Objects.hash(id, displayName, projectPath, description, module, mainClass);
         }
 
         @Override
         public String toString() {
             return "DemoEntry[" +
                     "id=" + id + ", " +
+                    "projectPath=" + projectPath + ", " +
                     "displayName=" + displayName + ", " +
                     "description=" + description + ", " +
                     "module=" + module + ", " +
-                    "mainClass=" + mainClass + ']';
+                    "mainClass=" + mainClass + ", " +
+                    "tags=" + tags + ']';
+        }
+
+        public String url() {
+            return "https://github.com/tamboui/tamboui/blob/main" + projectPath.replace(":", "/") + "/src/main/java";
         }
 
     }
@@ -226,13 +239,14 @@ public class DemoLauncher {
                 if (obj.contains("\"mainClass\"")) {
                     String id = extractField(obj, "id");
                     String displayName = extractField(obj, "displayName");
+                    String projectPath = extractField(obj, "projectPath");
                     String description = extractField(obj, "description");
                     String module = extractField(obj, "module");
                     String mainClass = extractField(obj, "mainClass");
                     Set<String> tags = extractTags(obj);
 
                     if (id != null && mainClass != null) {
-                        demos.put(id, new DemoEntry(id, displayName, description, module, mainClass, tags));
+                        demos.put(id, new DemoEntry(id, displayName, projectPath, description, module, mainClass, tags));
                     }
                 }
 
@@ -693,7 +707,7 @@ public class DemoLauncher {
             String description = demo.description() != null && !demo.description().isEmpty()
                     ? " - " + demo.description()
                     : "";
-            String itemText = String.format("[dim]%s[/]: [bold]%s[/][dim]%s[/]", demo.module(), demo.displayName(), description);
+            String itemText = String.format("[dim]%s[/]: [bold]%s[/][dim]%s[/] [link=%s]source[/link]", demo.module(), demo.displayName(), description, demo.url());
            /*  if (!demo.tags().isEmpty()) {
                 itemText += "\n";
                 itemText += " [blue]" + String.join(", ", demo.tags()) + "[/blue]";

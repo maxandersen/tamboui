@@ -35,14 +35,16 @@ public abstract class GenerateDemoManifestTask extends DefaultTask {
         private final String module;
         private final String mainClass;
         private final Set<String> tags;
+        private final String projectPath;
 
-        public DemoEntry(String id, String displayName, String description, String module, String mainClass, Set<String> tags) {
+        public DemoEntry(String id, String displayName, String description, String module, String mainClass, Set<String> tags, String projectPath) {
             this.id = id;
             this.displayName = displayName;
             this.description = description;
             this.module = module;
             this.mainClass = mainClass;
             this.tags = tags;
+            this.projectPath = projectPath;
         }
 
         public String getId() {
@@ -67,6 +69,10 @@ public abstract class GenerateDemoManifestTask extends DefaultTask {
 
         public Set<String> getTags() {
             return tags;
+        }
+
+        public String getProjectPath() {
+            return projectPath;
         }
     }
 
@@ -103,6 +109,7 @@ public abstract class GenerateDemoManifestTask extends DefaultTask {
             first = false;
             sb.append("    {\n");
             sb.append("      \"id\": ").append(jsonString(demo.getId())).append(",\n");
+            sb.append("      \"projectPath\": ").append(jsonString(demo.getProjectPath())).append(",\n");
             sb.append("      \"displayName\": ").append(jsonString(demo.getDisplayName())).append(",\n");
             sb.append("      \"description\": ").append(jsonString(demo.getDescription())).append(",\n");
             sb.append("      \"module\": ").append(jsonString(demo.getModule())).append(",\n");
