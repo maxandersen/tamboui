@@ -404,7 +404,23 @@ final class ThreadDumpReviewApp extends ToolkitApp {
 
     private StyledElement<?> renderStyledLine(StyledLine line) {
         String value = abbreviateByWidth(line.text(), DETAIL_LINE_WIDTH);
-        return switch (line.tone()) {
+        MatchSpan span = matchSpan(value, currentSearchCriteria);
+        if (span == null) {
+            return styledByTone(value, line.tone());
+        }
+        List<Element> segments = new ArrayList<>(3);
+        if (span.start() > 0) {
+            segments.add(styledByTone(value.substring(0, span.start()), line.tone()));
+        }
+        segments.add(text(value.substring(span.start(), span.end())).yellow().underlined().bold());
+        if (span.end() < value.length()) {
+            segments.add(styledByTone(value.substring(span.end()), line.tone()));
+        }
+        return row(segments.toArray(Element[]::new));
+    }
+
+    private StyledElement<?> styledByTone(String value, LineTone tone) {
+        return switch (tone) {
             case TITLE -> text(value).bold().cyan();
             case SECTION -> text(value).bold().white();
             case MUTED -> text(value).dim();
