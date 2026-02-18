@@ -35,5 +35,16 @@ Sleep 2
 Type "1"
 Sleep 2
 
+# Search by text
+Type "/worker"
+Enter
+Sleep 2
+
+# Toggle regex mode and search with pattern
+Ctrl+r
+Type "/http-.*"
+Enter
+Sleep 2
+
 # Quit
 Type "q"

@@ -16,6 +16,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.column;
@@ -58,6 +59,9 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     private DetailTab detailTab = DetailTab.THREAD;
     private ThreadDumpAnalyzer.ThreadFilter filter = ThreadDumpAnalyzer.ThreadFilter.ALL;
     private ThreadDumpAnalyzer.ThreadSort sort = ThreadDumpAnalyzer.ThreadSort.CPU_DESC;
+    private String searchQuery = "";
+    private boolean regexSearch;
+    private boolean searchInputMode;
 
     ThreadDumpReviewApp(List<String> inputArgs, ThreadDumpSnapshotLoader.LoadResult initialData) {
         this.inputArgs = List.copyOf(inputArgs);
@@ -70,12 +74,14 @@ final class ThreadDumpReviewApp extends ToolkitApp {
 
         ThreadDumpSnapshot currentSnapshot = currentSnapshot();
         ThreadDumpSnapshot baselineSnapshot = effectiveBaselineSnapshot(currentSnapshot);
-        List<ThreadDumpAnalyzer.ThreadView> threadViews = ThreadDumpAnalyzer.buildThreadViews(
+        List<ThreadDumpAnalyzer.ThreadView> unfilteredThreadViews = ThreadDumpAnalyzer.buildThreadViews(
             currentSnapshot,
             baselineSnapshot,
             filter,
             sort
         );
+        ThreadDumpAnalyzer.SearchCriteria searchCriteria = searchCriteria();
+        List<ThreadDumpAnalyzer.ThreadView> threadViews = ThreadDumpAnalyzer.applySearch(unfilteredThreadViews, searchCriteria);
 
         selectedThreadIndex = clampIndex(selectedThreadIndex, threadViews.size());
         ThreadDumpAnalyzer.ThreadView selectedThread = threadViews.isEmpty()
@@ -91,9 +97,18 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         detailCursor = clampIndex(detailCursor, detailLines.size());
         comparisonCursor = clampIndex(comparisonCursor, comparisonLines.size());
 
-        Element header = renderHeader(currentSnapshot, baselineSnapshot);
-        Element body = renderBody(currentSnapshot, baselineSnapshot, threadViews, selectedThread, diff, detailLines, comparisonLines);
-        Element footer = renderFooter();
+        Element header = renderHeader(currentSnapshot, baselineSnapshot, searchCriteria);
+        Element body = renderBody(
+            currentSnapshot,
+            baselineSnapshot,
+            unfilteredThreadViews.size(),
+            threadViews,
+            selectedThread,
+            diff,
+            detailLines,
+            comparisonLines
+        );
+        Element footer = renderFooter(searchCriteria);
 
         return dock()
             .top(header)
@@ -104,9 +119,20 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             .id("thread-dump-review-root");
     }
 
-    private Element renderHeader(ThreadDumpSnapshot currentSnapshot, ThreadDumpSnapshot baselineSnapshot) {
+    private Element renderHeader(
+        ThreadDumpSnapshot currentSnapshot,
+        ThreadDumpSnapshot baselineSnapshot,
+        ThreadDumpAnalyzer.SearchCriteria searchCriteria
+    ) {
         String currentLabel = currentSnapshot == null ? "-" : currentSnapshot.displayName();
         String baselineLabel = baselineSnapshot == null ? "-" : baselineSnapshot.displayName();
+        String modeLabel = regexSearch ? "regex" : "text";
+        String searchLabel = searchCriteria.active()
+            ? abbreviateByWidth(searchCriteria.query(), 16)
+            : "none";
+        if (searchInputMode) {
+            searchLabel = searchLabel + "_";
+        }
 
         return panel(row(
             text(" ThreadDump Review ").bold().cyan(),
@@ -118,6 +144,12 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             text(filter.label()).white(),
             text("  sort=").dim(),
             text(sort.label()).white(),
+            text("  search[").dim(),
+            text(modeLabel).fg(regexSearch ? Color.MAGENTA : Color.CYAN),
+            text("]=").dim(),
+            searchCriteria.valid()
+                ? text(searchLabel).white()
+                : text("invalid").red(),
             spacer(),
             text("current ").dim(),
             text(abbreviateByWidth(currentLabel, 20)).cyan(),
@@ -129,6 +161,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     private Element renderBody(
         ThreadDumpSnapshot currentSnapshot,
         ThreadDumpSnapshot baselineSnapshot,
+        int unfilteredThreadCount,
         List<ThreadDumpAnalyzer.ThreadView> threadViews,
         ThreadDumpAnalyzer.ThreadView selectedThread,
         ThreadDumpAnalyzer.SnapshotDiff diff,
@@ -137,7 +170,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     ) {
         return row(
             renderSnapshotsPane(),
-            renderThreadsPane(currentSnapshot, baselineSnapshot, threadViews),
+            renderThreadsPane(currentSnapshot, baselineSnapshot, unfilteredThreadCount, threadViews),
             renderDetailPane(currentSnapshot, baselineSnapshot, selectedThread, diff, detailLines, comparisonLines)
         );
     }
@@ -193,15 +226,19 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     private Element renderThreadsPane(
         ThreadDumpSnapshot currentSnapshot,
         ThreadDumpSnapshot baselineSnapshot,
+        int unfilteredThreadCount,
         List<ThreadDumpAnalyzer.ThreadView> threadViews
     ) {
         String title;
         if (currentSnapshot == null) {
             title = "Threads";
         } else {
-            title = "Threads " + threadViews.size() + "/" + currentSnapshot.stats().totalThreads();
+            title = "Threads " + threadViews.size() + "/" + unfilteredThreadCount;
             if (baselineSnapshot != null) {
                 title += " (vs baseline)";
+            }
+            if (!searchQuery.isBlank()) {
+                title += " [search]";
             }
         }
 
@@ -349,17 +386,23 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         };
     }
 
-    private Element renderFooter() {
+    private Element renderFooter(ThreadDumpAnalyzer.SearchCriteria searchCriteria) {
         Element timeline = renderTimelineElement();
+        StyledElement<?> searchHint = searchCriteria.valid()
+            ? text(searchPrompt()).dim()
+            : text(" invalid regex: " + abbreviateByWidth(searchCriteria.error(), 28) + " ").red();
         return panel(row(
             text(" Tab/S-Tab pane ").dim(),
             text(" Up/Down navigate ").dim(),
             text(" b baseline ").dim(),
             text(" f filter ").dim(),
             text(" s sort ").dim(),
+            text(" / search ").dim(),
+            text(" Ctrl+R regex ").dim(),
             text(" 1/2 tabs ").dim(),
             text(" r reload ").dim(),
             text(" q quit ").dim(),
+            searchHint,
             spacer(),
             timeline
         )).rounded().borderColor(Color.DARK_GRAY).length(3);
@@ -526,8 +569,29 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     }
 
     private EventResult handleKeyEvent(KeyEvent event) {
-        if (event.isQuit() || event.isCtrlC() || event.isCharIgnoreCase('q')) {
+        if (event.isCtrlC()) {
             quit();
+            return EventResult.HANDLED;
+        }
+        if (searchInputMode) {
+            return handleSearchInput(event);
+        }
+        if (event.isQuit() || event.isCharIgnoreCase('q')) {
+            quit();
+            return EventResult.HANDLED;
+        }
+        if (event.isChar('/')) {
+            searchInputMode = true;
+            return EventResult.HANDLED;
+        }
+        if (event.hasCtrl() && event.isCharIgnoreCase('r')) {
+            regexSearch = !regexSearch;
+            selectedThreadIndex = 0;
+            return EventResult.HANDLED;
+        }
+        if (event.isCharIgnoreCase('x')) {
+            searchQuery = "";
+            selectedThreadIndex = 0;
             return EventResult.HANDLED;
         }
 
@@ -617,6 +681,44 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         return EventResult.UNHANDLED;
     }
 
+    private EventResult handleSearchInput(KeyEvent event) {
+        if (event.isCancel()) {
+            searchInputMode = false;
+            return EventResult.HANDLED;
+        }
+        if (event.isConfirm()) {
+            searchInputMode = false;
+            selectedThreadIndex = 0;
+            return EventResult.HANDLED;
+        }
+        if (event.hasCtrl() && event.isCharIgnoreCase('r')) {
+            regexSearch = !regexSearch;
+            selectedThreadIndex = 0;
+            return EventResult.HANDLED;
+        }
+        if (event.hasCtrl() && event.isCharIgnoreCase('u')) {
+            searchQuery = "";
+            selectedThreadIndex = 0;
+            return EventResult.HANDLED;
+        }
+        if (event.isDeleteBackward()) {
+            if (!searchQuery.isEmpty()) {
+                searchQuery = searchQuery.substring(0, searchQuery.length() - 1);
+                selectedThreadIndex = 0;
+            }
+            return EventResult.HANDLED;
+        }
+        if (event.code() == KeyCode.CHAR && !event.hasCtrl() && !event.hasAlt()) {
+            char c = event.character();
+            if (c >= 32 && c != 127) {
+                searchQuery = searchQuery + c;
+                selectedThreadIndex = 0;
+            }
+            return EventResult.HANDLED;
+        }
+        return EventResult.HANDLED;
+    }
+
     private void moveSelection(int delta) {
         if (delta == 0) {
             return;
@@ -682,7 +784,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     private List<ThreadDumpAnalyzer.ThreadView> currentThreadViews() {
         ThreadDumpSnapshot current = currentSnapshot();
         ThreadDumpSnapshot baseline = effectiveBaselineSnapshot(current);
-        return ThreadDumpAnalyzer.buildThreadViews(current, baseline, filter, sort);
+        List<ThreadDumpAnalyzer.ThreadView> base = ThreadDumpAnalyzer.buildThreadViews(current, baseline, filter, sort);
+        return ThreadDumpAnalyzer.applySearch(base, searchCriteria());
     }
 
     private List<StyledLine> activeDetailLines() {
@@ -773,6 +876,21 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             detailCursor = 0;
             comparisonCursor = 0;
         }
+    }
+
+    private ThreadDumpAnalyzer.SearchCriteria searchCriteria() {
+        return ThreadDumpAnalyzer.searchCriteria(searchQuery, regexSearch);
+    }
+
+    private String searchPrompt() {
+        if (searchInputMode) {
+            return " search: " + abbreviateByWidth(searchQuery + "_", 26) + " ";
+        }
+        if (searchQuery.isBlank()) {
+            return " search: <none> ";
+        }
+        String mode = regexSearch ? "re" : "txt";
+        return " search(" + mode + "): " + abbreviateByWidth(searchQuery, 20) + " ";
     }
 
     private static int clampIndex(int index, int size) {

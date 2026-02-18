@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import me.bechberger.jthreaddump.model.StackFrame;
 import me.bechberger.jthreaddump.model.ThreadInfo;
@@ -119,6 +121,16 @@ final class ThreadDumpAnalyzer {
         }
     }
 
+    record SearchCriteria(String query, boolean regex, Pattern pattern, String error) {
+        boolean active() {
+            return query != null && !query.isBlank();
+        }
+
+        boolean valid() {
+            return error == null;
+        }
+    }
+
     static List<ThreadView> buildThreadViews(
         ThreadDumpSnapshot currentSnapshot,
         ThreadDumpSnapshot baselineSnapshot,
@@ -192,6 +204,38 @@ final class ThreadDumpAnalyzer {
         );
     }
 
+    static SearchCriteria searchCriteria(String query, boolean regex) {
+        String effectiveQuery = query == null ? "" : query;
+        if (effectiveQuery.isBlank()) {
+            return new SearchCriteria("", regex, null, null);
+        }
+        if (!regex) {
+            return new SearchCriteria(effectiveQuery, false, null, null);
+        }
+        try {
+            Pattern compiled = Pattern.compile(effectiveQuery, Pattern.CASE_INSENSITIVE);
+            return new SearchCriteria(effectiveQuery, true, compiled, null);
+        } catch (PatternSyntaxException e) {
+            return new SearchCriteria(effectiveQuery, true, null, e.getDescription());
+        }
+    }
+
+    static List<ThreadView> applySearch(List<ThreadView> views, SearchCriteria criteria) {
+        if (views.isEmpty()) {
+            return views;
+        }
+        if (criteria == null || !criteria.active() || !criteria.valid()) {
+            return views;
+        }
+        List<ThreadView> filtered = new ArrayList<>();
+        for (ThreadView view : views) {
+            if (matchesSearch(view, criteria)) {
+                filtered.add(view);
+            }
+        }
+        return filtered;
+    }
+
     private static ThreadDiffStatus determineDiffStatus(ThreadInfo currentThread, ThreadInfo baselineThread) {
         if (baselineThread == null) {
             return ThreadDiffStatus.NEW;
@@ -199,6 +243,53 @@ final class ThreadDumpAnalyzer {
         boolean sameState = Objects.equals(currentThread.state(), baselineThread.state());
         boolean sameFrame = Objects.equals(topFrameKey(currentThread), topFrameKey(baselineThread));
         return sameState && sameFrame ? ThreadDiffStatus.SAME : ThreadDiffStatus.CHANGED;
+    }
+
+    private static boolean matchesSearch(ThreadView view, SearchCriteria criteria) {
+        String haystack = searchText(view);
+        if (criteria.regex()) {
+            return criteria.pattern().matcher(haystack).find();
+        }
+        return haystack.toLowerCase(Locale.ROOT).contains(criteria.query().toLowerCase(Locale.ROOT));
+    }
+
+    private static String searchText(ThreadView view) {
+        ThreadInfo thread = view.thread();
+        StringBuilder text = new StringBuilder(192);
+        text.append(safeName(thread.name()));
+        text.append('\n').append(stateLabel(thread.state()));
+        text.append('\n').append(view.topFrameDisplay());
+        text.append('\n').append(view.topFrameKey());
+        if (thread.additionalInfo() != null && !thread.additionalInfo().isBlank()) {
+            text.append('\n').append(thread.additionalInfo());
+        }
+        if (thread.stackTrace() != null) {
+            for (StackFrame frame : thread.stackTrace()) {
+                text.append('\n').append(formatSearchFrame(frame));
+            }
+        }
+        if (thread.locks() != null) {
+            thread.locks().forEach(lock -> text.append('\n').append(lock.toString()));
+        }
+        return text.toString();
+    }
+
+    private static String formatSearchFrame(StackFrame frame) {
+        String className = frame.className() == null ? "?" : frame.className();
+        String methodName = frame.methodName() == null ? "?" : frame.methodName();
+        StringBuilder value = new StringBuilder();
+        value.append(className).append('.').append(methodName);
+        if (Boolean.TRUE.equals(frame.nativeMethod())) {
+            value.append(" Native Method");
+            return value.toString();
+        }
+        if (frame.fileName() != null) {
+            value.append(' ').append(frame.fileName());
+        }
+        if (frame.lineNumber() != null) {
+            value.append(':').append(frame.lineNumber());
+        }
+        return value.toString();
     }
 
     private static boolean matchesFilter(ThreadView view, ThreadFilter filter) {

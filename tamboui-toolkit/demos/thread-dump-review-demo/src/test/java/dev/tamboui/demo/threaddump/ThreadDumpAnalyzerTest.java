@@ -76,6 +76,61 @@ class ThreadDumpAnalyzerTest {
             .containsExactly("worker-2", "main", "http-acceptor");
     }
 
+    @Test
+    void shouldFilterThreadsByPlainTextSearch() throws IOException {
+        ThreadDumpSnapshot baseline = snapshot("baseline", 1, ThreadDumpTestData.SAMPLE_DUMP_1);
+        ThreadDumpSnapshot current = snapshot("current", 1, ThreadDumpTestData.SAMPLE_DUMP_2);
+        List<ThreadDumpAnalyzer.ThreadView> views = ThreadDumpAnalyzer.buildThreadViews(
+            current,
+            baseline,
+            ThreadDumpAnalyzer.ThreadFilter.ALL,
+            ThreadDumpAnalyzer.ThreadSort.NAME
+        );
+
+        ThreadDumpAnalyzer.SearchCriteria criteria = ThreadDumpAnalyzer.searchCriteria("accept", false);
+        List<ThreadDumpAnalyzer.ThreadView> filtered = ThreadDumpAnalyzer.applySearch(views, criteria);
+
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.get(0).thread().name()).isEqualTo("http-acceptor");
+    }
+
+    @Test
+    void shouldFilterThreadsByRegexSearch() throws IOException {
+        ThreadDumpSnapshot baseline = snapshot("baseline", 1, ThreadDumpTestData.SAMPLE_DUMP_1);
+        ThreadDumpSnapshot current = snapshot("current", 1, ThreadDumpTestData.SAMPLE_DUMP_2);
+        List<ThreadDumpAnalyzer.ThreadView> views = ThreadDumpAnalyzer.buildThreadViews(
+            current,
+            baseline,
+            ThreadDumpAnalyzer.ThreadFilter.ALL,
+            ThreadDumpAnalyzer.ThreadSort.NAME
+        );
+
+        ThreadDumpAnalyzer.SearchCriteria criteria = ThreadDumpAnalyzer.searchCriteria("worker-\\d", true);
+        List<ThreadDumpAnalyzer.ThreadView> filtered = ThreadDumpAnalyzer.applySearch(views, criteria);
+
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.get(0).thread().name()).isEqualTo("worker-2");
+    }
+
+    @Test
+    void shouldIgnoreInvalidRegexAndReturnUnfilteredView() throws IOException {
+        ThreadDumpSnapshot baseline = snapshot("baseline", 1, ThreadDumpTestData.SAMPLE_DUMP_1);
+        ThreadDumpSnapshot current = snapshot("current", 1, ThreadDumpTestData.SAMPLE_DUMP_2);
+        List<ThreadDumpAnalyzer.ThreadView> views = ThreadDumpAnalyzer.buildThreadViews(
+            current,
+            baseline,
+            ThreadDumpAnalyzer.ThreadFilter.ALL,
+            ThreadDumpAnalyzer.ThreadSort.NAME
+        );
+
+        ThreadDumpAnalyzer.SearchCriteria criteria = ThreadDumpAnalyzer.searchCriteria("[", true);
+        List<ThreadDumpAnalyzer.ThreadView> filtered = ThreadDumpAnalyzer.applySearch(views, criteria);
+
+        assertThat(criteria.valid()).isFalse();
+        assertThat(criteria.error()).isNotBlank();
+        assertThat(filtered).hasSize(views.size());
+    }
+
     private static ThreadDumpSnapshot snapshot(String source, int sequence, String dumpText) throws IOException {
         ThreadDump parsed = ThreadDumpParser.parse(dumpText);
         return ThreadDumpSnapshot.of(source, sequence, parsed);
