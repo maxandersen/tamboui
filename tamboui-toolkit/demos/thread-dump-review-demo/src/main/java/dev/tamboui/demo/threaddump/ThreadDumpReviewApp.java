@@ -7,6 +7,7 @@ package dev.tamboui.demo.threaddump;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import dev.tamboui.layout.Rect;
@@ -66,6 +67,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     private String searchQuery = "";
     private boolean regexSearch;
     private boolean searchInputMode;
+    private ThreadDumpAnalyzer.SearchCriteria currentSearchCriteria = ThreadDumpAnalyzer.searchCriteria("", false);
 
     ThreadDumpReviewApp(List<String> inputArgs, ThreadDumpSnapshotLoader.LoadResult initialData) {
         this.inputArgs = List.copyOf(inputArgs);
@@ -92,6 +94,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             sort
         );
         ThreadDumpAnalyzer.SearchCriteria searchCriteria = searchCriteria();
+        currentSearchCriteria = searchCriteria;
         List<ThreadDumpAnalyzer.ThreadView> threadViews = ThreadDumpAnalyzer.applySearch(unfilteredThreadViews, searchCriteria);
 
         selectedThreadIndex = clampIndex(selectedThreadIndex, threadViews.size());
@@ -287,19 +290,30 @@ final class ThreadDumpReviewApp extends ToolkitApp {
 
         String name = abbreviateByWidth(safeThreadName(view.thread()), THREAD_NAME_WIDTH);
         String state = ThreadDumpAnalyzer.stateLabel(view.thread().state());
+        String paddedState = String.format("%-13s", state);
         String cpuInfo = view.thread().cpuTimeSec() == null
             ? "cpu=n/a"
             : String.format("cpu=%.4fs", view.thread().cpuTimeSec());
         String depthInfo = "depth=" + view.stackDepth();
         String secondLine = cpuInfo + "  " + depthInfo + "  " + abbreviateByWidth(view.topFrameDisplay(), FRAME_LABEL_WIDTH);
 
+        MatchScope matchScope = searchMatchScope(view, currentSearchCriteria);
+        StyledElement<?> stateElement = text(paddedState).fg(stateColor(view.thread().state())).length(14);
+        if (matchScope == MatchScope.STATE) {
+            stateElement = text(paddedState).fg(stateColor(view.thread().state())).underlined().bold().length(14);
+        }
+        StyledElement<?> matchBadge = matchScope == MatchScope.NONE
+            ? text("")
+            : text(" [" + matchScope.label + "]").fg(Color.CYAN).dim();
+
         return column(
             row(
                 text(statusText).fg(statusColor).bold().length(6),
-                text(String.format("%-13s", state)).fg(stateColor(view.thread().state())).length(14),
-                text(name)
+                stateElement,
+                highlightedText(name, currentSearchCriteria, false),
+                matchBadge
             ),
-            text(secondLine).dim()
+            highlightedText(secondLine, currentSearchCriteria, true)
         ).length(2);
     }
 
@@ -694,6 +708,11 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             detailTab = DetailTab.COMPARISON;
             return EventResult.HANDLED;
         }
+        if (event.isConfirm() && focusPane == FocusPane.THREADS) {
+            detailTab = DetailTab.THREAD;
+            focusPane = FocusPane.DETAILS;
+            return EventResult.HANDLED;
+        }
         return EventResult.UNHANDLED;
     }
 
@@ -988,6 +1007,83 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         return " search(" + mode + "): " + abbreviateByWidth(searchQuery, 20) + " ";
     }
 
+    private StyledElement<?> highlightedText(
+        String value,
+        ThreadDumpAnalyzer.SearchCriteria criteria,
+        boolean dimBase
+    ) {
+        MatchSpan span = matchSpan(value, criteria);
+        if (span == null) {
+            return dimBase ? text(value).dim() : text(value);
+        }
+        List<Element> segments = new ArrayList<>(3);
+        if (span.start() > 0) {
+            segments.add(dimBase ? text(value.substring(0, span.start())).dim() : text(value.substring(0, span.start())));
+        }
+        segments.add(text(value.substring(span.start(), span.end())).yellow().underlined().bold());
+        if (span.end() < value.length()) {
+            segments.add(dimBase ? text(value.substring(span.end())).dim() : text(value.substring(span.end())));
+        }
+        return row(segments.toArray(Element[]::new));
+    }
+
+    private MatchSpan matchSpan(String value, ThreadDumpAnalyzer.SearchCriteria criteria) {
+        if (value == null || value.isEmpty() || criteria == null || !criteria.active() || !criteria.valid()) {
+            return null;
+        }
+        if (criteria.regex()) {
+            var matcher = criteria.pattern().matcher(value);
+            if (matcher.find() && matcher.end() > matcher.start()) {
+                return new MatchSpan(matcher.start(), matcher.end());
+            }
+            return null;
+        }
+        String search = criteria.query().toLowerCase(Locale.ROOT);
+        int index = value.toLowerCase(Locale.ROOT).indexOf(search);
+        if (index < 0) {
+            return null;
+        }
+        return new MatchSpan(index, index + search.length());
+    }
+
+    private boolean matchesText(String value, ThreadDumpAnalyzer.SearchCriteria criteria) {
+        return matchSpan(value, criteria) != null;
+    }
+
+    private MatchScope searchMatchScope(ThreadDumpAnalyzer.ThreadView view, ThreadDumpAnalyzer.SearchCriteria criteria) {
+        if (criteria == null || !criteria.active() || !criteria.valid()) {
+            return MatchScope.NONE;
+        }
+        ThreadInfo thread = view.thread();
+        if (matchesText(safeThreadName(thread), criteria)) {
+            return MatchScope.NAME;
+        }
+        if (matchesText(ThreadDumpAnalyzer.stateLabel(thread.state()), criteria)) {
+            return MatchScope.STATE;
+        }
+        if (matchesText(view.topFrameDisplay(), criteria)) {
+            return MatchScope.FRAME;
+        }
+        if (thread.stackTrace() != null) {
+            for (int i = 1; i < thread.stackTrace().size(); i++) {
+                if (matchesText(formatFrame(thread.stackTrace().get(i)), criteria)) {
+                    return MatchScope.STACK;
+                }
+            }
+        }
+        if (thread.locks() != null) {
+            for (LockInfo lock : thread.locks()) {
+                if (matchesText(lock.toString(), criteria)) {
+                    return MatchScope.LOCKS;
+                }
+            }
+        }
+        if (matchesText(thread.additionalInfo(), criteria)) {
+            return MatchScope.INFO;
+        }
+        return MatchScope.NONE;
+    }
+
     private FocusPane paneAt(int x, int y) {
         Rect snapshotArea = areaById("snapshot-list");
         if (snapshotArea != null && snapshotArea.contains(x, y)) {
@@ -1179,9 +1275,28 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         WARN
     }
 
+    private enum MatchScope {
+        NONE(""),
+        NAME("name"),
+        STATE("state"),
+        FRAME("frame"),
+        STACK("stack"),
+        LOCKS("locks"),
+        INFO("info");
+
+        private final String label;
+
+        MatchScope(String label) {
+            this.label = label;
+        }
+    }
+
     private record StyledLine(String text, LineTone tone) {
     }
 
     private record SnapshotRow(int index, ThreadDumpSnapshot snapshot) {
+    }
+
+    private record MatchSpan(int start, int end) {
     }
 }
