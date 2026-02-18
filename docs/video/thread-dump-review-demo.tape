@@ -16,7 +16,7 @@ Down
 Sleep 1
 
 # Move to threads and select another thread
-Tab
+Right
 Down
 Sleep 1
 
@@ -27,7 +27,7 @@ Type "2"
 Sleep 2
 
 # Move into detail pane and scroll comparison content
-Tab
+Right
 Down 4
 Sleep 2
 

@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.toolkit.app.ToolkitApp;
@@ -16,8 +17,11 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.tui.event.MouseEventKind;
 
 import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.dock;
@@ -69,6 +73,13 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     }
 
     @Override
+    protected TuiConfig configure() {
+        return TuiConfig.builder()
+            .mouseCapture(true)
+            .build();
+    }
+
+    @Override
     protected Element render() {
         clampSnapshotSelection();
 
@@ -115,6 +126,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             .center(body)
             .bottom(footer)
             .onKeyEvent(this::handleKeyEvent)
+            .onMouseEvent(this::handleMouseEvent)
             .focusable()
             .id("thread-dump-review-root");
     }
@@ -190,7 +202,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             .autoScroll()
             .title("Snapshots (" + snapshots.size() + ")")
             .rounded()
-            .borderColor(focusPane == FocusPane.SNAPSHOTS ? Color.CYAN : Color.DARK_GRAY);
+            .borderColor(focusPane == FocusPane.SNAPSHOTS ? Color.CYAN : Color.DARK_GRAY)
+            .id("snapshot-list");
 
         if (snapshots.isEmpty()) {
             listElement.displayOnly();
@@ -251,7 +264,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             .autoScroll()
             .title(title)
             .rounded()
-            .borderColor(focusPane == FocusPane.THREADS ? Color.CYAN : Color.DARK_GRAY);
+            .borderColor(focusPane == FocusPane.THREADS ? Color.CYAN : Color.DARK_GRAY)
+            .id("thread-list");
 
         if (threadViews.isEmpty()) {
             listElement.displayOnly();
@@ -318,7 +332,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             .autoScroll()
             .title(detailTab == DetailTab.THREAD ? detailTitle(selectedThread) : comparisonTitle(baselineSnapshot))
             .rounded()
-            .borderColor(focusPane == FocusPane.DETAILS ? Color.CYAN : Color.DARK_GRAY);
+            .borderColor(focusPane == FocusPane.DETAILS ? Color.CYAN : Color.DARK_GRAY)
+            .id("detail-list");
 
         return column(
             summary,
@@ -392,8 +407,9 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             ? text(searchPrompt()).dim()
             : text(" invalid regex: " + abbreviateByWidth(searchCriteria.error(), 28) + " ").red();
         return panel(row(
-            text(" Tab/S-Tab pane ").dim(),
+            text(" Left/Right pane ").dim(),
             text(" Up/Down navigate ").dim(),
+            text(" click/select ").dim(),
             text(" b baseline ").dim(),
             text(" f filter ").dim(),
             text(" s sort ").dim(),
@@ -595,12 +611,12 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             return EventResult.HANDLED;
         }
 
-        if (event.isFocusNext()) {
-            focusPane = focusPane.next();
+        if (event.isLeft()) {
+            focusPane = focusPane.previous();
             return EventResult.HANDLED;
         }
-        if (event.isFocusPrevious()) {
-            focusPane = focusPane.previous();
+        if (event.isRight()) {
+            focusPane = focusPane.next();
             return EventResult.HANDLED;
         }
         if (event.isCharIgnoreCase('f')) {
@@ -640,12 +656,12 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             detailTab = DetailTab.COMPARISON;
             return EventResult.HANDLED;
         }
-        if (event.isLeft() && focusPane == FocusPane.DETAILS) {
-            detailTab = DetailTab.THREAD;
+        if (event.isChar('[')) {
+            focusPane = focusPane.previous();
             return EventResult.HANDLED;
         }
-        if (event.isRight() && focusPane == FocusPane.DETAILS) {
-            detailTab = DetailTab.COMPARISON;
+        if (event.isChar(']')) {
+            focusPane = focusPane.next();
             return EventResult.HANDLED;
         }
 
@@ -717,6 +733,85 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             return EventResult.HANDLED;
         }
         return EventResult.HANDLED;
+    }
+
+    private EventResult handleMouseEvent(MouseEvent event) {
+        if (searchInputMode && event.isPress() && event.isLeftButton()) {
+            searchInputMode = false;
+        }
+        FocusPane hovered = paneAt(event.x(), event.y());
+        if (hovered == null) {
+            return EventResult.UNHANDLED;
+        }
+
+        if (event.kind() == MouseEventKind.PRESS && event.isLeftButton()) {
+            focusPane = hovered;
+            switch (hovered) {
+                case SNAPSHOTS -> {
+                    int row = rowIndex(areaById("snapshot-list"), event.y(), 2);
+                    if (row >= 0) {
+                        int next = clampIndex(row, snapshots.size());
+                        if (next != selectedSnapshotIndex) {
+                            selectedSnapshotIndex = next;
+                            selectedThreadIndex = 0;
+                            detailCursor = 0;
+                            comparisonCursor = 0;
+                        }
+                    }
+                }
+                case THREADS -> {
+                    List<ThreadDumpAnalyzer.ThreadView> views = currentThreadViews();
+                    int row = rowIndex(areaById("thread-list"), event.y(), 2);
+                    if (row >= 0) {
+                        selectedThreadIndex = clampIndex(row, views.size());
+                        detailCursor = 0;
+                    }
+                }
+                case DETAILS -> {
+                    int row = rowIndex(areaById("detail-list"), event.y(), 1);
+                    if (row >= 0) {
+                        int size = activeDetailLines().size();
+                        if (detailTab == DetailTab.THREAD) {
+                            detailCursor = clampIndex(row, size);
+                        } else {
+                            comparisonCursor = clampIndex(row, size);
+                        }
+                    }
+                }
+            }
+            return EventResult.HANDLED;
+        }
+
+        if (event.kind() == MouseEventKind.SCROLL_UP || event.kind() == MouseEventKind.SCROLL_DOWN) {
+            int delta = event.kind() == MouseEventKind.SCROLL_DOWN ? 3 : -3;
+            switch (hovered) {
+                case SNAPSHOTS -> {
+                    int next = clampIndex(selectedSnapshotIndex + delta, snapshots.size());
+                    if (next != selectedSnapshotIndex) {
+                        selectedSnapshotIndex = next;
+                        selectedThreadIndex = 0;
+                        detailCursor = 0;
+                        comparisonCursor = 0;
+                    }
+                }
+                case THREADS -> {
+                    int total = currentThreadViews().size();
+                    selectedThreadIndex = clampIndex(selectedThreadIndex + delta, total);
+                    detailCursor = 0;
+                }
+                case DETAILS -> {
+                    int total = activeDetailLines().size();
+                    if (detailTab == DetailTab.THREAD) {
+                        detailCursor = clampIndex(detailCursor + delta, total);
+                    } else {
+                        comparisonCursor = clampIndex(comparisonCursor + delta, total);
+                    }
+                }
+            }
+            return EventResult.HANDLED;
+        }
+
+        return EventResult.UNHANDLED;
     }
 
     private void moveSelection(int delta) {
@@ -891,6 +986,41 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         }
         String mode = regexSearch ? "re" : "txt";
         return " search(" + mode + "): " + abbreviateByWidth(searchQuery, 20) + " ";
+    }
+
+    private FocusPane paneAt(int x, int y) {
+        Rect snapshotArea = areaById("snapshot-list");
+        if (snapshotArea != null && snapshotArea.contains(x, y)) {
+            return FocusPane.SNAPSHOTS;
+        }
+        Rect threadArea = areaById("thread-list");
+        if (threadArea != null && threadArea.contains(x, y)) {
+            return FocusPane.THREADS;
+        }
+        Rect detailArea = areaById("detail-list");
+        if (detailArea != null && detailArea.contains(x, y)) {
+            return FocusPane.DETAILS;
+        }
+        return null;
+    }
+
+    private Rect areaById(String elementId) {
+        if (runner() == null || runner().elementRegistry() == null) {
+            return null;
+        }
+        return runner().elementRegistry().getArea(elementId);
+    }
+
+    private static int rowIndex(Rect area, int mouseY, int rowHeight) {
+        if (area == null || rowHeight <= 0) {
+            return -1;
+        }
+        int innerTop = area.top() + 1;
+        int innerBottom = area.bottom() - 1;
+        if (mouseY < innerTop || mouseY >= innerBottom) {
+            return -1;
+        }
+        return (mouseY - innerTop) / rowHeight;
     }
 
     private static int clampIndex(int index, int size) {
