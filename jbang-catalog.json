@@ -109,6 +109,9 @@
     "textarea-demo": {
       "script-ref": "tamboui-toolkit/demos/textarea-demo/src/main/java/dev/tamboui/demo/TextAreaDemo.java"
     },
+    "thread-dump-review-demo": {
+      "script-ref": "tamboui-toolkit/demos/thread-dump-review-demo/src/main/java/dev/tamboui/demo/threaddump/ThreadDumpReviewDemo.java"
+    },
     "toolkit-demo": {
       "script-ref": "tamboui-toolkit/demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
     },
