@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Function;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -404,19 +405,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
 
     private StyledElement<?> renderStyledLine(StyledLine line) {
         String value = abbreviateByWidth(line.text(), DETAIL_LINE_WIDTH);
-        MatchSpan span = matchSpan(value, currentSearchCriteria);
-        if (span == null) {
-            return styledByTone(value, line.tone());
-        }
-        List<Element> segments = new ArrayList<>(3);
-        if (span.start() > 0) {
-            segments.add(styledByTone(value.substring(0, span.start()), line.tone()));
-        }
-        segments.add(text(value.substring(span.start(), span.end())).yellow().underlined().bold());
-        if (span.end() < value.length()) {
-            segments.add(styledByTone(value.substring(span.end()), line.tone()));
-        }
-        return row(segments.toArray(Element[]::new));
+        List<MatchSpan> spans = matchSpans(value, currentSearchCriteria);
+        return highlightedWithBase(value, spans, segment -> styledByTone(segment, line.tone()));
     }
 
     private StyledElement<?> styledByTone(String value, LineTone tone) {
@@ -1028,42 +1018,75 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         ThreadDumpAnalyzer.SearchCriteria criteria,
         boolean dimBase
     ) {
-        MatchSpan span = matchSpan(value, criteria);
-        if (span == null) {
-            return dimBase ? text(value).dim() : text(value);
+        List<MatchSpan> spans = matchSpans(value, criteria);
+        return highlightedWithBase(value, spans, segment -> dimBase ? text(segment).dim() : text(segment));
+    }
+
+    private StyledElement<?> highlightedWithBase(
+        String value,
+        List<MatchSpan> spans,
+        Function<String, StyledElement<?>> baseRenderer
+    ) {
+        if (spans.isEmpty()) {
+            return baseRenderer.apply(value);
         }
-        List<Element> segments = new ArrayList<>(3);
-        if (span.start() > 0) {
-            segments.add(dimBase ? text(value.substring(0, span.start())).dim() : text(value.substring(0, span.start())));
+        List<Element> segments = new ArrayList<>(spans.size() * 2 + 1);
+        int cursor = 0;
+        for (MatchSpan span : spans) {
+            if (span.start() > cursor) {
+                segments.add(baseRenderer.apply(value.substring(cursor, span.start())));
+            }
+            segments.add(text(value.substring(span.start(), span.end())).yellow().underlined().bold());
+            cursor = span.end();
         }
-        segments.add(text(value.substring(span.start(), span.end())).yellow().underlined().bold());
-        if (span.end() < value.length()) {
-            segments.add(dimBase ? text(value.substring(span.end())).dim() : text(value.substring(span.end())));
+        if (cursor < value.length()) {
+            segments.add(baseRenderer.apply(value.substring(cursor)));
         }
         return row(segments.toArray(Element[]::new));
     }
 
-    private MatchSpan matchSpan(String value, ThreadDumpAnalyzer.SearchCriteria criteria) {
+    private List<MatchSpan> matchSpans(String value, ThreadDumpAnalyzer.SearchCriteria criteria) {
         if (value == null || value.isEmpty() || criteria == null || !criteria.active() || !criteria.valid()) {
-            return null;
+            return List.of();
         }
+        List<MatchSpan> spans = new ArrayList<>();
         if (criteria.regex()) {
             var matcher = criteria.pattern().matcher(value);
-            if (matcher.find() && matcher.end() > matcher.start()) {
-                return new MatchSpan(matcher.start(), matcher.end());
+            int searchFrom = 0;
+            while (searchFrom <= value.length() && matcher.find(searchFrom)) {
+                int start = matcher.start();
+                int end = matcher.end();
+                if (end > start) {
+                    spans.add(new MatchSpan(start, end));
+                    searchFrom = end;
+                } else {
+                    searchFrom = start + 1;
+                }
+                if (spans.size() >= 64) {
+                    break;
+                }
             }
-            return null;
+            return spans;
         }
         String search = criteria.query().toLowerCase(Locale.ROOT);
-        int index = value.toLowerCase(Locale.ROOT).indexOf(search);
-        if (index < 0) {
-            return null;
+        String source = value.toLowerCase(Locale.ROOT);
+        int fromIndex = 0;
+        while (fromIndex < source.length()) {
+            int index = source.indexOf(search, fromIndex);
+            if (index < 0) {
+                break;
+            }
+            spans.add(new MatchSpan(index, index + search.length()));
+            fromIndex = index + search.length();
+            if (spans.size() >= 64) {
+                break;
+            }
         }
-        return new MatchSpan(index, index + search.length());
+        return spans;
     }
 
     private boolean matchesText(String value, ThreadDumpAnalyzer.SearchCriteria criteria) {
-        return matchSpan(value, criteria) != null;
+        return !matchSpans(value, criteria).isEmpty();
     }
 
     private MatchScope searchMatchScope(ThreadDumpAnalyzer.ThreadView view, ThreadDumpAnalyzer.SearchCriteria criteria) {
