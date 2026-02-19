@@ -60,6 +60,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
     private int selectedThreadIndex;
     private int detailCursor;
     private int comparisonCursor;
+    private int lockGraphCursor;
+    private int deadlockCursor;
 
     private FocusPane focusPane = FocusPane.SNAPSHOTS;
     private DetailTab detailTab = DetailTab.THREAD;
@@ -106,11 +108,17 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         ThreadDumpAnalyzer.SnapshotDiff diff = baselineSnapshot == null || currentSnapshot == null
             ? null
             : ThreadDumpAnalyzer.compare(baselineSnapshot, currentSnapshot);
+        ThreadDumpAnalyzer.LockGraph lockGraph = ThreadDumpAnalyzer.buildLockGraph(currentSnapshot);
+        ThreadDumpAnalyzer.DeadlockExplorer deadlockExplorer = ThreadDumpAnalyzer.buildDeadlockExplorer(currentSnapshot);
 
         List<StyledLine> detailLines = buildThreadDetailLines(selectedThread);
         List<StyledLine> comparisonLines = buildComparisonLines(currentSnapshot, baselineSnapshot, diff);
+        List<StyledLine> lockGraphLines = buildLockGraphLines(currentSnapshot, baselineSnapshot, lockGraph);
+        List<StyledLine> deadlockLines = buildDeadlockLines(currentSnapshot, deadlockExplorer);
         detailCursor = clampIndex(detailCursor, detailLines.size());
         comparisonCursor = clampIndex(comparisonCursor, comparisonLines.size());
+        lockGraphCursor = clampIndex(lockGraphCursor, lockGraphLines.size());
+        deadlockCursor = clampIndex(deadlockCursor, deadlockLines.size());
 
         Element header = renderHeader(currentSnapshot, baselineSnapshot, searchCriteria);
         Element body = renderBody(
@@ -121,7 +129,9 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             selectedThread,
             diff,
             detailLines,
-            comparisonLines
+            comparisonLines,
+            lockGraphLines,
+            deadlockLines
         );
         Element footer = renderFooter(searchCriteria);
 
@@ -182,12 +192,23 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         ThreadDumpAnalyzer.ThreadView selectedThread,
         ThreadDumpAnalyzer.SnapshotDiff diff,
         List<StyledLine> detailLines,
-        List<StyledLine> comparisonLines
+        List<StyledLine> comparisonLines,
+        List<StyledLine> lockGraphLines,
+        List<StyledLine> deadlockLines
     ) {
         return row(
             renderSnapshotsPane(),
             renderThreadsPane(currentSnapshot, baselineSnapshot, unfilteredThreadCount, threadViews),
-            renderDetailPane(currentSnapshot, baselineSnapshot, selectedThread, diff, detailLines, comparisonLines)
+            renderDetailPane(
+                currentSnapshot,
+                baselineSnapshot,
+                selectedThread,
+                diff,
+                detailLines,
+                comparisonLines,
+                lockGraphLines,
+                deadlockLines
+            )
         );
     }
 
@@ -324,20 +345,33 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         ThreadDumpAnalyzer.ThreadView selectedThread,
         ThreadDumpAnalyzer.SnapshotDiff diff,
         List<StyledLine> detailLines,
-        List<StyledLine> comparisonLines
+        List<StyledLine> comparisonLines,
+        List<StyledLine> lockGraphLines,
+        List<StyledLine> deadlockLines
     ) {
         Element summary = renderSummaryPanel(currentSnapshot, baselineSnapshot, diff);
-        var tabBar = tabs("Thread detail", "Comparison")
-            .selected(detailTab == DetailTab.THREAD ? 0 : 1)
+        var tabBar = tabs("Thread detail", "Comparison", "Lock graph", "Deadlocks")
+            .selected(detailTab.tabIndex())
             .highlightColor(Color.CYAN)
             .padding(" ", " ")
             .divider(" ")
             .rounded()
             .borderColor(focusPane == FocusPane.DETAILS ? Color.CYAN : Color.DARK_GRAY)
+            .id("detail-tabs")
             .length(3);
 
-        List<StyledLine> activeLines = detailTab == DetailTab.THREAD ? detailLines : comparisonLines;
-        int activeCursor = detailTab == DetailTab.THREAD ? detailCursor : comparisonCursor;
+        List<StyledLine> activeLines = switch (detailTab) {
+            case THREAD -> detailLines;
+            case COMPARISON -> comparisonLines;
+            case LOCK_GRAPH -> lockGraphLines;
+            case DEADLOCKS -> deadlockLines;
+        };
+        int activeCursor = switch (detailTab) {
+            case THREAD -> detailCursor;
+            case COMPARISON -> comparisonCursor;
+            case LOCK_GRAPH -> lockGraphCursor;
+            case DEADLOCKS -> deadlockCursor;
+        };
 
         ListElement<StyledLine> content = list()
             .data(activeLines, this::renderStyledLine)
@@ -345,7 +379,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             .displayOnly()
             .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
             .autoScroll()
-            .title(detailTab == DetailTab.THREAD ? detailTitle(selectedThread) : comparisonTitle(baselineSnapshot))
+            .title(detailTitle(detailTab, selectedThread, baselineSnapshot))
             .rounded()
             .borderColor(focusPane == FocusPane.DETAILS ? Color.CYAN : Color.DARK_GRAY)
             .id("detail-list");
@@ -435,7 +469,9 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             text(" s sort ").dim(),
             text(" / search ").dim(),
             text(" Ctrl+R regex ").dim(),
-            text(" 1/2 tabs ").dim(),
+            text(" 1-4 tabs ").dim(),
+            text(" g lock ").dim(),
+            text(" d deadlock ").dim(),
             text(" r reload ").dim(),
             text(" q quit ").dim(),
             searchHint,
@@ -590,18 +626,121 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         return lines;
     }
 
-    private String detailTitle(ThreadDumpAnalyzer.ThreadView selectedThread) {
-        if (selectedThread == null) {
-            return "Thread detail";
+    private List<StyledLine> buildLockGraphLines(
+        ThreadDumpSnapshot currentSnapshot,
+        ThreadDumpSnapshot baselineSnapshot,
+        ThreadDumpAnalyzer.LockGraph lockGraph
+    ) {
+        List<StyledLine> lines = new ArrayList<>();
+        if (currentSnapshot == null) {
+            lines.add(new StyledLine("No snapshot selected.", LineTone.TITLE));
+            return lines;
         }
-        return "Thread detail: " + abbreviateByWidth(safeThreadName(selectedThread.thread()), 32);
+        lines.add(new StyledLine("Snapshot: " + currentSnapshot.displayName(), LineTone.TITLE));
+        lines.add(new StyledLine("Lock graph summary", LineTone.SECTION));
+        lines.add(new StyledLine(
+            "blocking edges=" + lockGraph.edges().size()
+                + "  contendedLocks=" + lockGraph.contendedLocks()
+                + "  unknownOwners=" + lockGraph.unknownOwners(),
+            LineTone.NORMAL
+        ));
+        if (baselineSnapshot != null) {
+            ThreadDumpAnalyzer.LockGraph baselineGraph = ThreadDumpAnalyzer.buildLockGraph(baselineSnapshot);
+            lines.add(new StyledLine(
+                "vs baseline edges delta="
+                    + signed(lockGraph.edges().size() - baselineGraph.edges().size()),
+                toneForSigned(lockGraph.edges().size() - baselineGraph.edges().size())
+            ));
+        }
+
+        lines.add(new StyledLine("", LineTone.NORMAL));
+        lines.add(new StyledLine("Hotspots (threads)", LineTone.SECTION));
+        if (lockGraph.hotspots().isEmpty()) {
+            lines.add(new StyledLine("(no lock activity detected)", LineTone.MUTED));
+        } else {
+            lockGraph.hotspots().stream().limit(20).forEach(node -> lines.add(new StyledLine(
+                node.threadName()
+                    + "  blocking=" + node.blockingEdges()
+                    + " waiting=" + node.waitingEdges()
+                    + " owns=" + node.ownedLocks(),
+                node.blockingEdges() > 0 ? LineTone.WARN : LineTone.NORMAL
+            )));
+        }
+
+        lines.add(new StyledLine("", LineTone.NORMAL));
+        lines.add(new StyledLine("Blocking edges", LineTone.SECTION));
+        if (lockGraph.edges().isEmpty()) {
+            lines.add(new StyledLine("(no waiting edges)", LineTone.MUTED));
+        } else {
+            lockGraph.edges().stream().limit(80).forEach(edge -> lines.add(new StyledLine(
+                edge.waitingThread()
+                    + " --[" + edge.lockType() + " " + edge.lockId() + "]--> "
+                    + edge.ownerThread(),
+                edge.ownerKnown() ? LineTone.NORMAL : LineTone.BAD
+            )));
+        }
+
+        return lines;
     }
 
-    private String comparisonTitle(ThreadDumpSnapshot baselineSnapshot) {
-        if (baselineSnapshot == null) {
-            return "Comparison (set baseline)";
+    private List<StyledLine> buildDeadlockLines(
+        ThreadDumpSnapshot currentSnapshot,
+        ThreadDumpAnalyzer.DeadlockExplorer deadlockExplorer
+    ) {
+        List<StyledLine> lines = new ArrayList<>();
+        if (currentSnapshot == null) {
+            lines.add(new StyledLine("No snapshot selected.", LineTone.TITLE));
+            return lines;
         }
-        return "Comparison vs " + abbreviateByWidth(baselineSnapshot.displayName(), 24);
+        lines.add(new StyledLine("Snapshot: " + currentSnapshot.displayName(), LineTone.TITLE));
+        lines.add(new StyledLine(
+            "Deadlock cycles=" + deadlockExplorer.cycles().size()
+                + "  participants=" + deadlockExplorer.totalParticipants(),
+            deadlockExplorer.cycles().isEmpty() ? LineTone.MUTED : LineTone.BAD
+        ));
+
+        if (deadlockExplorer.cycles().isEmpty()) {
+            lines.add(new StyledLine("", LineTone.NORMAL));
+            lines.add(new StyledLine("No deadlocks reported in this dump.", LineTone.GOOD));
+            return lines;
+        }
+
+        for (ThreadDumpAnalyzer.DeadlockCycle cycle : deadlockExplorer.cycles()) {
+            lines.add(new StyledLine("", LineTone.NORMAL));
+            lines.add(new StyledLine(
+                "Cycle #" + cycle.cycleIndex() + " (" + cycle.participants().size() + " threads)",
+                LineTone.SECTION
+            ));
+            for (ThreadDumpAnalyzer.DeadlockParticipant participant : cycle.participants()) {
+                String waitingFor = participant.waitingFor() == null ? "?" : participant.waitingFor();
+                String waitingType = participant.waitingForType() == null ? "?" : participant.waitingForType();
+                String heldBy = participant.heldBy() == null ? "?" : participant.heldBy();
+                lines.add(new StyledLine("- " + participant.threadName(), LineTone.WARN));
+                lines.add(new StyledLine(
+                    "    waitsFor " + waitingFor + " (" + waitingType + ") heldBy " + heldBy,
+                    LineTone.MUTED
+                ));
+                lines.add(new StyledLine("    topFrame " + participant.topFrame(), LineTone.NORMAL));
+            }
+        }
+        return lines;
+    }
+
+    private String detailTitle(
+        DetailTab tab,
+        ThreadDumpAnalyzer.ThreadView selectedThread,
+        ThreadDumpSnapshot baselineSnapshot
+    ) {
+        return switch (tab) {
+            case THREAD -> selectedThread == null
+                ? "Thread detail"
+                : "Thread detail: " + abbreviateByWidth(safeThreadName(selectedThread.thread()), 32);
+            case COMPARISON -> baselineSnapshot == null
+                ? "Comparison (set baseline)"
+                : "Comparison vs " + abbreviateByWidth(baselineSnapshot.displayName(), 24);
+            case LOCK_GRAPH -> "Lock graph";
+            case DEADLOCKS -> "Deadlock explorer";
+        };
     }
 
     private EventResult handleKeyEvent(KeyEvent event) {
@@ -644,6 +783,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             selectedThreadIndex = 0;
             detailCursor = 0;
             comparisonCursor = 0;
+            lockGraphCursor = 0;
+            deadlockCursor = 0;
             return EventResult.HANDLED;
         }
         if (event.isCharIgnoreCase('s')) {
@@ -651,6 +792,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             selectedThreadIndex = 0;
             detailCursor = 0;
             comparisonCursor = 0;
+            lockGraphCursor = 0;
+            deadlockCursor = 0;
             return EventResult.HANDLED;
         }
         if (event.isCharIgnoreCase('b')) {
@@ -665,7 +808,7 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             return EventResult.HANDLED;
         }
         if (event.isCharIgnoreCase('c')) {
-            detailTab = detailTab == DetailTab.THREAD ? DetailTab.COMPARISON : DetailTab.THREAD;
+            detailTab = detailTab.next();
             return EventResult.HANDLED;
         }
         if (event.isChar('1')) {
@@ -674,6 +817,22 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         }
         if (event.isChar('2')) {
             detailTab = DetailTab.COMPARISON;
+            return EventResult.HANDLED;
+        }
+        if (event.isChar('3')) {
+            detailTab = DetailTab.LOCK_GRAPH;
+            return EventResult.HANDLED;
+        }
+        if (event.isChar('4')) {
+            detailTab = DetailTab.DEADLOCKS;
+            return EventResult.HANDLED;
+        }
+        if (event.isCharIgnoreCase('g')) {
+            detailTab = DetailTab.LOCK_GRAPH;
+            return EventResult.HANDLED;
+        }
+        if (event.isCharIgnoreCase('d')) {
+            detailTab = DetailTab.DEADLOCKS;
             return EventResult.HANDLED;
         }
         if (event.isChar('[')) {
@@ -781,6 +940,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
                             selectedThreadIndex = 0;
                             detailCursor = 0;
                             comparisonCursor = 0;
+                            lockGraphCursor = 0;
+                            deadlockCursor = 0;
                         }
                     }
                 }
@@ -790,16 +951,27 @@ final class ThreadDumpReviewApp extends ToolkitApp {
                     if (row >= 0) {
                         selectedThreadIndex = clampIndex(row, views.size());
                         detailCursor = 0;
+                        lockGraphCursor = 0;
+                        deadlockCursor = 0;
                     }
                 }
                 case DETAILS -> {
+                    Rect tabsArea = areaById("detail-tabs");
+                    if (tabsArea != null && tabsArea.contains(event.x(), event.y())) {
+                        DetailTab clicked = detailTabAt(tabsArea, event.x());
+                        if (clicked != null) {
+                            detailTab = clicked;
+                            return EventResult.HANDLED;
+                        }
+                    }
                     int row = rowIndex(areaById("detail-list"), event.y(), 1);
                     if (row >= 0) {
                         int size = activeDetailLines().size();
-                        if (detailTab == DetailTab.THREAD) {
-                            detailCursor = clampIndex(row, size);
-                        } else {
-                            comparisonCursor = clampIndex(row, size);
+                        switch (detailTab) {
+                            case THREAD -> detailCursor = clampIndex(row, size);
+                            case COMPARISON -> comparisonCursor = clampIndex(row, size);
+                            case LOCK_GRAPH -> lockGraphCursor = clampIndex(row, size);
+                            case DEADLOCKS -> deadlockCursor = clampIndex(row, size);
                         }
                     }
                 }
@@ -817,19 +989,24 @@ final class ThreadDumpReviewApp extends ToolkitApp {
                         selectedThreadIndex = 0;
                         detailCursor = 0;
                         comparisonCursor = 0;
+                        lockGraphCursor = 0;
+                        deadlockCursor = 0;
                     }
                 }
                 case THREADS -> {
                     int total = currentThreadViews().size();
                     selectedThreadIndex = clampIndex(selectedThreadIndex + delta, total);
                     detailCursor = 0;
+                    lockGraphCursor = 0;
+                    deadlockCursor = 0;
                 }
                 case DETAILS -> {
                     int total = activeDetailLines().size();
-                    if (detailTab == DetailTab.THREAD) {
-                        detailCursor = clampIndex(detailCursor + delta, total);
-                    } else {
-                        comparisonCursor = clampIndex(comparisonCursor + delta, total);
+                    switch (detailTab) {
+                        case THREAD -> detailCursor = clampIndex(detailCursor + delta, total);
+                        case COMPARISON -> comparisonCursor = clampIndex(comparisonCursor + delta, total);
+                        case LOCK_GRAPH -> lockGraphCursor = clampIndex(lockGraphCursor + delta, total);
+                        case DEADLOCKS -> deadlockCursor = clampIndex(deadlockCursor + delta, total);
                     }
                 }
             }
@@ -854,19 +1031,24 @@ final class ThreadDumpReviewApp extends ToolkitApp {
                     selectedThreadIndex = 0;
                     detailCursor = 0;
                     comparisonCursor = 0;
+                    lockGraphCursor = 0;
+                    deadlockCursor = 0;
                 }
             }
             case THREADS -> {
                 int total = currentThreadViews().size();
                 selectedThreadIndex = clampIndex(selectedThreadIndex + delta, total);
                 detailCursor = 0;
+                lockGraphCursor = 0;
+                deadlockCursor = 0;
             }
             case DETAILS -> {
                 int total = activeDetailLines().size();
-                if (detailTab == DetailTab.THREAD) {
-                    detailCursor = clampIndex(detailCursor + delta, total);
-                } else {
-                    comparisonCursor = clampIndex(comparisonCursor + delta, total);
+                switch (detailTab) {
+                    case THREAD -> detailCursor = clampIndex(detailCursor + delta, total);
+                    case COMPARISON -> comparisonCursor = clampIndex(comparisonCursor + delta, total);
+                    case LOCK_GRAPH -> lockGraphCursor = clampIndex(lockGraphCursor + delta, total);
+                    case DEADLOCKS -> deadlockCursor = clampIndex(deadlockCursor + delta, total);
                 }
             }
         }
@@ -877,10 +1059,11 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             case SNAPSHOTS -> selectedSnapshotIndex = clampIndex(0, snapshots.size());
             case THREADS -> selectedThreadIndex = clampIndex(0, currentThreadViews().size());
             case DETAILS -> {
-                if (detailTab == DetailTab.THREAD) {
-                    detailCursor = 0;
-                } else {
-                    comparisonCursor = 0;
+                switch (detailTab) {
+                    case THREAD -> detailCursor = 0;
+                    case COMPARISON -> comparisonCursor = 0;
+                    case LOCK_GRAPH -> lockGraphCursor = 0;
+                    case DEADLOCKS -> deadlockCursor = 0;
                 }
             }
         }
@@ -892,10 +1075,11 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             case THREADS -> selectedThreadIndex = clampIndex(Integer.MAX_VALUE, currentThreadViews().size());
             case DETAILS -> {
                 int size = activeDetailLines().size();
-                if (detailTab == DetailTab.THREAD) {
-                    detailCursor = clampIndex(Integer.MAX_VALUE, size);
-                } else {
-                    comparisonCursor = clampIndex(Integer.MAX_VALUE, size);
+                switch (detailTab) {
+                    case THREAD -> detailCursor = clampIndex(Integer.MAX_VALUE, size);
+                    case COMPARISON -> comparisonCursor = clampIndex(Integer.MAX_VALUE, size);
+                    case LOCK_GRAPH -> lockGraphCursor = clampIndex(Integer.MAX_VALUE, size);
+                    case DEADLOCKS -> deadlockCursor = clampIndex(Integer.MAX_VALUE, size);
                 }
             }
         }
@@ -918,10 +1102,18 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         if (detailTab == DetailTab.THREAD) {
             return buildThreadDetailLines(selected);
         }
-        ThreadDumpAnalyzer.SnapshotDiff diff = baseline == null || current == null
-            ? null
-            : ThreadDumpAnalyzer.compare(baseline, current);
-        return buildComparisonLines(current, baseline, diff);
+        if (detailTab == DetailTab.COMPARISON) {
+            ThreadDumpAnalyzer.SnapshotDiff diff = baseline == null || current == null
+                ? null
+                : ThreadDumpAnalyzer.compare(baseline, current);
+            return buildComparisonLines(current, baseline, diff);
+        }
+        if (detailTab == DetailTab.LOCK_GRAPH) {
+            ThreadDumpAnalyzer.LockGraph lockGraph = ThreadDumpAnalyzer.buildLockGraph(current);
+            return buildLockGraphLines(current, baseline, lockGraph);
+        }
+        ThreadDumpAnalyzer.DeadlockExplorer deadlockExplorer = ThreadDumpAnalyzer.buildDeadlockExplorer(current);
+        return buildDeadlockLines(current, deadlockExplorer);
     }
 
     private void reloadSnapshots() {
@@ -995,6 +1187,8 @@ final class ThreadDumpReviewApp extends ToolkitApp {
             selectedThreadIndex = 0;
             detailCursor = 0;
             comparisonCursor = 0;
+            lockGraphCursor = 0;
+            deadlockCursor = 0;
         }
     }
 
@@ -1136,7 +1330,22 @@ final class ThreadDumpReviewApp extends ToolkitApp {
         if (detailArea != null && detailArea.contains(x, y)) {
             return FocusPane.DETAILS;
         }
+        Rect detailTabs = areaById("detail-tabs");
+        if (detailTabs != null && detailTabs.contains(x, y)) {
+            return FocusPane.DETAILS;
+        }
         return null;
+    }
+
+    private DetailTab detailTabAt(Rect tabsArea, int x) {
+        int innerLeft = tabsArea.left() + 1;
+        int innerWidth = Math.max(1, tabsArea.width() - 2);
+        int slotWidth = Math.max(1, innerWidth / DetailTab.values().length);
+        int slot = (x - innerLeft) / slotWidth;
+        if (slot < 0 || slot >= DetailTab.values().length) {
+            return null;
+        }
+        return DetailTab.values()[slot];
     }
 
     private Rect areaById(String elementId) {
@@ -1301,7 +1510,18 @@ final class ThreadDumpReviewApp extends ToolkitApp {
 
     private enum DetailTab {
         THREAD,
-        COMPARISON
+        COMPARISON,
+        LOCK_GRAPH,
+        DEADLOCKS;
+
+        int tabIndex() {
+            return ordinal();
+        }
+
+        DetailTab next() {
+            DetailTab[] tabs = values();
+            return tabs[(ordinal() + 1) % tabs.length];
+        }
     }
 
     private enum LineTone {

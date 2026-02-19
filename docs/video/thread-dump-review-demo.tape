@@ -26,7 +26,15 @@ Sleep 1
 Type "2"
 Sleep 2
 
+# Explore lock graph and deadlock tabs
+Type "3"
+Sleep 2
+Type "4"
+Sleep 2
+
 # Move into detail pane and scroll comparison content
+Type "2"
+Sleep 1
 Right
 Down 4
 Sleep 2

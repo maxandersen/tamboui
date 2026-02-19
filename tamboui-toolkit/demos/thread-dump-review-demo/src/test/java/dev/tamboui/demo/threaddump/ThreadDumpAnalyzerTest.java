@@ -11,7 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import me.bechberger.jthreaddump.model.DeadlockInfo;
+import me.bechberger.jthreaddump.model.LockInfo;
+import me.bechberger.jthreaddump.model.StackFrame;
 import me.bechberger.jthreaddump.model.ThreadDump;
+import me.bechberger.jthreaddump.model.ThreadInfo;
 import me.bechberger.jthreaddump.parser.ThreadDumpParser;
 
 class ThreadDumpAnalyzerTest {
@@ -129,6 +133,116 @@ class ThreadDumpAnalyzerTest {
         assertThat(criteria.valid()).isFalse();
         assertThat(criteria.error()).isNotBlank();
         assertThat(filtered).hasSize(views.size());
+    }
+
+    @Test
+    void shouldBuildLockGraphFromBlockingRelationships() {
+        ThreadInfo owner = thread(
+            "owner-thread",
+            11L,
+            Thread.State.RUNNABLE,
+            List.of(lock("0xdead", "java.lang.Object", LockInfo.LockOperation.LOCKED, null))
+        );
+        ThreadInfo waiter = thread(
+            "waiter-thread",
+            22L,
+            Thread.State.BLOCKED,
+            List.of(lock("0xdead", "java.lang.Object", LockInfo.LockOperation.WAITING_TO_LOCK, null))
+        );
+
+        ThreadDumpSnapshot snapshot = ThreadDumpSnapshot.of(
+            "synthetic",
+            1,
+            new ThreadDump(null, "synthetic-jvm", List.of(owner, waiter), null, "synthetic", List.of())
+        );
+
+        ThreadDumpAnalyzer.LockGraph graph = ThreadDumpAnalyzer.buildLockGraph(snapshot);
+
+        assertThat(graph.contendedLocks()).isEqualTo(1);
+        assertThat(graph.unknownOwners()).isZero();
+        assertThat(graph.edges()).hasSize(1);
+        assertThat(graph.edges().get(0).waitingThread()).isEqualTo("waiter-thread");
+        assertThat(graph.edges().get(0).ownerThread()).isEqualTo("owner-thread");
+        assertThat(graph.edges().get(0).ownerKnown()).isTrue();
+        assertThat(graph.hotspots())
+            .extracting(ThreadDumpAnalyzer.LockNode::threadName)
+            .contains("owner-thread", "waiter-thread");
+    }
+
+    @Test
+    void shouldExposeDeadlockCyclesForExplorer() {
+        DeadlockInfo.DeadlockedThread threadA = new DeadlockInfo.DeadlockedThread(
+            "deadlock-A",
+            null,
+            "0x1",
+            "java.lang.Object",
+            "deadlock-B",
+            List.of(frame("demo.A", "run")),
+            List.of(lock("0x1", "java.lang.Object", LockInfo.LockOperation.WAITING_TO_LOCK, "2"))
+        );
+        DeadlockInfo.DeadlockedThread threadB = new DeadlockInfo.DeadlockedThread(
+            "deadlock-B",
+            null,
+            "0x2",
+            "java.lang.Object",
+            "deadlock-A",
+            List.of(frame("demo.B", "run")),
+            List.of(lock("0x2", "java.lang.Object", LockInfo.LockOperation.WAITING_TO_LOCK, "1"))
+        );
+
+        ThreadDumpSnapshot snapshot = ThreadDumpSnapshot.of(
+            "synthetic-deadlock",
+            1,
+            new ThreadDump(
+                null,
+                "synthetic-jvm",
+                List.of(),
+                null,
+                "synthetic",
+                List.of(new DeadlockInfo(List.of(threadA, threadB)))
+            )
+        );
+
+        ThreadDumpAnalyzer.DeadlockExplorer explorer = ThreadDumpAnalyzer.buildDeadlockExplorer(snapshot);
+
+        assertThat(explorer.cycles()).hasSize(1);
+        assertThat(explorer.totalParticipants()).isEqualTo(2);
+        assertThat(explorer.cycles().get(0).participants())
+            .extracting(ThreadDumpAnalyzer.DeadlockParticipant::threadName)
+            .containsExactly("deadlock-A", "deadlock-B");
+        assertThat(explorer.cycles().get(0).participants().get(0).topFrame()).contains("demo.A.run");
+    }
+
+    private static ThreadInfo thread(String name, long threadId, Thread.State state, List<LockInfo> locks) {
+        return new ThreadInfo(
+            name,
+            threadId,
+            null,
+            5,
+            false,
+            state,
+            null,
+            null,
+            List.of(frame("demo." + name.replace('-', '_'), "run")),
+            locks,
+            ""
+        );
+    }
+
+    private static LockInfo lock(
+        String lockId,
+        String className,
+        LockInfo.LockOperation operation,
+        String ownerThreadId
+    ) {
+        if (ownerThreadId == null) {
+            return new LockInfo(lockId, className, operation);
+        }
+        return new LockInfo(lockId, className, operation, ownerThreadId);
+    }
+
+    private static StackFrame frame(String className, String methodName) {
+        return new StackFrame(className, methodName, "Synthetic.java", 1);
     }
 
     private static ThreadDumpSnapshot snapshot(String source, int sequence, String dumpText) throws IOException {

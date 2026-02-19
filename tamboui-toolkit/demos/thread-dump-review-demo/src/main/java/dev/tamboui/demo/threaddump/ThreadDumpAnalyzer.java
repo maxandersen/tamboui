@@ -16,6 +16,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import me.bechberger.jthreaddump.model.DeadlockInfo;
+import me.bechberger.jthreaddump.model.LockInfo;
 import me.bechberger.jthreaddump.model.StackFrame;
 import me.bechberger.jthreaddump.model.ThreadInfo;
 
@@ -131,6 +133,56 @@ final class ThreadDumpAnalyzer {
         }
     }
 
+    record LockEdge(
+        String waitingThread,
+        String ownerThread,
+        String lockId,
+        String lockType,
+        boolean ownerKnown
+    ) {
+    }
+
+    record LockNode(
+        String threadName,
+        int waitingEdges,
+        int blockingEdges,
+        int ownedLocks
+    ) {
+    }
+
+    record LockGraph(
+        List<LockEdge> edges,
+        List<LockNode> hotspots,
+        int contendedLocks,
+        int unknownOwners
+    ) {
+        LockGraph {
+            edges = List.copyOf(edges);
+            hotspots = List.copyOf(hotspots);
+        }
+    }
+
+    record DeadlockParticipant(
+        String threadName,
+        String waitingFor,
+        String waitingForType,
+        String heldBy,
+        String topFrame
+    ) {
+    }
+
+    record DeadlockCycle(int cycleIndex, List<DeadlockParticipant> participants) {
+        DeadlockCycle {
+            participants = List.copyOf(participants);
+        }
+    }
+
+    record DeadlockExplorer(List<DeadlockCycle> cycles, int totalParticipants) {
+        DeadlockExplorer {
+            cycles = List.copyOf(cycles);
+        }
+    }
+
     static List<ThreadView> buildThreadViews(
         ThreadDumpSnapshot currentSnapshot,
         ThreadDumpSnapshot baselineSnapshot,
@@ -202,6 +254,162 @@ final class ThreadDumpAnalyzer {
             frameDeltaData.added(),
             frameDeltaData.removed()
         );
+    }
+
+    static LockGraph buildLockGraph(ThreadDumpSnapshot snapshot) {
+        if (snapshot == null) {
+            return new LockGraph(List.of(), List.of(), 0, 0);
+        }
+        List<ThreadInfo> threads = snapshot.dump().threads();
+        if (threads.isEmpty()) {
+            return new LockGraph(List.of(), List.of(), 0, 0);
+        }
+
+        Map<String, List<ThreadInfo>> ownersByLock = new HashMap<>();
+        Map<Long, ThreadInfo> threadById = new HashMap<>();
+        Map<String, ThreadNodeAccumulator> accumulators = new HashMap<>();
+
+        for (ThreadInfo thread : threads) {
+            if (thread.threadId() != null) {
+                threadById.putIfAbsent(thread.threadId(), thread);
+            }
+            ThreadNodeAccumulator accumulator = accumulators.computeIfAbsent(
+                logicalId(thread),
+                ignored -> new ThreadNodeAccumulator(thread));
+
+            if (thread.locks() == null) {
+                continue;
+            }
+            for (LockInfo lock : thread.locks()) {
+                if (lock == null) {
+                    continue;
+                }
+                if (lock.isLocked()) {
+                    accumulator.ownedLocks++;
+                    if (lock.lockId() != null) {
+                        ownersByLock.computeIfAbsent(lock.lockId(), ignored -> new ArrayList<>()).add(thread);
+                    }
+                }
+            }
+        }
+
+        int unknownOwners = 0;
+        Map<String, Integer> waitCountByLock = new HashMap<>();
+        List<LockEdge> edges = new ArrayList<>();
+
+        for (ThreadInfo thread : threads) {
+            if (thread.locks() == null) {
+                continue;
+            }
+            for (LockInfo lock : thread.locks()) {
+                if (lock == null || !lock.isBlocking()) {
+                    continue;
+                }
+                String lockId = lock.lockId() != null ? lock.lockId() : "?";
+                waitCountByLock.merge(lockId, 1, Integer::sum);
+                ThreadNodeAccumulator waiter = accumulators.computeIfAbsent(
+                    logicalId(thread),
+                    ignored -> new ThreadNodeAccumulator(thread));
+                waiter.waitingEdges++;
+
+                List<ThreadInfo> owners = resolveOwners(lock, ownersByLock, threadById);
+                boolean emittedOwnerEdge = false;
+                for (ThreadInfo owner : owners) {
+                    if (owner == null || owner == thread) {
+                        continue;
+                    }
+                    emittedOwnerEdge = true;
+                    ThreadNodeAccumulator ownerAcc = accumulators.computeIfAbsent(
+                        logicalId(owner),
+                        ignored -> new ThreadNodeAccumulator(owner));
+                    ownerAcc.blockingEdges++;
+                    edges.add(new LockEdge(
+                        safeName(thread.name()),
+                        safeName(owner.name()),
+                        lockId,
+                        lock.lockType(),
+                        true
+                    ));
+                }
+
+                if (!emittedOwnerEdge) {
+                    unknownOwners++;
+                    edges.add(new LockEdge(
+                        safeName(thread.name()),
+                        "<unknown>",
+                        lockId,
+                        lock.lockType(),
+                        false
+                    ));
+                }
+            }
+        }
+
+        List<LockNode> hotspots = accumulators.values().stream()
+            .map(acc -> new LockNode(
+                safeName(acc.thread.name()),
+                acc.waitingEdges,
+                acc.blockingEdges,
+                acc.ownedLocks
+            ))
+            .filter(node -> node.waitingEdges() > 0 || node.blockingEdges() > 0 || node.ownedLocks() > 0)
+            .sorted(Comparator
+                .comparingInt(LockNode::blockingEdges).reversed()
+                .thenComparingInt(LockNode::waitingEdges).reversed()
+                .thenComparingInt(LockNode::ownedLocks).reversed()
+                .thenComparing(LockNode::threadName, String.CASE_INSENSITIVE_ORDER))
+            .toList();
+
+        edges.sort(Comparator
+            .comparing(LockEdge::waitingThread, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(LockEdge::ownerThread, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(LockEdge::lockId));
+
+        int contendedLocks = (int) waitCountByLock.entrySet().stream()
+            .filter(entry -> !"?".equals(entry.getKey()))
+            .count();
+        return new LockGraph(edges, hotspots, contendedLocks, unknownOwners);
+    }
+
+    static DeadlockExplorer buildDeadlockExplorer(ThreadDumpSnapshot snapshot) {
+        if (snapshot == null) {
+            return new DeadlockExplorer(List.of(), 0);
+        }
+        List<DeadlockInfo> deadlocks = snapshot.dump().deadlockInfos();
+        if (deadlocks == null || deadlocks.isEmpty()) {
+            return new DeadlockExplorer(List.of(), 0);
+        }
+
+        List<DeadlockCycle> cycles = new ArrayList<>();
+        int totalParticipants = 0;
+        int cycleNumber = 1;
+
+        for (DeadlockInfo deadlock : deadlocks) {
+            if (deadlock == null || deadlock.threads() == null || deadlock.threads().isEmpty()) {
+                continue;
+            }
+            List<DeadlockParticipant> participants = new ArrayList<>();
+            for (DeadlockInfo.DeadlockedThread deadlockedThread : deadlock.threads()) {
+                String topFrame = "(no stack)";
+                if (deadlockedThread.stackTrace() != null && !deadlockedThread.stackTrace().isEmpty()) {
+                    topFrame = formatSearchFrame(deadlockedThread.stackTrace().get(0));
+                }
+                participants.add(new DeadlockParticipant(
+                    deadlockedThread.threadName(),
+                    deadlockedThread.waitingForObject() != null
+                        ? deadlockedThread.waitingForObject()
+                        : deadlockedThread.waitingForMonitor(),
+                    deadlockedThread.waitingForObjectType(),
+                    deadlockedThread.heldBy(),
+                    topFrame
+                ));
+            }
+            if (!participants.isEmpty()) {
+                cycles.add(new DeadlockCycle(cycleNumber++, participants));
+                totalParticipants += participants.size();
+            }
+        }
+        return new DeadlockExplorer(cycles, totalParticipants);
     }
 
     static SearchCriteria searchCriteria(String query, boolean regex) {
@@ -290,6 +498,45 @@ final class ThreadDumpAnalyzer {
             value.append(':').append(frame.lineNumber());
         }
         return value.toString();
+    }
+
+    private static List<ThreadInfo> resolveOwners(
+        LockInfo lock,
+        Map<String, List<ThreadInfo>> ownersByLock,
+        Map<Long, ThreadInfo> threadById
+    ) {
+        List<ThreadInfo> owners = new ArrayList<>();
+        Long ownerThreadId = parseThreadId(lock.ownerThreadId());
+        if (ownerThreadId != null) {
+            ThreadInfo owner = threadById.get(ownerThreadId);
+            if (owner != null) {
+                owners.add(owner);
+            }
+        }
+        if (!owners.isEmpty()) {
+            return owners;
+        }
+        if (lock.lockId() != null) {
+            List<ThreadInfo> lockOwners = ownersByLock.get(lock.lockId());
+            if (lockOwners != null && !lockOwners.isEmpty()) {
+                owners.addAll(lockOwners);
+            }
+        }
+        return owners;
+    }
+
+    private static Long parseThreadId(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            if (value.startsWith("0x") || value.startsWith("0X")) {
+                return Long.parseUnsignedLong(value.substring(2), 16);
+            }
+            return Long.parseLong(value);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
     }
 
     private static boolean matchesFilter(ThreadView view, ThreadFilter filter) {
@@ -479,5 +726,16 @@ final class ThreadDumpAnalyzer {
     }
 
     private record FrameDeltaData(List<FrameDelta> added, List<FrameDelta> removed) {
+    }
+
+    private static final class ThreadNodeAccumulator {
+        private final ThreadInfo thread;
+        private int waitingEdges;
+        private int blockingEdges;
+        private int ownedLocks;
+
+        private ThreadNodeAccumulator(ThreadInfo thread) {
+            this.thread = thread;
+        }
     }
 }
