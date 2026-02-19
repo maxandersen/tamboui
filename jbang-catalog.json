@@ -31,6 +31,9 @@
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
+    "quarkus-tui-app-demo": {
+      "script-ref": "demos/quarkus-tui-app-demo/src/main/java/dev/tamboui/demo/quarkus/QuarkusTuiAppDemo.java"
+    },
     "rflex-demo": {
       "script-ref": "demos/rflex-demo/src/main/java/dev/tamboui/demo/flex/RFlexDemo.java"
     },
