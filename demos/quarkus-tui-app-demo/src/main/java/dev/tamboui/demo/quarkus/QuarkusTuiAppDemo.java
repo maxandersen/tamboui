@@ -6,8 +6,15 @@
  */
 package dev.tamboui.demo.quarkus;
 
+import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,6 +37,7 @@ import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.widgets.form.BooleanFieldState;
 import dev.tamboui.widgets.form.FieldType;
 import dev.tamboui.widgets.form.SelectFieldState;
@@ -111,10 +119,14 @@ public final class QuarkusTuiAppDemo {
     private final SelectFieldState languageState = new SelectFieldState(LANGUAGES, 0);
     private final SelectFieldState javaVersionState = new SelectFieldState(JAVA_VERSIONS, 1);
     private final BooleanFieldState noCodeState = new BooleanFieldState(false);
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
 
     private final Set<String> selectedExtensionIds = new LinkedHashSet<>();
     private int extensionCursorIndex = 0;
-    private String statusMessage = "Ready. Use Tab to switch focus and Space to toggle extensions.";
+    private GeneratedOutput generatedOutput;
+    private String statusMessage = "Ready. Edit fields, press Ctrl+G to generate, Ctrl+D to download.";
 
     /**
      * Demo entry point.
@@ -130,6 +142,7 @@ public final class QuarkusTuiAppDemo {
         selectedExtensionIds.add("resteasy-reactive");
         selectedExtensionIds.add("smallrye-openapi");
         selectedExtensionIds.add("smallrye-health");
+        generatedOutput = createGeneratedOutput();
     }
 
     private void run() throws Exception {
@@ -149,40 +162,22 @@ public final class QuarkusTuiAppDemo {
         Element projectPanel = panel("Project setup", column(
                 formField("Group", groupIdState)
                         .id("group-id")
-                        .labelWidth(LABEL_WIDTH)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN),
+                        .labelWidth(LABEL_WIDTH),
                 formField("Artifact", artifactIdState)
                         .id("artifact-id")
-                        .labelWidth(LABEL_WIDTH)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN),
+                        .labelWidth(LABEL_WIDTH),
                 formField("Version", versionState)
                         .id("version")
-                        .labelWidth(LABEL_WIDTH)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN),
+                        .labelWidth(LABEL_WIDTH),
                 formField("Package", packageNameState)
                         .id("package")
-                        .labelWidth(LABEL_WIDTH)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN),
+                        .labelWidth(LABEL_WIDTH),
                 formField("Name", appNameState)
                         .id("app-name")
-                        .labelWidth(LABEL_WIDTH)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN),
+                        .labelWidth(LABEL_WIDTH),
                 formField("Quarkus", quarkusVersionState)
                         .id("quarkus-version")
-                        .labelWidth(LABEL_WIDTH)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN),
+                        .labelWidth(LABEL_WIDTH),
                 formField("Build tool", buildToolState)
                         .id("build-tool")
                         .labelWidth(LABEL_WIDTH),
@@ -196,18 +191,20 @@ public final class QuarkusTuiAppDemo {
                         .id("no-code")
                         .labelWidth(LABEL_WIDTH)
                         .checkedColor(Color.GREEN)
-        ).spacing(1)).rounded().borderColor(Color.CYAN).constraint(Constraint.percentage(40));
+        ).spacing(0)).rounded().borderColor(Color.CYAN).constraint(Constraint.percentage(40));
 
         KeyEventHandler extensionListHandler = this::handleExtensionListKey;
         var extensionList = list()
                 .data(filteredExtensions, this::renderExtensionItem)
                 .selected(extensionCursorIndex)
+                .autoScroll()
                 .highlightSymbol(">> ")
                 .highlightStyle(Style.EMPTY.bg(Color.CYAN).fg(Color.BLACK))
                 .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
                 .id("extension-list")
                 .focusable()
                 .onKeyEvent(extensionListHandler)
+                .onMouseEvent(this::handleExtensionListMouse)
                 .constraint(Constraint.fill());
 
         Element extensionPanel = panel(
@@ -225,7 +222,7 @@ public final class QuarkusTuiAppDemo {
                 ).spacing(1)
         ).rounded().borderColor(Color.MAGENTA).constraint(Constraint.fill(2));
 
-        List<String> outputLines = generatedOutputLines();
+        List<String> outputLines = generatedOutput.lines();
         Element outputPanel = panel("Generated recipe", list()
                 .data(outputLines, line -> text(line))
                 .displayOnly()
@@ -245,7 +242,6 @@ public final class QuarkusTuiAppDemo {
         ).spacing(1)
          .fill()
          .id("root")
-         .focusable()
          .onKeyEvent(this::handleGlobalKey);
     }
 
@@ -266,6 +262,10 @@ public final class QuarkusTuiAppDemo {
                         text(": focus  ").dim(),
                         text("Space/Enter").bold(),
                         text(": toggle extension  ").dim(),
+                        text("Ctrl+G").bold(),
+                        text(": generate  ").dim(),
+                        text("Ctrl+D").bold(),
+                        text(": download zip  ").dim(),
                         text("Ctrl+A").bold(),
                         text(": toggle visible  ").dim(),
                         text("Ctrl+R").bold(),
@@ -305,6 +305,14 @@ public final class QuarkusTuiAppDemo {
             return EventResult.UNHANDLED;
         }
         char command = Character.toLowerCase(event.character());
+        if (command == 'g') {
+            generateFromCurrentInputs();
+            return EventResult.HANDLED;
+        }
+        if (command == 'd') {
+            downloadGeneratedProjectArchive();
+            return EventResult.HANDLED;
+        }
         if (command == 'r') {
             resetToDefaults();
             return EventResult.HANDLED;
@@ -356,6 +364,67 @@ public final class QuarkusTuiAppDemo {
             return EventResult.HANDLED;
         }
         return EventResult.UNHANDLED;
+    }
+
+    private EventResult handleExtensionListMouse(MouseEvent event) {
+        if (!event.isClick()) {
+            return EventResult.UNHANDLED;
+        }
+        List<ExtensionOption> filteredExtensions = filteredExtensions();
+        if (filteredExtensions.isEmpty()) {
+            return EventResult.HANDLED;
+        }
+        toggleCurrentExtension(filteredExtensions);
+        return EventResult.HANDLED;
+    }
+
+    private void generateFromCurrentInputs() {
+        generatedOutput = createGeneratedOutput();
+        statusMessage = "Generated project recipe for " + generatedOutput.artifactId() + ".";
+    }
+
+    private void downloadGeneratedProjectArchive() {
+        if (generatedOutput == null) {
+            generateFromCurrentInputs();
+        }
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create(generatedOutput.downloadUrl()))
+                .header("Accept", "application/zip")
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                statusMessage = "Download failed: code.quarkus.io returned HTTP " + response.statusCode() + ".";
+                return;
+            }
+            byte[] archiveBytes = response.body();
+            if (archiveBytes == null || archiveBytes.length == 0) {
+                statusMessage = "Download failed: received an empty archive.";
+                return;
+            }
+            Path outputPath = uniqueArchivePath(generatedOutput.artifactId());
+            Files.write(outputPath, archiveBytes);
+            statusMessage = "Downloaded archive: " + outputPath.toAbsolutePath();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            statusMessage = "Download interrupted.";
+        } catch (IOException e) {
+            statusMessage = "Download failed: " + e.getMessage();
+        }
+    }
+
+    private Path uniqueArchivePath(String artifactId) {
+        String sanitizedArtifact = artifactId.replaceAll("[^A-Za-z0-9._-]", "-");
+        String baseName = sanitizedArtifact + "-quarkus-project";
+        Path candidate = Path.of(baseName + ".zip");
+        int index = 1;
+        while (Files.exists(candidate)) {
+            candidate = Path.of(baseName + "-" + index + ".zip");
+            index++;
+        }
+        return candidate;
     }
 
     private void toggleCurrentExtension(List<ExtensionOption> filteredExtensions) {
@@ -417,7 +486,8 @@ public final class QuarkusTuiAppDemo {
         selectedExtensionIds.add("smallrye-health");
 
         extensionCursorIndex = 0;
-        statusMessage = "Reset to code.quarkus.io-style defaults.";
+        generatedOutput = createGeneratedOutput();
+        statusMessage = "Reset defaults and regenerated project recipe.";
     }
 
     private void setText(TextInputState state, String value) {
@@ -464,7 +534,7 @@ public final class QuarkusTuiAppDemo {
         ).spacing(1);
     }
 
-    private List<String> generatedOutputLines() {
+    private GeneratedOutput createGeneratedOutput() {
         List<String> selectedIds = selectedExtensionIdsInCatalogOrder();
         String extensionCsv = String.join(",", selectedIds);
         BuildTool buildTool = BuildTool.fromLabel(buildToolState.selectedValue());
@@ -505,10 +575,11 @@ public final class QuarkusTuiAppDemo {
 
         lines.add("");
         lines.add("Download URL");
-        lines.add(downloadUrl(selectedIds, buildTool, language));
+        String downloadUrl = downloadUrl(selectedIds, buildTool, language);
+        lines.add(downloadUrl);
         lines.add("");
         lines.add("Selected extensions (" + selectedIds.size() + "): " + summarizeExtensions(selectedIds));
-        return lines;
+        return new GeneratedOutput(lines, downloadUrl, artifactId());
     }
 
     private List<String> selectedExtensionIdsInCatalogOrder() {
@@ -602,6 +673,9 @@ public final class QuarkusTuiAppDemo {
             return fallback;
         }
         return trimmed;
+    }
+
+    private record GeneratedOutput(List<String> lines, String downloadUrl, String artifactId) {
     }
 
     private enum BuildTool {
