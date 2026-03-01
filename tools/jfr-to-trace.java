@@ -113,6 +113,16 @@ public class jfr_to_trace {
         n.flags = parseFlags(strField(ev, "flags", n.flagsRaw));
         n.flagsRaw = strField(ev, "flags", n.flagsRaw);
         n.zIndex = intField(ev, "zIndex", n.zIndex);
+        // Support combined node+layout event payloads
+        if (ev.getEventType().getName().equals("dev.tamboui.ui.node")) {
+            int x = intField(ev, "x", Integer.MIN_VALUE);
+            int y = intField(ev, "y", Integer.MIN_VALUE);
+            int w = intField(ev, "width", Integer.MIN_VALUE);
+            int h = intField(ev, "height", Integer.MIN_VALUE);
+            if (x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && w != Integer.MIN_VALUE && h != Integer.MIN_VALUE) {
+                n.layout = new Layout(x, y, w, h, boolField(ev, "clipped", false));
+            }
+        }
         if (!f.nodes.contains(n)) f.nodes.add(n);
     }
 

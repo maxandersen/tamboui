@@ -22,6 +22,7 @@ import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.toolkit.jfr.UiSnapshotEmitter;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.bindings.ActionHandler;
@@ -80,6 +81,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private final boolean faultTolerant;
     private final List<ToolkitPostRenderProcessor> postRenderProcessors;
     private volatile Duration lastElapsed = Duration.ZERO;
+    private volatile long frameCounter = 0L;
 
     private ToolkitRunner(TuiRunner tuiRunner,
                           boolean faultTolerant,
@@ -167,6 +169,9 @@ public final class ToolkitRunner implements AutoCloseable {
                         focusManager.setFocus(focusOrder.get(0));
                     }
                 }
+
+                // Emit UI structure + layout snapshot for this frame when JFR events are enabled
+                UiSnapshotEmitter.emit(++frameCounter, frame.area(), elementRegistry, focusManager);
 
                 // Apply post-render processors (e.g., effects, overlays)
                 for (ToolkitPostRenderProcessor processor : postRenderProcessors) {
