@@ -1,23 +1,316 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Tamboui Trace Viewer</title>
-<style>body{margin:0;font-family:system-ui;background:#0f1115;color:#dbe3ef}header{padding:10px 14px;border-bottom:1px solid #2a3140;display:flex;gap:10px;align-items:center}main{display:grid;grid-template-columns:320px 1fr 360px;height:calc(100vh - 52px)}.pane{border-right:1px solid #2a3140;overflow:auto}.pane:last-child{border-right:none}.section{padding:10px;border-bottom:1px solid #2a3140}h2{font-size:12px;color:#8fa0b8;text-transform:uppercase;margin:0 0 8px}.mono{font-family:ui-monospace,monospace;font-size:12px}select,input,button{background:#171a21;color:#dbe3ef;border:1px solid #2a3140;border-radius:6px;padding:6px 8px}.tree ul{list-style:none;margin:0;padding-left:16px}.tree li{padding:2px 0}.node{display:inline-block;padding:2px 6px;border-radius:6px;cursor:pointer}.node:hover{background:#1f2531}.selected{background:#23354a;outline:1px solid #325a7f}#canvas{position:relative;background:#0a0d12;border:1px solid #2a3140;min-height:320px}.box{position:absolute;border:1px solid rgba(88,196,255,.55);background:rgba(88,196,255,.08);color:#a8ddff;font-size:10px;padding:1px 2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.box.selected{border-color:#ffd166;background:rgba(255,209,102,.15);color:#ffe6a6}table{width:100%;border-collapse:collapse;font-size:12px}td{border-bottom:1px solid #2a3140;padding:6px 4px;vertical-align:top}td.k{color:#8fa0b8;width:42%}</style></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tamboui Trace Viewer</title>
+  <style>
+    :root { --bg:#0f1115; --panel:#171a21; --text:#dbe3ef; --muted:#8fa0b8; --accent:#58c4ff; --line:#2a3140; --warn:#ffd166; --ok:#7bd88f; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--text); }
+    header { padding:10px 14px; border-bottom:1px solid var(--line); display:flex; gap:10px; align-items:center; }
+    header h1 { font-size:16px; margin:0; }
+    .muted { color:var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
+    main { display:grid; grid-template-columns: 340px 1fr 360px; height: calc(100vh - 110px); }
+    .pane { border-right:1px solid var(--line); overflow:auto; }
+    .pane:last-child { border-right:none; }
+    .section { padding:10px; border-bottom:1px solid var(--line); }
+    .section h2 { margin:0 0 8px 0; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+    input[type=file], button, select, label.chk { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
+    label.chk { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; }
+
+    .tree ul { list-style:none; margin:0; padding-left:16px; }
+    .tree li { padding:2px 0; }
+    .node { display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:6px; cursor:pointer; }
+    .node:hover { background:#1f2531; }
+    .node.selected { background:#23354a; outline:1px solid #325a7f; }
+    .badge { font-size:10px; border:1px solid #345; border-radius:999px; padding:1px 6px; color:#9ecbff; }
+    .badge.dup { color:#ffe0a6; border-color:#6a5323; background:#3d3014; }
+    .badge.unchanged { color:#b9eec7; border-color:#2e5b3a; background:#183323; }
+
+    #canvasWrap { padding:10px; }
+    #canvas { position:relative; background:#0a0d12; border:1px solid var(--line); min-height:360px; overflow:hidden; }
+    .box {
+      position:absolute; border:1px solid rgba(88,196,255,.55); background:rgba(88,196,255,.08);
+      color:#a8ddff; font-size:10px; overflow:hidden;
+    }
+    .box.changed { border-color:rgba(255,209,102,.9); background:rgba(255,209,102,.12); }
+    .box.selected { border-color:#ffd166; box-shadow:0 0 0 1px #ffd166 inset; }
+    .box-label {
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      max-width:95%; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+      text-align:center; pointer-events:none;
+      text-shadow:0 1px 2px rgba(0,0,0,.85);
+    }
+
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    td { border-bottom:1px solid var(--line); padding:6px 4px; vertical-align:top; }
+    td.k { width:42%; color:var(--muted); }
+
+    footer { height:58px; border-top:1px solid var(--line); padding:8px 10px; display:flex; align-items:center; gap:10px; }
+    #timeline { display:flex; gap:2px; overflow-x:auto; padding:4px; border:1px solid var(--line); border-radius:6px; background:#111620; flex:1; }
+    .tick {
+      width:10px; min-width:10px; height:26px; border:1px solid #2a3140; border-radius:2px;
+      background:#2b4058; cursor:pointer; position:relative;
+    }
+    .tick.active { outline:2px solid #58c4ff; }
+    .tick:hover::after {
+      content:attr(data-tip); position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+      background:#111; border:1px solid #444; border-radius:4px; color:#eee; font-size:11px; padding:3px 6px; white-space:nowrap;
+    }
+  </style>
+</head>
 <body>
-<header><strong>Tamboui Trace Viewer</strong><input id="file" type="file" accept="application/json,.json"/><select id="frameSelect"></select><button id="fit">Fit</button><span id="meta" class="mono" style="color:#8fa0b8"></span></header>
+<header>
+  <h1>Tamboui Trace Viewer</h1>
+  <input id="file" type="file" accept="application/json,.json" />
+  <button id="prev">◀</button>
+  <button id="next">▶</button>
+  <label class="chk"><input id="hideUnchanged" type="checkbox"/> Hide unchanged</label>
+  <label class="chk"><input id="hideTiny" type="checkbox" checked/> Hide tiny labels</label>
+  <span id="meta" class="muted mono"></span>
+</header>
+
 <main>
-<div class="pane"><div class="section"><h2>Tree</h2><div class="tree mono" id="tree"></div></div></div>
-<div class="pane"><div class="section" style="border-bottom:none;padding:0"><h2 style="padding:10px;margin:0">Layout</h2><div id="canvas"></div></div></div>
-<div class="pane"><div class="section"><h2>Frame</h2><table id="frameInfo"></table></div><div class="section"><h2>Node</h2><table id="nodeInfo"></table></div></div>
+  <div class="pane">
+    <div class="section">
+      <h2>Tree</h2>
+      <div id="tree" class="tree mono"></div>
+    </div>
+  </div>
+
+  <div class="pane" id="canvasWrap">
+    <div class="section" style="padding:0;border-bottom:none;">
+      <h2 style="padding:10px;margin:0;">Layout</h2>
+      <div id="canvas"></div>
+    </div>
+  </div>
+
+  <div class="pane">
+    <div class="section">
+      <h2>Frame</h2>
+      <table id="frameInfo"></table>
+    </div>
+    <div class="section">
+      <h2>Node</h2>
+      <table id="nodeInfo"></table>
+    </div>
+  </div>
 </main>
+
+<footer>
+  <span class="mono muted">Frames</span>
+  <div id="timeline"></div>
+</footer>
+
 <script>
-(()=>{let trace=null,frame=null,selectedNodeId=null;const el=id=>document.getElementById(id);
-el('file').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;trace=JSON.parse(await f.text());initTrace();});
-el('frameSelect').addEventListener('change',()=>{frame=trace.frames[Number(el('frameSelect').value||0)];selectedNodeId=null;render();});
-el('fit').addEventListener('click',drawLayout);
-function initTrace(){if(!trace?.frames?.length)return;el('meta').textContent=`${trace.meta?.app||'app'} · ${trace.frames.length} frame(s)`;const fs=el('frameSelect');fs.innerHTML='';trace.frames.forEach((f,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`#${f.frameId} (${f.screen?.w||0}x${f.screen?.h||0})`;fs.appendChild(o);});fs.value='0';frame=trace.frames[0];render();}
-function render(){if(!frame)return;drawFrameInfo();drawTree();drawLayout();drawNodeInfo();}
-function drawFrameInfo(){const s=frame.summary||{};const rows=[['frameId',frame.frameId],['screen',`${frame.screen?.w||0} x ${frame.screen?.h||0}`],['focusedNodeId',frame.focusedNodeId],['routeId',frame.routeId],['nodeCount',s.nodeCount],['layoutTotalNanos',s.layoutTotalNanos],['renderTotalNanos',s.renderTotalNanos],['diffNanos',s.diffNanos],['flushNanos',s.flushNanos],['dirtyCells',s.dirtyCells]];el('frameInfo').innerHTML=rows.map(([k,v])=>`<tr><td class='k'>${k}</td><td class='mono'>${v??''}</td></tr>`).join('');}
-function drawTree(){const nodes=frame.nodes||[];const byParent=new Map();nodes.forEach(n=>{const p=Number(n.parentId??-1);if(!byParent.has(p))byParent.set(p,[]);byParent.get(p).push(n);});byParent.forEach(arr=>arr.sort((a,b)=>(a.indexInParent||0)-(b.indexInParent||0)));function renderList(pid){const kids=byParent.get(pid)||[];if(!kids.length)return '';return `<ul>${kids.map(n=>{const sel=Number(n.nodeId)===Number(selectedNodeId)?'selected':'';const label=`${n.type||'Node'} #${n.nodeId}${n.id?` (${n.id})`:''}`;return `<li><span class='node ${sel}' data-node='${n.nodeId}'>${label}</span>${renderList(Number(n.nodeId))}</li>`;}).join('')}</ul>`;}const html=renderList(-1)||renderList(0)||'<div class="mono" style="color:#8fa0b8">No tree</div>';const tree=el('tree');tree.innerHTML=html;tree.querySelectorAll('[data-node]').forEach(n=>n.addEventListener('click',()=>{selectedNodeId=Number(n.getAttribute('data-node'));render();}));}
-function drawLayout(){const canvas=el('canvas');const W=canvas.clientWidth||900;const H=Math.max(360,window.innerHeight-180);canvas.style.height=`${H}px`;canvas.innerHTML='';const sw=frame.screen?.w||1, sh=frame.screen?.h||1;const scale=Math.min((W-12)/sw,(H-12)/sh);const ox=6,oy=6;(frame.nodes||[]).forEach(n=>{if(!n.layout)return;const x=ox+n.layout.x*scale,y=oy+n.layout.y*scale,w=Math.max(1,n.layout.w*scale),h=Math.max(1,n.layout.h*scale);const d=document.createElement('div');d.className='box'+(Number(n.nodeId)===Number(selectedNodeId)?' selected':'');d.style.left=`${x}px`;d.style.top=`${y}px`;d.style.width=`${w}px`;d.style.height=`${h}px`;d.textContent=`${n.type||'N'}#${n.nodeId}`;d.title=`${n.type||'Node'} #${n.nodeId} (${n.layout.x},${n.layout.y},${n.layout.w},${n.layout.h})`;d.addEventListener('click',()=>{selectedNodeId=Number(n.nodeId);render();});canvas.appendChild(d);});}
-function drawNodeInfo(){const n=(frame.nodes||[]).find(x=>Number(x.nodeId)===Number(selectedNodeId));if(!n){el('nodeInfo').innerHTML="<tr><td class='k'>selected</td><td class='mono' style='color:#8fa0b8'>none</td></tr>";return;}const rows=[['nodeId',n.nodeId],['type',n.type],['id',n.id||''],['parentId',n.parentId],['indexInParent',n.indexInParent],['classes',n.classes||''],['flags',(n.flags||[]).join(', ')],['zIndex',n.zIndex],['layout',n.layout?`${n.layout.x},${n.layout.y},${n.layout.w},${n.layout.h}`:''],['layoutNanos',n.cost?.layoutNanos??''],['renderNanos',n.cost?.renderNanos??''],['dirtyCells',n.cost?.dirtyCells??'']];el('nodeInfo').innerHTML=rows.map(([k,v])=>`<tr><td class='k'>${k}</td><td class='mono'>${v??''}</td></tr>`).join('');}
+(() => {
+  let trace = null;
+  let frames = [];
+  let frameIndex = 0;
+  let selectedNodeId = null;
+
+  const $ = id => document.getElementById(id);
+
+  $("file").addEventListener("change", async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    trace = JSON.parse(await f.text());
+    frames = normalizeFrames(trace.frames || []);
+    frameIndex = 0;
+    selectedNodeId = null;
+    renderAll();
+  });
+
+  $("prev").addEventListener("click", () => setFrame(Math.max(0, frameIndex - 1)));
+  $("next").addEventListener("click", () => setFrame(Math.min(frames.length - 1, frameIndex + 1)));
+  $("hideUnchanged").addEventListener("change", renderAll);
+  $("hideTiny").addEventListener("change", drawLayout);
+
+  function setFrame(i) {
+    frameIndex = i;
+    selectedNodeId = null;
+    renderAll();
+  }
+
+  function normalizeFrames(rawFrames) {
+    return rawFrames.map((f, idx) => {
+      const m = new Map();
+      const dup = new Map();
+      for (const n of (f.nodes || [])) {
+        const key = Number(n.nodeId);
+        dup.set(key, (dup.get(key) || 0) + 1);
+        // keep latest occurrence (usually best merged state)
+        m.set(key, { ...n, __dupCount: dup.get(key) });
+      }
+      const nodes = [...m.values()];
+      nodes.sort((a,b) => (a.parentId-b.parentId) || ((a.indexInParent||0)-(b.indexInParent||0)) || (a.nodeId-b.nodeId));
+
+      // mark changed vs previous frame
+      const prev = idx > 0 ? rawFrames[idx - 1] : null;
+      const prevMap = new Map((prev?.nodes || []).map(n => [Number(n.nodeId), n]));
+      for (const n of nodes) {
+        const p = prevMap.get(Number(n.nodeId));
+        n.__changed = !p || changedNode(p, n);
+      }
+      return { ...f, nodes };
+    });
+  }
+
+  function changedNode(a, b) {
+    const ak = [a.type,a.id,a.classes,a.flags,a.parentId,a.indexInParent,a.zIndex,a.layout?.x,a.layout?.y,a.layout?.w,a.layout?.h].join('|');
+    const bk = [b.type,b.id,b.classes,b.flags,b.parentId,b.indexInParent,b.zIndex,b.layout?.x,b.layout?.y,b.layout?.w,b.layout?.h].join('|');
+    return ak !== bk;
+  }
+
+  function current() { return frames[frameIndex]; }
+
+  function renderAll() {
+    if (!frames.length) return;
+    const f = current();
+    $("meta").textContent = `${trace?.meta?.app || 'app'} · frame ${frameIndex+1}/${frames.length} · #${f.frameId}`;
+    drawTimeline();
+    drawFrameInfo();
+    drawTree();
+    drawLayout();
+    drawNodeInfo();
+  }
+
+  function drawTimeline() {
+    const t = $("timeline");
+    t.innerHTML = "";
+    const maxCost = Math.max(1, ...frames.map(f => Number(f.summary?.renderTotalNanos || 0)));
+    frames.forEach((f, i) => {
+      const d = document.createElement("div");
+      d.className = "tick" + (i === frameIndex ? " active" : "");
+      const cost = Number(f.summary?.renderTotalNanos || 0);
+      const hue = 200 - Math.min(180, Math.floor((cost / maxCost) * 180));
+      d.style.background = `hsl(${hue} 60% 30%)`;
+      d.dataset.tip = `#${f.frameId} render=${cost}`;
+      d.addEventListener("click", () => setFrame(i));
+      t.appendChild(d);
+    });
+  }
+
+  function drawFrameInfo() {
+    const f = current();
+    const s = f.summary || {};
+    const rows = [
+      ["frameId", f.frameId],
+      ["screen", `${f.screen?.w || 0} x ${f.screen?.h || 0}`],
+      ["focusedNodeId", f.focusedNodeId],
+      ["routeId", f.routeId],
+      ["nodeCount", s.nodeCount],
+      ["layoutTotalNanos", s.layoutTotalNanos],
+      ["renderTotalNanos", s.renderTotalNanos],
+      ["diffNanos", s.diffNanos],
+      ["flushNanos", s.flushNanos],
+      ["dirtyCells", s.dirtyCells]
+    ];
+    $("frameInfo").innerHTML = rows.map(([k,v]) => `<tr><td class="k">${k}</td><td class="mono">${v ?? ''}</td></tr>`).join("");
+  }
+
+  function drawTree() {
+    const f = current();
+    const hideUnchanged = $("hideUnchanged").checked;
+    const nodes = f.nodes || [];
+    const byParent = new Map();
+    nodes.forEach(n => {
+      const p = Number(n.parentId ?? -1);
+      if (!byParent.has(p)) byParent.set(p, []);
+      byParent.get(p).push(n);
+    });
+
+    function subtreeChanged(nodeId) {
+      const kids = byParent.get(Number(nodeId)) || [];
+      return kids.some(k => k.__changed || subtreeChanged(k.nodeId));
+    }
+
+    function renderList(parentId) {
+      const kids = (byParent.get(parentId) || []).filter(n => !(hideUnchanged && !n.__changed && !subtreeChanged(n.nodeId)));
+      if (!kids.length) return "";
+      return `<ul>${kids.map(n => {
+        const selected = Number(n.nodeId) === Number(selectedNodeId) ? "selected" : "";
+        const changedBadge = n.__changed ? "" : `<span class='badge unchanged'>unchanged</span>`;
+        const dupBadge = n.__dupCount > 1 ? `<span class='badge dup'>x${n.__dupCount}</span>` : "";
+        const label = `${n.type || 'Node'} #${n.nodeId}${n.id ? ` (${n.id})` : ''}`;
+        return `<li><span class='node ${selected}' data-node='${n.nodeId}'>${label} ${dupBadge} ${changedBadge}</span>${renderList(Number(n.nodeId))}</li>`;
+      }).join("")}</ul>`;
+    }
+
+    const html = renderList(-1) || renderList(0) || `<div class='muted mono'>No tree data</div>`;
+    const tree = $("tree");
+    tree.innerHTML = html;
+    tree.querySelectorAll("[data-node]").forEach(n => n.addEventListener("click", () => {
+      selectedNodeId = Number(n.getAttribute("data-node"));
+      drawTree(); drawLayout(); drawNodeInfo();
+    }));
+  }
+
+  function drawLayout() {
+    const f = current();
+    const canvas = $("canvas");
+    const W = canvas.clientWidth || 900;
+    const H = Math.max(360, window.innerHeight - 220);
+    canvas.style.height = `${H}px`;
+    canvas.innerHTML = "";
+
+    const sw = f.screen?.w || 1;
+    const sh = f.screen?.h || 1;
+    const scale = Math.min((W - 12) / sw, (H - 12) / sh);
+    const ox = 6, oy = 6;
+    const hideTiny = $("hideTiny").checked;
+
+    (f.nodes || []).forEach(n => {
+      if (!n.layout) return;
+      const x = ox + n.layout.x * scale;
+      const y = oy + n.layout.y * scale;
+      const w = Math.max(1, n.layout.w * scale);
+      const h = Math.max(1, n.layout.h * scale);
+
+      const d = document.createElement("div");
+      d.className = "box" + (n.__changed ? " changed" : "") + (Number(n.nodeId) === Number(selectedNodeId) ? " selected" : "");
+      d.style.left = `${x}px`; d.style.top = `${y}px`; d.style.width = `${w}px`; d.style.height = `${h}px`;
+      d.title = `${n.type || 'Node'} #${n.nodeId}${n.id ? ` (${n.id})` : ''} [${n.layout.x},${n.layout.y},${n.layout.w},${n.layout.h}]`;
+      d.addEventListener("click", () => { selectedNodeId = Number(n.nodeId); drawTree(); drawLayout(); drawNodeInfo(); });
+
+      const showLabel = !hideTiny || (w >= 40 && h >= 18);
+      if (showLabel) {
+        const l = document.createElement("div");
+        l.className = "box-label";
+        l.textContent = n.id || `${n.type || 'N'}#${n.nodeId}`;
+        d.appendChild(l);
+      }
+      canvas.appendChild(d);
+    });
+  }
+
+  function drawNodeInfo() {
+    const f = current();
+    const n = (f.nodes || []).find(x => Number(x.nodeId) === Number(selectedNodeId));
+    if (!n) {
+      $("nodeInfo").innerHTML = `<tr><td class='k'>selected</td><td class='mono muted'>none</td></tr>`;
+      return;
+    }
+    const rows = [
+      ["nodeId", n.nodeId],
+      ["type", n.type],
+      ["id", n.id || ""],
+      ["parentId", n.parentId],
+      ["indexInParent", n.indexInParent],
+      ["dupCount", n.__dupCount || 1],
+      ["changed", !!n.__changed],
+      ["classes", n.classes || ""],
+      ["flags", (n.flags || []).join(", ")],
+      ["layout", n.layout ? `${n.layout.x},${n.layout.y},${n.layout.w},${n.layout.h}` : ""],
+      ["layoutNanos", n.cost?.layoutNanos ?? ""],
+      ["renderNanos", n.cost?.renderNanos ?? ""],
+      ["dirtyCells", n.cost?.dirtyCells ?? ""]
+    ];
+    $("nodeInfo").innerHTML = rows.map(([k,v]) => `<tr><td class='k'>${k}</td><td class='mono'>${v ?? ''}</td></tr>`).join("");
+  }
 })();
-</script></body></html>
+</script>
+</body>
+</html>
