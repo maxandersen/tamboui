@@ -114,6 +114,7 @@
   let selectedNodeId = null;
   let hoveredNodeId = null;
   const collapsedNodes = new Set();
+  let timelineDragging = false;
 
   const $ = id => document.getElementById(id);
 
@@ -131,6 +132,19 @@
   $("next").addEventListener("click", () => setFrame(Math.min(frames.length - 1, frameIndex + 1)));
   $("hideUnchanged").addEventListener("change", renderAll);
   $("hideTiny").addEventListener("change", drawLayout);
+
+  const timeline = $("timeline");
+  timeline.addEventListener("mousedown", (e) => {
+    timelineDragging = true;
+    const idx = timelineIndexFromEvent(e);
+    if (idx != null) setFrame(idx);
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!timelineDragging) return;
+    const idx = timelineIndexFromEvent(e);
+    if (idx != null && idx !== frameIndex) setFrame(idx);
+  });
+  window.addEventListener("mouseup", () => { timelineDragging = false; });
 
   function setFrame(i) {
     frameIndex = i;
@@ -192,9 +206,21 @@
       const hue = 200 - Math.min(180, Math.floor((cost / maxCost) * 180));
       d.style.background = `hsl(${hue} 60% 30%)`;
       d.dataset.tip = `#${f.frameId} render=${cost}`;
+      d.dataset.index = String(i);
       d.addEventListener("click", () => setFrame(i));
       t.appendChild(d);
     });
+  }
+
+
+  function timelineIndexFromEvent(e) {
+    const timeline = $("timeline");
+    const elAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+    if (!elAtPoint) return null;
+    const tick = elAtPoint.closest('.tick');
+    if (!tick || !timeline.contains(tick)) return null;
+    const idx = Number(tick.dataset.index);
+    return Number.isFinite(idx) ? idx : null;
   }
 
   function drawFrameInfo() {
