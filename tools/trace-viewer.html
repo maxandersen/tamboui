@@ -113,6 +113,7 @@
   let frameIndex = 0;
   let selectedNodeId = null;
   let hoveredNodeId = null;
+  const collapsedNodes = new Set();
 
   const $ = id => document.getElementById(id);
 
@@ -238,8 +239,13 @@
         const hovered = Number(n.nodeId) === Number(hoveredNodeId) ? "hovered" : "";
         const changedBadge = n.__changed ? "" : `<span class='badge unchanged'>unchanged</span>`;
         const dupBadge = n.__dupCount > 1 ? `<span class='badge dup'>x${n.__dupCount}</span>` : "";
+        const nid = Number(n.nodeId);
+        const hasChildren = (byParent.get(nid) || []).length > 0;
+        const collapsed = collapsedNodes.has(nid);
+        const caret = hasChildren ? (collapsed ? '▸' : '▾') : '·';
         const label = `${n.type || 'Node'} #${n.nodeId}${n.id ? ` (${n.id})` : ''}`;
-        return `<li><span class='node ${selected} ${hovered}' data-node='${n.nodeId}'>${label} ${dupBadge} ${changedBadge}</span>${renderList(Number(n.nodeId))}</li>`;
+        const childrenHtml = (hasChildren && !collapsed) ? renderList(nid) : '';
+        return `<li><span class='node ${selected} ${hovered}' data-node='${n.nodeId}' data-toggle='${hasChildren ? 1 : 0}'><span class='mono' style='opacity:.8'>${caret}</span> ${label} ${dupBadge} ${changedBadge}</span>${childrenHtml}</li>`;
       }).join("")}</ul>`;
     }
 
@@ -250,6 +256,13 @@
       n.addEventListener("click", () => {
         selectedNodeId = Number(n.getAttribute("data-node"));
         drawTree(); drawLayout(); drawNodeInfo();
+      });
+      n.addEventListener("dblclick", () => {
+        const nodeId = Number(n.getAttribute("data-node"));
+        if (n.getAttribute("data-toggle") === '1') {
+          if (collapsedNodes.has(nodeId)) collapsedNodes.delete(nodeId); else collapsedNodes.add(nodeId);
+          drawTree();
+        }
       });
       n.addEventListener("mouseenter", () => { hoveredNodeId = Number(n.getAttribute("data-node")); drawTree(); drawLayout(); });
       n.addEventListener("mouseleave", () => { hoveredNodeId = null; drawTree(); drawLayout(); });
