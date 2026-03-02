@@ -25,6 +25,7 @@
     .node { display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:6px; cursor:pointer; }
     .node:hover { background:#1f2531; }
     .node.selected { background:#23354a; outline:1px solid #325a7f; }
+    .node.hovered { background:#1d2a3a; outline:1px solid #2f4f72; }
     .badge { font-size:10px; border:1px solid #345; border-radius:999px; padding:1px 6px; color:#9ecbff; }
     .badge.dup { color:#ffe0a6; border-color:#6a5323; background:#3d3014; }
     .badge.unchanged { color:#b9eec7; border-color:#2e5b3a; background:#183323; }
@@ -37,6 +38,7 @@
     }
     .box.changed { border-color:rgba(255,209,102,.9); background:rgba(255,209,102,.12); }
     .box.selected { border-color:#ffd166; box-shadow:0 0 0 1px #ffd166 inset; }
+    .box.hovered { border-color:#9ecbff; box-shadow:0 0 0 1px #9ecbff inset; }
     .box-label {
       position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
       max-width:95%; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
@@ -110,6 +112,7 @@
   let frames = [];
   let frameIndex = 0;
   let selectedNodeId = null;
+  let hoveredNodeId = null;
 
   const $ = id => document.getElementById(id);
 
@@ -232,20 +235,25 @@
       if (!kids.length) return "";
       return `<ul>${kids.map(n => {
         const selected = Number(n.nodeId) === Number(selectedNodeId) ? "selected" : "";
+        const hovered = Number(n.nodeId) === Number(hoveredNodeId) ? "hovered" : "";
         const changedBadge = n.__changed ? "" : `<span class='badge unchanged'>unchanged</span>`;
         const dupBadge = n.__dupCount > 1 ? `<span class='badge dup'>x${n.__dupCount}</span>` : "";
         const label = `${n.type || 'Node'} #${n.nodeId}${n.id ? ` (${n.id})` : ''}`;
-        return `<li><span class='node ${selected}' data-node='${n.nodeId}'>${label} ${dupBadge} ${changedBadge}</span>${renderList(Number(n.nodeId))}</li>`;
+        return `<li><span class='node ${selected} ${hovered}' data-node='${n.nodeId}'>${label} ${dupBadge} ${changedBadge}</span>${renderList(Number(n.nodeId))}</li>`;
       }).join("")}</ul>`;
     }
 
     const html = renderList(-1) || renderList(0) || `<div class='muted mono'>No tree data</div>`;
     const tree = $("tree");
     tree.innerHTML = html;
-    tree.querySelectorAll("[data-node]").forEach(n => n.addEventListener("click", () => {
-      selectedNodeId = Number(n.getAttribute("data-node"));
-      drawTree(); drawLayout(); drawNodeInfo();
-    }));
+    tree.querySelectorAll("[data-node]").forEach(n => {
+      n.addEventListener("click", () => {
+        selectedNodeId = Number(n.getAttribute("data-node"));
+        drawTree(); drawLayout(); drawNodeInfo();
+      });
+      n.addEventListener("mouseenter", () => { hoveredNodeId = Number(n.getAttribute("data-node")); drawTree(); drawLayout(); });
+      n.addEventListener("mouseleave", () => { hoveredNodeId = null; drawTree(); drawLayout(); });
+    });
   }
 
   function drawLayout() {
@@ -261,6 +269,7 @@
     const scale = Math.min((W - 12) / sw, (H - 12) / sh);
     const ox = 6, oy = 6;
     const hideTiny = $("hideTiny").checked;
+    const maxRender = Math.max(1, ...(f.nodes||[]).map(n => Number(n.cost?.renderNanos || 0)));
 
     (f.nodes || []).forEach(n => {
       if (!n.layout) return;
@@ -270,10 +279,15 @@
       const h = Math.max(1, n.layout.h * scale);
 
       const d = document.createElement("div");
-      d.className = "box" + (n.__changed ? " changed" : "") + (Number(n.nodeId) === Number(selectedNodeId) ? " selected" : "");
+      d.className = "box" + (n.__changed ? " changed" : "") + (Number(n.nodeId) === Number(selectedNodeId) ? " selected" : "") + (Number(n.nodeId) === Number(hoveredNodeId) ? " hovered" : "");
       d.style.left = `${x}px`; d.style.top = `${y}px`; d.style.width = `${w}px`; d.style.height = `${h}px`;
+      const rn = Number(n.cost?.renderNanos || 0);
+      const alpha = Math.min(0.45, rn / maxRender * 0.45);
+      d.style.background = `rgba(88,196,255,${0.06 + alpha})`;
       d.title = `${n.type || 'Node'} #${n.nodeId}${n.id ? ` (${n.id})` : ''} [${n.layout.x},${n.layout.y},${n.layout.w},${n.layout.h}]`;
       d.addEventListener("click", () => { selectedNodeId = Number(n.nodeId); drawTree(); drawLayout(); drawNodeInfo(); });
+      d.addEventListener("mouseenter", () => { hoveredNodeId = Number(n.nodeId); drawTree(); drawLayout(); });
+      d.addEventListener("mouseleave", () => { hoveredNodeId = null; drawTree(); drawLayout(); });
 
       const showLabel = !hideTiny || (w >= 40 && h >= 18);
       if (showLabel) {
