@@ -325,7 +325,11 @@
       d.style.background = `rgba(88,196,255,${0.06 + alpha})`;
       d.title = `${n.type || 'Node'} #${n.nodeId}${n.id ? ` (${n.id})` : ''} [${n.layout.x},${n.layout.y},${n.layout.w},${n.layout.h}]`;
       d.addEventListener("click", () => { selectedNodeId = Number(n.nodeId); drawTree(); drawLayout(); drawNodeInfo(); });
-      d.addEventListener("mouseenter", () => { hoveredNodeId = Number(n.nodeId); drawTree(); drawLayout(); });
+      d.addEventListener("mouseenter", () => {
+        hoveredNodeId = Number(n.nodeId);
+        selectedNodeId = Number(n.nodeId);
+        drawTree(); drawLayout(); drawNodeInfo();
+      });
       d.addEventListener("mouseleave", () => { hoveredNodeId = null; drawTree(); drawLayout(); });
 
       const showLabel = !hideTiny || (w >= 40 && h >= 18);
