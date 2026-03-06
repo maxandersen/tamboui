@@ -27,6 +27,8 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.dvdlogo.DVDLogo;
+import dev.tamboui.widgets.dvdlogo.DVDLogoState;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -40,6 +42,8 @@ public class FileManagerView implements Element {
     private final FileManagerController manager;
     private final FileManagerKeyHandler keyHandler;
     private DialogElement currentDialog;
+    private boolean dvdLogoActive = false;
+    private final DVDLogoState dvdLogoState = new DVDLogoState();
 
     /**
      * Creates a new FileManagerView.
@@ -47,7 +51,14 @@ public class FileManagerView implements Element {
      */
     public FileManagerView(FileManagerController manager) {
         this.manager = manager;
-        this.keyHandler = new FileManagerKeyHandler(manager);
+        this.keyHandler = new FileManagerKeyHandler(manager, this);
+    }
+
+    /**
+     * Toggles the DVD logo screensaver overlay on/off.
+     */
+    public void toggleDvdLogo() {
+        dvdLogoActive = !dvdLogoActive;
     }
 
     /**
@@ -72,6 +83,24 @@ public class FileManagerView implements Element {
         } else {
             currentDialog = null;
         }
+
+        // Render DVD logo overlay on top of everything
+        if (dvdLogoActive) {
+            renderDvdLogo(frame, area);
+        }
+    }
+
+    private void renderDvdLogo(Frame frame, Rect area) {
+        if (area.width() < DVDLogoState.LOGO_WIDTH || area.height() < DVDLogoState.LOGO_HEIGHT) {
+            return;
+        }
+        dvdLogoState.update(area.width(), area.height());
+        Rect logoRect = new Rect(
+                area.x() + dvdLogoState.logoX(),
+                area.y() + dvdLogoState.logoY(),
+                DVDLogoState.LOGO_WIDTH,
+                DVDLogoState.LOGO_HEIGHT);
+        frame.renderStatefulWidget(DVDLogo.INSTANCE, logoRect, dvdLogoState);
     }
 
     private void renderDialog(Frame frame, Rect area, RenderContext context) {
@@ -205,6 +234,7 @@ public class FileManagerView implements Element {
                 text(" [F8] Delete ").dim(),
                 text(" [o] Goto ").dim(),
                 text(" [v] View ").dim(),
+                text(" [z] DVD ").dim(),
                 text(" [q] Quit ").dim()
         ).length(1);
     }

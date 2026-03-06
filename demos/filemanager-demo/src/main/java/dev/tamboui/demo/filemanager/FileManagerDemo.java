@@ -45,6 +45,7 @@ import dev.tamboui.tui.TuiConfig;
  *   <li>F8/D - Delete</li>
  *   <li>V - View file (text files show in scrollable paragraph, PNG images show in Image widget)</li>
  *   <li>R - Refresh</li>
+ *   <li>Z - Toggle DVD logo screensaver overlay</li>
  *   <li>Q - Quit</li>
  * </ul>
  * <p>Viewer key bindings:

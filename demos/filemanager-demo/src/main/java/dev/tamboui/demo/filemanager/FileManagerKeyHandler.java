@@ -18,13 +18,16 @@ import dev.tamboui.tui.event.KeyEvent;
 public class FileManagerKeyHandler {
 
     private final FileManagerController manager;
+    private final FileManagerView view;
 
     /**
      * Creates a new FileManagerKeyHandler.
      * @param manager the file manager controller
+     * @param view the file manager view (for toggling overlays)
      */
-    public FileManagerKeyHandler(FileManagerController manager) {
+    public FileManagerKeyHandler(FileManagerController manager, FileManagerView view) {
         this.manager = manager;
+        this.view = view;
     }
 
     /**
@@ -168,6 +171,12 @@ public class FileManagerKeyHandler {
         // View file
         if (event.isCharIgnoreCase('v')) {
             manager.promptViewFile();
+            return EventResult.HANDLED;
+        }
+
+        // Toggle DVD logo screensaver overlay
+        if (event.isCharIgnoreCase('z')) {
+            view.toggleDvdLogo();
             return EventResult.HANDLED;
         }
 
