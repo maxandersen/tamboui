@@ -25,10 +25,10 @@ import dev.tamboui.style.Color;
 public final class DVDLogoState {
 
     /** Width of the DVD logo widget including its border. */
-    public static final int LOGO_WIDTH = 9;
+    public static final int LOGO_WIDTH = 16;
 
     /** Height of the DVD logo widget including its border. */
-    public static final int LOGO_HEIGHT = 3;
+    public static final int LOGO_HEIGHT = 6;
 
     private static final Color[] COLORS = {
         Color.RED,

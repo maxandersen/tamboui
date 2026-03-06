@@ -16,6 +16,9 @@ import dev.tamboui.widgets.block.Borders;
 /**
  * A widget that renders a bouncing "DVD" logo, reminiscent of the classic DVD screensaver.
  *
+ * <p>The logo uses Unicode Braille characters to render a dot-matrix style "DVD" text,
+ * similar to the viral Claude Code hook by @itseieio.
+ *
  * <p>This is a {@link StatefulWidget} – the caller must provide a {@link DVDLogoState} that
  * tracks position, velocity, and color. Call {@link DVDLogoState#update(int, int)} once per
  * frame before rendering to advance the animation.
@@ -44,6 +47,16 @@ public final class DVDLogo implements StatefulWidget<DVDLogoState> {
      */
     public static final DVDLogo INSTANCE = new DVDLogo();
 
+    // Braille dot-matrix "DVD" logo rows (generated from a 16×16 pixel bitmap).
+    // Each braille character encodes a 2×4 pixel block. The result is 14 chars wide × 4 rows tall,
+    // which fits inside the 16×6 widget area (1-char border on each side).
+    private static final String[] LOGO_ROWS = {
+        "⣾⠉⢳⡄⠀⣿⠀⢸⡇⠀⣾⠉⢳⡄",
+        "⣿⠀⢸⡇⠀⠹⣆⡾⠁⠀⣿⠀⢸⡇",
+        "⣿⠀⢸⡇⠀⠀⢹⠁⠀⠀⣿⠀⢸⡇",
+        "⠻⠤⠞⠁⠀⠀⠸⠀⠀⠀⠻⠤⠞⠁",
+    };
+
     private DVDLogo() {
     }
 
@@ -57,19 +70,18 @@ public final class DVDLogo implements StatefulWidget<DVDLogoState> {
         Clear.INSTANCE.render(area, buffer);
 
         // Colored rounded border
-        Style borderStyle = Style.EMPTY.fg(state.color());
+        Style style = Style.EMPTY.fg(state.color());
         Block block = Block.builder()
                 .borders(Borders.ALL)
                 .borderType(BorderType.ROUNDED)
-                .borderStyle(borderStyle)
+                .borderStyle(style)
                 .build();
         block.render(area, buffer);
 
-        // "DVD" text centred inside the border
+        // Render braille "DVD" rows inside the border
         Rect inner = block.inner(area);
-        if (!inner.isEmpty()) {
-            String label = " DVD ";
-            buffer.setString(inner.x(), inner.y(), label, Style.EMPTY.fg(state.color()).bold());
+        for (int i = 0; i < LOGO_ROWS.length && i < inner.height(); i++) {
+            buffer.setString(inner.x(), inner.y() + i, LOGO_ROWS[i], style);
         }
     }
 }
