@@ -7,6 +7,9 @@
     "aesh-ssh-http-demo": {
       "script-ref": "demos/aesh-ssh-http-demo/src/main/java/dev/tamboui/demo/aesh/AeshSshHttpDemo.java"
     },
+    "dvdlogo-demo": {
+      "script-ref": "demos/dvdlogo-demo/src/main/java/dev/tamboui/demo/dvdlogo/DVDLogoDemo.java"
+    },
     "error-handling-demo": {
       "script-ref": "demos/error-handling-demo/src/main/java/dev/tamboui/demo/errorhandling/ErrorHandlingDemo.java"
     },

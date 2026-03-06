@@ -2,6 +2,13 @@
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
+//DEPS dev.tamboui:tamboui-toolkit:0.1.0
+//DEPS dev.tamboui:tamboui-jline3-backend:0.1.0
+//DEPS dev.tamboui:tamboui-panama-backend:0.1.0
+
+//SOURCES ../../../../../../../../../tamboui-widgets/src/main/java/dev/tamboui/widgets/dvdlogo/DVDLogoState.java ../../../../../../../../../tamboui-widgets/src/main/java/dev/tamboui/widgets/dvdlogo/DVDLogo.java
+// Prevents OSX from showing up in the terminal when running the demo
+//JAVA_OPTIONS -Dapple.awt.UIElement=true
 package dev.tamboui.demo.dvdlogo;
 
 import java.time.Duration;
