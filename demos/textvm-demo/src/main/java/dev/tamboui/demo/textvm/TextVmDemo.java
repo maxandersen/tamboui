@@ -48,6 +48,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
@@ -283,7 +284,7 @@ public final class TextVmDemo {
 
         Element trace = list()
                 .data(last.stackTraceLines(), line -> text(line).addClass("error-trace").ellipsis())
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .id("error-trace")
                 .focusable()
                 .fill();
@@ -296,7 +297,7 @@ public final class TextVmDemo {
                         .spacing(1))
                 .rounded()
                 .width(110)
-                .height(24)
+                .length(24)
                 .onCancel(() -> showErrorPopup = false)
                 .onConfirm(() -> showErrorPopup = false);
     }
@@ -349,7 +350,7 @@ public final class TextVmDemo {
         var list = list()
                 .data(processes, this::renderProcessItem)
                 .selected(selectedProcessIndex)
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .id("process-list");
 
         return panel(() -> list)
@@ -456,11 +457,11 @@ public final class TextVmDemo {
                 // Command as a list
                 text("Command:").addClass("kv-key").length(1),
                 list(commandLines)
-                        .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED),
+                        .scrollbar(ScrollBarPolicy.AS_NEEDED),
                 // Args as a list
                 text("Args:").addClass("kv-key").length(1),
                 list(argLines)
-                        .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                        .scrollbar(ScrollBarPolicy.AS_NEEDED)
                         .fill())
                         .spacing(0)
                         .fill())
@@ -565,7 +566,7 @@ public final class TextVmDemo {
 
         Element threadList = list()
                 .data(threads, this::renderThreadItem)
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .id("thread-list");
 
         Element listPanel = panel(() -> threadList)
@@ -610,7 +611,7 @@ public final class TextVmDemo {
 
         Element list = list()
                 .data(sorted, this::renderGcItem)
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .id("gc-list");
 
         return panel(() -> list)
@@ -641,7 +642,7 @@ public final class TextVmDemo {
                         text(entry.getValue()).ellipsis().addClass("kv-value").fill())
                         .spacing(1)
                         .length(1))
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .id("properties-list");
 
         return panel(() -> list)
