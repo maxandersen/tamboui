@@ -16,9 +16,10 @@ dependencies {
     implementation(libs.asciidoctor.plugin)
     implementation(libs.git.publish.plugin)
     implementation(libs.spotless.gradle.plugin)
+    implementation(libs.test.logger.gradle.plugin)
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.14.3")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {
