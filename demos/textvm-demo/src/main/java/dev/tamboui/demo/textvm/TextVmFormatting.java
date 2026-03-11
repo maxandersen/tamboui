@@ -6,7 +6,6 @@ package dev.tamboui.demo.textvm;
 
 import java.time.Duration;
 import java.util.Locale;
-import java.util.Objects;
 
 final class TextVmFormatting {
 

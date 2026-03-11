@@ -73,7 +73,6 @@ public final class TextVmDemo {
     private static final Duration ATTACH_RETRY_INTERVAL = Duration.ofSeconds(5);
     private static final int HISTORY_SIZE = 60;
     private static final int MAX_THREADS = 80;
-    private static final int MAX_PROPERTIES = 24;
     private static final int PROCESS_PANEL_WIDTH = 38;
     private static final int MAX_ERROR_LOG_ENTRIES = 200;
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -101,6 +100,8 @@ public final class TextVmDemo {
     private String statusMessage = "Ready";
     private final Deque<ErrorEntry> errorLog = new ArrayDeque<>();
     private boolean showErrorPopup;
+    private boolean showThreadDetail;
+    private int selectedThreadIndex;
 
     private record ErrorEntry(String timestamp, String message, List<String> stackTraceLines) {
     }
@@ -141,6 +142,12 @@ public final class TextVmDemo {
 
         try (var runner = ToolkitRunner.builder().config(config).styleEngine(styleEngine).build()) {
             this.runner = runner;
+            runner.eventRouter().addGlobalHandler(event -> {
+                if (event instanceof KeyEvent ke) {
+                    return handleKey(ke);
+                }
+                return EventResult.UNHANDLED;
+            });
             updateProcessList(ProcessCollector.collect());
             startBackgroundTasks();
             runner.run(this::render);
@@ -253,15 +260,14 @@ public final class TextVmDemo {
                 .top(header, Constraint.length(1))
                 .center(content)
                 .bottom(footer, Constraint.length(1))
-                .id("textvm")
-                .focusable()
-                .onKeyEvent(this::handleKey);
-        if (!showErrorPopup) {
-            return base;
+                .id("textvm");
+        if (showThreadDetail) {
+            return stack(base, renderThreadDetailPopup());
         }
-        return stack(
-                base,
-                renderErrorPopup());
+        if (showErrorPopup) {
+            return stack(base, renderErrorPopup());
+        }
+        return base;
     }
 
     private Element renderErrorPopup() {
@@ -302,6 +308,42 @@ public final class TextVmDemo {
                 .onConfirm(() -> showErrorPopup = false);
     }
 
+    private Element renderThreadDetailPopup() {
+        if (selectedThreadIndex < 0 || selectedThreadIndex >= threads.size()) {
+            showThreadDetail = false;
+            return text("");
+        }
+        ThreadSnapshot thread = threads.get(selectedThreadIndex);
+        String title = thread.name() + " [" + thread.state().name() + "]";
+
+        Element header = row(
+                text(title).addClass("thread-detail-title"),
+                spacer(),
+                text("[Esc] close").addClass("hint"))
+                .spacing(1)
+                .length(1);
+
+        List<String> lines = thread.stackTrace().isEmpty()
+                ? List.of("  (no stack trace available)")
+                : thread.stackTrace();
+
+        Element trace = list()
+                .data(lines, line -> text(line).addClass("stack-frame").ellipsis())
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
+                .displayOnly()
+                .id("thread-stack")
+                .focusable()
+                .fill();
+
+        return dialog("Thread Detail",
+                column(header, trace).spacing(1))
+                .rounded()
+                .width(100)
+                .length(30)
+                .onCancel(() -> showThreadDetail = false)
+                .onConfirm(() -> showThreadDetail = false);
+    }
+
     private JavaProcess selectedProcess() {
         if (processes.isEmpty()) {
             return null;
@@ -324,9 +366,13 @@ public final class TextVmDemo {
     }
 
     private Element renderFooter() {
-        String hint = " [Up/Down] Process  [Left/Right] Tabs  [1-5] Jump  [R] Refresh  [Q] Quit ";
+        String common = " [Tab] Focus  [↑↓] Navigate  [←→] Tab  [1-5] Jump  [R] Refresh  [E] Errors  [Q] Quit";
+        String tabHint = switch (selectedTabIndex) {
+            case 2 -> "  [Enter] Stack trace";
+            default -> "";
+        };
         return row(
-                text(hint).addClass("hint"),
+                text(common + tabHint).addClass("hint"),
                 spacer(),
                 text(statusMessage).addClass("status"))
                 .id("footer");
@@ -347,13 +393,25 @@ public final class TextVmDemo {
                     .title("Processes");
         }
 
-        var list = list()
+        ListElement<JavaProcess> processList = list()
                 .data(processes, this::renderProcessItem)
                 .selected(selectedProcessIndex)
                 .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                .id("process-list");
+                .id("process-list")
+                .focusable();
+        processList.onKeyEvent(event -> {
+            if (event.matches(Actions.MOVE_UP)) {
+                selectProcess(selectedProcessIndex - 1);
+                return EventResult.HANDLED;
+            }
+            if (event.matches(Actions.MOVE_DOWN)) {
+                selectProcess(selectedProcessIndex + 1);
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        });
 
-        return panel(() -> list)
+        return panel(() -> processList)
                 .title("Processes")
                 .id("process-panel");
     }
@@ -564,13 +622,23 @@ public final class TextVmDemo {
         Map<Thread.State, Long> stateCounts = threads.stream()
                 .collect(Collectors.groupingBy(ThreadSnapshot::state, Collectors.counting()));
 
-        Element threadList = list()
+        ListElement<ThreadSnapshot> threadList = list()
                 .data(threads, this::renderThreadItem)
+                .selected(selectedThreadIndex)
                 .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                .id("thread-list");
+                .id("thread-list")
+                .focusable();
+        threadList.onKeyEvent(event -> {
+            if (event.matches(Actions.CONFIRM) || event.matches(Actions.SELECT)) {
+                selectedThreadIndex = threadList.selected();
+                showThreadDetail = true;
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        });
 
         Element listPanel = panel(() -> threadList)
-                .title("Threads")
+                .title("Threads (" + threads.size() + ")")
                 .fill();
 
         Element statePanel = panel(() -> column(
@@ -593,9 +661,18 @@ public final class TextVmDemo {
                 ? String.format(Locale.ROOT, "%d ms", snapshot.cpuTimeMs())
                 : "n/a";
 
+        String stateClass = switch (snapshot.state()) {
+            case RUNNABLE -> "state-runnable";
+            case BLOCKED -> "state-blocked";
+            case WAITING -> "state-waiting";
+            case TIMED_WAITING -> "state-timed-waiting";
+            case NEW -> "state-new";
+            case TERMINATED -> "state-terminated";
+        };
+
         return row(
                 text(snapshot.name()).ellipsis().addClass("thread-name").fill(),
-                text(snapshot.state().name()).addClass("thread-state"),
+                text(snapshot.state().name()).addClass("thread-state").addClass(stateClass),
                 text(cpuTime).addClass("thread-cpu"))
                 .spacing(1)
                 .length(1);
@@ -612,10 +689,24 @@ public final class TextVmDemo {
         Element list = list()
                 .data(sorted, this::renderGcItem)
                 .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                .id("gc-list");
+                .id("gc-list")
+                .focusable();
 
-        return panel(() -> list)
+        Element listPanel = panel(() -> list)
                 .title("Garbage Collectors")
+                .fill();
+
+        Element pausePanel = panel(() -> column(
+                metricHeader("GC Pause", formatGcPause()),
+                gauge(Math.max(0, metrics.gcPausePercent()))
+                        .label(formatGcPause())
+                        .useUnicode(false),
+                sparkline(gcSeries.values()).max(100)))
+                .title("GC Pause %")
+                .fill();
+
+        return row(listPanel, pausePanel)
+                .spacing(1)
                 .fill();
     }
 
@@ -643,7 +734,8 @@ public final class TextVmDemo {
                         .spacing(1)
                         .length(1))
                 .scrollbar(ScrollBarPolicy.AS_NEEDED)
-                .id("properties-list");
+                .id("properties-list")
+                .focusable();
 
         return panel(() -> list)
                 .title("Runtime Properties")
@@ -663,29 +755,6 @@ public final class TextVmDemo {
                 text(safeValue).ellipsis().addClass("kv-value").fill())
                 .spacing(1)
                 .length(1);
-    }
-
-    private static List<String> splitIntoLines(String text, int maxWidth) {
-        if (text == null || text.isBlank()) {
-            return List.of("n/a");
-        }
-        List<String> lines = new ArrayList<>();
-        String[] words = text.split("\\s+");
-        StringBuilder currentLine = new StringBuilder();
-        for (String word : words) {
-            if (currentLine.length() + word.length() + 1 > maxWidth && currentLine.length() > 0) {
-                lines.add(currentLine.toString());
-                currentLine.setLength(0);
-            }
-            if (currentLine.length() > 0) {
-                currentLine.append(' ');
-            }
-            currentLine.append(word);
-        }
-        if (currentLine.length() > 0) {
-            lines.add(currentLine.toString());
-        }
-        return lines.isEmpty() ? List.of("n/a") : lines;
     }
 
     private Element metricHeader(String label, String value) {
@@ -780,17 +849,7 @@ public final class TextVmDemo {
     }
 
     private EventResult handleKey(KeyEvent event) {
-        // Only handle Up/Down for process selection when wrapper is focused
-        // Lists will handle Up/Down when they are focused
-        if (event.matches(Actions.MOVE_UP)) {
-            selectProcess(selectedProcessIndex - 1);
-            return EventResult.HANDLED;
-        }
-        if (event.matches(Actions.MOVE_DOWN)) {
-            selectProcess(selectedProcessIndex + 1);
-            return EventResult.HANDLED;
-        }
-        // Always handle Left/Right for tabs and number keys for tab jumping
+        // Left/Right for tabs, letter keys for actions, number keys for tab jumping
         if (event.matches(Actions.MOVE_LEFT)) {
             selectTab(selectedTabIndex - 1);
             return EventResult.HANDLED;
@@ -804,25 +863,15 @@ public final class TextVmDemo {
             statusMessage = "Process list refreshed";
             return EventResult.HANDLED;
         }
-        if (event.isChar('1')) {
-            selectTab(0);
+        if (event.isChar('e') || event.isChar('E')) {
+            showErrorPopup = !showErrorPopup;
             return EventResult.HANDLED;
         }
-        if (event.isChar('2')) {
-            selectTab(1);
-            return EventResult.HANDLED;
-        }
-        if (event.isChar('3')) {
-            selectTab(2);
-            return EventResult.HANDLED;
-        }
-        if (event.isChar('4')) {
-            selectTab(3);
-            return EventResult.HANDLED;
-        }
-        if (event.isChar('5')) {
-            selectTab(4);
-            return EventResult.HANDLED;
+        for (int i = 0; i < TAB_TITLES.size(); i++) {
+            if (event.isChar((char) ('1' + i))) {
+                selectTab(i);
+                return EventResult.HANDLED;
+            }
         }
         return EventResult.UNHANDLED;
     }
@@ -1012,7 +1061,7 @@ public final class TextVmDemo {
         }
     }
 
-    private record ThreadSnapshot(String name, Thread.State state, long cpuTimeMs) {
+    private record ThreadSnapshot(String name, Thread.State state, long cpuTimeMs, List<String> stackTrace) {
     }
 
     private record GcSnapshot(String name, long count, long timeMs) {
@@ -1194,7 +1243,7 @@ public final class TextVmDemo {
                 return Collections.emptyList();
             }
             long[] ids = threadBean.getAllThreadIds();
-            ThreadInfo[] infos = threadBean.getThreadInfo(ids, 0);
+            ThreadInfo[] infos = threadBean.getThreadInfo(ids, 64);
             boolean cpuEnabled = threadBean.isThreadCpuTimeSupported()
                     && threadBean.isThreadCpuTimeEnabled();
 
@@ -1210,7 +1259,11 @@ public final class TextVmDemo {
                         cpuTimeMs = TimeUnit.NANOSECONDS.toMillis(cpuTimeNs);
                     }
                 }
-                snapshots.add(new ThreadSnapshot(info.getThreadName(), info.getThreadState(), cpuTimeMs));
+                List<String> stackTrace = new ArrayList<>();
+                for (StackTraceElement frame : info.getStackTrace()) {
+                    stackTrace.add("  at " + frame.toString());
+                }
+                snapshots.add(new ThreadSnapshot(info.getThreadName(), info.getThreadState(), cpuTimeMs, stackTrace));
             }
 
             snapshots.sort((a, b) -> Long.compare(b.cpuTimeMs(), a.cpuTimeMs()));
@@ -1241,33 +1294,16 @@ public final class TextVmDemo {
             Map<String, String> props = runtime.getSystemProperties();
             List<Map.Entry<String, String>> entries = new ArrayList<>();
 
-            List<String> keys = List.of(
-                    "java.version",
-                    "java.vm.name",
-                    "java.vm.vendor",
-                    "java.home",
-                    "sun.java.command",
-                    "user.dir",
-                    "os.name",
-                    "os.arch",
-                    "os.version",
-                    "java.class.path");
-
-            for (String key : keys) {
-                String value = props.get(key);
-                if (value != null && !value.isBlank()) {
-                    entries.add(Map.entry(key, value));
-                }
-            }
-
             String args = TextVmFormatting.joinArgs(runtime.getInputArguments().toArray(new String[0]));
             if (!args.isBlank()) {
                 entries.add(Map.entry("vm.args", args));
             }
 
-            if (entries.size() > MAX_PROPERTIES) {
-                return new ArrayList<>(entries.subList(0, MAX_PROPERTIES));
-            }
+            props.entrySet().stream()
+                    .filter(e -> e.getValue() != null && !e.getValue().isBlank())
+                    .sorted(Map.Entry.comparingByKey())
+                    .forEach(entries::add);
+
             return entries;
         }
 

@@ -109,3 +109,50 @@ GaugeElement-filled {
 SparklineElement {
     color: var(--accent);
 }
+
+.state-runnable {
+    color: #7fc97f;
+}
+
+.state-blocked {
+    color: #e05252;
+    text-style: bold;
+}
+
+.state-waiting {
+    color: #d4a843;
+}
+
+.state-timed-waiting {
+    color: #9e8a3e;
+}
+
+.state-new {
+    color: var(--accent);
+}
+
+.state-terminated {
+    color: var(--dim);
+}
+
+.thread-cpu {
+    color: var(--dim);
+}
+
+.thread-detail-title {
+    color: var(--accent);
+    text-style: bold;
+}
+
+.stack-frame {
+    color: var(--text);
+}
+
+.error-timestamp {
+    color: var(--dim);
+}
+
+.error-message {
+    color: #e05252;
+    text-style: bold;
+}
