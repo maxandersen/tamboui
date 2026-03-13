@@ -25,7 +25,6 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 import dev.tamboui.buffer.Buffer;
-import dev.tamboui.buffer.Cell;
 import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
