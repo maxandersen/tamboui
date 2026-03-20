@@ -25,6 +25,9 @@
     "inline-progress-demo": {
       "script-ref": "demos/inline-progress-demo/src/main/java/dev/tamboui/demo/InlineProgressDemo.java"
     },
+    "jdkdb-data-browser-demo": {
+      "script-ref": "demos/jdkdb-data-browser-demo/src/main/java/dev/tamboui/demo/jdkdb/JdkDbDataBrowserDemo.java"
+    },
     "listelement-demo": {
       "script-ref": "demos/listelement-demo/src/main/java/dev/tamboui/demo/ListElementDemo.java"
     },
