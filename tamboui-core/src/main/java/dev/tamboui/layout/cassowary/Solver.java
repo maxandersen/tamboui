@@ -83,10 +83,31 @@ public final class Solver {
     // Artificial objective for handling infeasibility
     private Row artificial;
 
+    private static final boolean DEFAULT_STRICT = Boolean.getBoolean("tamboui.solver.strict");
+
+    // Strongest non-required strength, used to soften unsatisfiable REQUIRED constraints in lenient mode
+    private static final Strength SOFTENED_REQUIRED = Strength.create(999, 999, 999);
+
+    private final boolean strict;
+
     /**
-     * Creates a new empty solver.
+     * Creates a new empty solver in lenient mode (default).
+     * In lenient mode, unsatisfiable REQUIRED constraints are automatically
+     * softened instead of throwing. Set the system property
+     * {@code tamboui.solver.strict} to {@code true} to disable this behavior.
      */
     public Solver() {
+        this(DEFAULT_STRICT);
+    }
+
+    /**
+     * Creates a new solver with the specified strictness mode.
+     *
+     * @param strict if true, unsatisfiable REQUIRED constraints throw;
+     *               if false, they are softened automatically
+     */
+    Solver(boolean strict) {
+        this.strict = strict;
         this.constraints = new LinkedHashMap<>();
         this.vars = new LinkedHashMap<>();
         this.rows = new LinkedHashMap<>();
@@ -101,10 +122,20 @@ public final class Solver {
      *
      * @param constraint the constraint to add
      * @throws DuplicateConstraintException     if the constraint already exists
-     * @throws UnsatisfiableConstraintException if required and unsatisfiable
+     * @throws UnsatisfiableConstraintException if required, unsatisfiable, and solver is in strict mode
      */
     public void addConstraint(CassowaryConstraint constraint) {
-        addConstraintInternal(constraint);
+        if (!tryAddConstraint(constraint) && constraint.isRequired()) {
+            if (strict) {
+                throw new UnsatisfiableConstraintException(constraint);
+            }
+            // Lenient mode: soften the constraint and retry
+            CassowaryConstraint softened = new CassowaryConstraint(
+                    constraint.expression(), constraint.relation(), SOFTENED_REQUIRED);
+            if (!tryAddConstraint(softened)) {
+                throw new UnsatisfiableConstraintException(constraint);
+            }
+        }
         optimize(objective);
     }
 
@@ -121,7 +152,14 @@ public final class Solver {
         }
     }
 
-    private void addConstraintInternal(CassowaryConstraint constraint) {
+    /**
+     * Tries to add a constraint to the solver.
+     *
+     * @param constraint the constraint to add
+     * @return true if the constraint was added successfully, false if unsatisfiable
+     * @throws DuplicateConstraintException if the constraint already exists
+     */
+    private boolean tryAddConstraint(CassowaryConstraint constraint) {
         if (constraints.containsKey(constraint)) {
             throw new DuplicateConstraintException(constraint);
         }
@@ -132,7 +170,7 @@ public final class Solver {
 
         if (subject == null && allDummies(row)) {
             if (!row.constant().isZero()) {
-                throw new UnsatisfiableConstraintException(constraint);
+                return false;
             }
             // The row is trivially satisfied
             subject = tag.marker;
@@ -140,7 +178,7 @@ public final class Solver {
 
         if (subject == null) {
             if (!addWithArtificialVariable(row)) {
-                throw new UnsatisfiableConstraintException(constraint);
+                return false;
             }
         } else {
             row.solveFor(subject);
@@ -149,6 +187,7 @@ public final class Solver {
         }
 
         constraints.put(constraint, tag);
+        return true;
     }
 
     /**

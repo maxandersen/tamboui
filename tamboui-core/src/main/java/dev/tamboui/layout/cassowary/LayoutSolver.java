@@ -32,6 +32,7 @@ public final class LayoutSolver {
     // Constraint strengths matching ratatui's hierarchy (higher = more important)
     // These ensure consistent priority ordering for constraint resolution
     private static final Strength LENGTH_SIZE_EQ = Strength.create(10, 0, 0);      // Fixed length
+    private static final Strength MIN_SIZE_GEQ = Strength.create(10, 0, 0);       // Min floor (strong, not required)
     private static final Strength PERCENTAGE_SIZE_EQ = Strength.STRONG;             // Percentage
     private static final Strength RATIO_SIZE_EQ = Strength.create(
             Fraction.of(1, 10), Fraction.ZERO, Fraction.ZERO);                      // Ratio
@@ -165,10 +166,11 @@ public final class LayoutSolver {
                     .equalTo(target, RATIO_SIZE_EQ));
 
         } else if (c instanceof Constraint.Min) {
-            // Minimum: size >= value (hard constraint)
+            // Minimum: size >= value (strong but not required, to degrade gracefully
+            // when multiple Min constraints exceed available space)
             int value = ((Constraint.Min) c).value();
             dest.add(Expression.variable(size)
-                    .greaterThanOrEqual(value, Strength.REQUIRED));
+                    .greaterThanOrEqual(value, MIN_SIZE_GEQ));
             // Min tries to GROW to fill available space (like Fill)
             dest.add(Expression.variable(size)
                     .equalTo(available, FILL_GROW));

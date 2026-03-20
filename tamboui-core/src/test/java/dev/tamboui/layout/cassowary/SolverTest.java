@@ -108,9 +108,9 @@ class SolverTest {
     }
 
     @Test
-    @DisplayName("Unsatisfiable required constraint throws exception")
+    @DisplayName("Unsatisfiable required constraint throws exception in strict mode")
     void unsatisfiableThrows() {
-        Solver solver = new Solver();
+        Solver solver = new Solver(true);
         Variable x = new Variable("x");
 
         solver.addConstraint(
@@ -246,6 +246,28 @@ class SolverTest {
         solver.reset();
         solver.updateVariables();
         assertThat(solver.valueOf(x)).isEqualTo(Fraction.ZERO);
+    }
+
+    @Test
+    @DisplayName("Lenient mode softens unsatisfiable required constraints instead of throwing")
+    void lenientMode_softensUnsatisfiableRequired() {
+        Solver solver = new Solver();
+        Variable x = new Variable("x");
+
+        // x == 100 (required)
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(100, Strength.REQUIRED));
+
+        // x == 200 (required, conflicting) — lenient mode should soften, not throw
+        solver.addConstraint(
+                Expression.variable(x)
+                        .equalTo(200, Strength.REQUIRED));
+
+        solver.updateVariables();
+
+        // First REQUIRED constraint wins; softened second is overridden
+        assertThat(solver.valueOf(x)).isEqualTo(Fraction.of(100));
     }
 
     @Test

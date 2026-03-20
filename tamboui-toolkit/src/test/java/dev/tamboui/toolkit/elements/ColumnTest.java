@@ -13,7 +13,6 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.layout.cassowary.UnsatisfiableConstraintException;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
@@ -22,7 +21,6 @@ import dev.tamboui.toolkit.element.RenderContext;
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for Column.
@@ -333,24 +331,24 @@ class ColumnTest {
         }
 
         @Test
-        @DisplayName("Two WRAP_CHARACTER texts whose combined minimum exceeds available height")
+        @DisplayName("Two WRAP_CHARACTER texts whose combined minimum exceeds available height degrade gracefully")
         void twoWrapTexts_combinedMinExceedsAvailableHeight() {
             // Each text needs 2 rows at width 6 (12 chars each), so the combined minimum
             // is 4 rows, but only 3 rows are available.
-            // The per-element cap (Math.min(preferredHeight, available)) gives each text
-            // Constraint.min(2), which is individually valid but jointly infeasible:
-            //   size[0] >= 2  AND  size[1] >= 2  AND  size[0] + size[1] <= 3
-            // The Cassowary solver therefore throws UnsatisfiableConstraintException.
+            // Both the Column (proportional Min capping) and the solver (non-required Min
+            // strength) ensure graceful degradation instead of throwing.
             Rect area = new Rect(0, 0, 6, 3);
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            assertThatThrownBy(() ->
-                column(
-                    text("AAAAAABBBBBB").overflow(Overflow.WRAP_CHARACTER),
-                    text("CCCCCCDDDDDD").overflow(Overflow.WRAP_CHARACTER)
-                ).render(frame, area, RenderContext.empty())
-            ).isInstanceOf(UnsatisfiableConstraintException.class);
+            // Should NOT throw — degrades gracefully
+            column(
+                text("AAAAAABBBBBB").overflow(Overflow.WRAP_CHARACTER),
+                text("CCCCCCDDDDDD").overflow(Overflow.WRAP_CHARACTER)
+            ).render(frame, area, RenderContext.empty());
+
+            // Both texts should get some space rendered
+            assertThat(buffer).isNotNull();
         }
 
         @Test

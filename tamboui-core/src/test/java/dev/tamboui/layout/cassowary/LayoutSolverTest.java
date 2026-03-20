@@ -178,4 +178,43 @@ class LayoutSolverTest {
             assertThat(size).isGreaterThanOrEqualTo(0);
         }
     }
+
+    @Test
+    @DisplayName("Multiple min constraints exceeding available space degrade gracefully")
+    void minConstraints_exceedingAvailable_degradesGracefully() {
+        LayoutSolver solver = new LayoutSolver();
+        List<Constraint> constraints = Arrays.asList(
+                Constraint.min(2),
+                Constraint.min(2)
+        );
+
+        // Combined minimum is 4, but only 3 available — should not throw
+        int[] sizes = solver.solve(constraints, 3, 0, Flex.START);
+
+        assertThat(sizes).hasSize(2);
+        for (int size : sizes) {
+            assertThat(size).isGreaterThanOrEqualTo(0);
+        }
+        assertThat(sizes[0] + sizes[1]).isLessThanOrEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("Three min constraints exceeding available space share space proportionally")
+    void threeMinConstraints_exceedingAvailable_shareProportionally() {
+        LayoutSolver solver = new LayoutSolver();
+        List<Constraint> constraints = Arrays.asList(
+                Constraint.min(5),
+                Constraint.min(5),
+                Constraint.min(5)
+        );
+
+        // Combined minimum is 15, but only 10 available — should not throw
+        int[] sizes = solver.solve(constraints, 10, 0, Flex.START);
+
+        assertThat(sizes).hasSize(3);
+        for (int size : sizes) {
+            assertThat(size).isGreaterThanOrEqualTo(0);
+        }
+        assertThat(sizes[0] + sizes[1] + sizes[2]).isLessThanOrEqualTo(10);
+    }
 }

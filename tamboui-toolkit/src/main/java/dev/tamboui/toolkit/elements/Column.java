@@ -240,6 +240,9 @@ public final class Column extends ContainerElement<Column> {
             }
         }
 
+        // Defensive cap: ensure total of Min constraints doesn't exceed available height
+        capMinConstraints(constraints, effectiveArea.height(), effectiveSpacing);
+
         // Build layout - only apply flex if explicitly set
         Layout layout = Layout.vertical()
             .constraints(constraints.toArray(new Constraint[0]));
@@ -261,6 +264,35 @@ public final class Column extends ContainerElement<Column> {
             Rect childArea = areas.get(i);
             context.renderChild(child, frame, childArea);
             childIndex++;
+        }
+    }
+
+    /**
+     * Caps Min constraints so their sum does not exceed the distributable height.
+     * When multiple children have Min constraints whose total exceeds available space,
+     * they are proportionally scaled down to fit.
+     */
+    private static void capMinConstraints(List<Constraint> constraints, int availableHeight, int spacing) {
+        int totalMin = 0;
+        int fixedSpace = 0;
+        for (Constraint c : constraints) {
+            if (c instanceof Constraint.Min) {
+                totalMin += ((Constraint.Min) c).value();
+            } else if (c instanceof Constraint.Length) {
+                fixedSpace += ((Constraint.Length) c).value();
+            }
+        }
+
+        int distributableForMins = Math.max(0, availableHeight - fixedSpace);
+        if (totalMin > distributableForMins && totalMin > 0) {
+            for (int i = 0; i < constraints.size(); i++) {
+                Constraint c = constraints.get(i);
+                if (c instanceof Constraint.Min) {
+                    int original = ((Constraint.Min) c).value();
+                    int scaled = (int) ((long) original * distributableForMins / totalMin);
+                    constraints.set(i, Constraint.min(Math.max(0, scaled)));
+                }
+            }
         }
     }
 
