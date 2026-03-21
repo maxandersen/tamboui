@@ -47,6 +47,7 @@ final class InlineViewport {
      * @return the width in characters
      */
     int width() {
+        syncArea(contentHeight);
         return area.width();
     }
 
@@ -65,6 +66,7 @@ final class InlineViewport {
      * @return the area rectangle
      */
     Rect area() {
+        syncArea(contentHeight);
         return area;
     }
 
@@ -80,13 +82,8 @@ final class InlineViewport {
      */
     void setContentHeight(int height) {
         height = Math.max(0, height);
-        // Grow buffer if needed
-        if (height > area.height()) {
-            this.area = Rect.of(area.width(), height);
-            this.buffer = Buffer.empty(area);
-            this.frame = Frame.forTesting(buffer);
-        }
         this.contentHeight = height;
+        syncArea(height);
     }
 
     /**
@@ -98,6 +95,7 @@ final class InlineViewport {
      * @param renderer the render function that populates the frame
      */
     void draw(Consumer<Frame> renderer) {
+        syncArea(contentHeight);
         buffer.clear();
         frame.clearCursor();  // Reset cursor before render
         renderer.accept(frame);
@@ -115,6 +113,18 @@ final class InlineViewport {
                 }
             }
         }, contentHeight, cursorX, cursorY);
+    }
+
+    private void syncArea(int minHeight) {
+        int targetWidth = display.width();
+        int targetHeight = Math.max(area.height(), minHeight);
+        if (targetWidth == area.width() && targetHeight == area.height()) {
+            return;
+        }
+
+        this.area = Rect.of(targetWidth, targetHeight);
+        this.buffer = Buffer.empty(area);
+        this.frame = Frame.forTesting(buffer);
     }
 
     /**

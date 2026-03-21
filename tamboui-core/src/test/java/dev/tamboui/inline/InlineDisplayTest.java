@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
 import dev.tamboui.style.Color;
@@ -189,17 +189,44 @@ class InlineDisplayTest {
         assertThat(output).contains("styled");
     }
 
+    @Test
+    @DisplayName("auto-width displays track terminal resize on the next render")
+    void autoWidthDisplayTracksTerminalResize() throws IOException {
+        InlineDisplay display = InlineDisplay.withBackend(2, mockBackend);
+
+        display.render((area, buf) -> assertThat(area.width()).isEqualTo(80));
+
+        mockBackend.resize(48, 24);
+
+        display.render((area, buf) -> assertThat(area.width()).isEqualTo(48));
+
+        assertThat(display.width()).isEqualTo(48);
+    }
+
+    @Test
+    @DisplayName("fixed-width displays ignore terminal resize")
+    void fixedWidthDisplayIgnoresTerminalResize() throws IOException {
+        InlineDisplay display = InlineDisplay.withBackend(2, 40, mockBackend);
+
+        mockBackend.resize(72, 24);
+
+        display.render((area, buf) -> assertThat(area.width()).isEqualTo(40));
+
+        assertThat(display.width()).isEqualTo(40);
+    }
+
     /**
      * A minimal mock Backend for testing.
      */
     private static class MockBackend implements Backend {
         boolean closed = false;
+        int width = 80;
+        int height = 24;
+        Runnable resizeHandler;
 
         @Override
-        public void draw(Iterable<CellUpdate> updates) throws IOException {
-        }
-
-        @Override
+        public void draw(DiffResult diff) throws IOException {
+        }        @Override
         public void flush() throws IOException {
         }
 
@@ -209,7 +236,7 @@ class InlineDisplayTest {
 
         @Override
         public Size size() throws IOException {
-            return new Size(80, 24);
+            return new Size(width, height);
         }
 
         @Override
@@ -252,6 +279,7 @@ class InlineDisplayTest {
 
         @Override
         public void onResize(Runnable handler) {
+            this.resizeHandler = handler;
         }
 
         @Override
@@ -267,6 +295,14 @@ class InlineDisplayTest {
         @Override
         public void close() throws IOException {
             closed = true;
+        }
+
+        void resize(int width, int height) {
+            this.width = width;
+            this.height = height;
+            if (resizeHandler != null) {
+                resizeHandler.run();
+            }
         }
     }
 }

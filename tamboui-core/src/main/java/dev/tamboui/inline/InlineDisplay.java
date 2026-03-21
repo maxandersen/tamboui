@@ -54,7 +54,8 @@ import dev.tamboui.text.Text;
 public final class InlineDisplay implements AutoCloseable {
 
     private final int height;  // Maximum height
-    private final int width;
+    private final boolean autoWidth;
+    private int width;
     private Buffer buffer;  // Resizable buffer
     private final PrintWriter out;
     private final Backend backend;
@@ -65,8 +66,13 @@ public final class InlineDisplay implements AutoCloseable {
     private int currentHeight;  // Current terminal lines allocated
 
     InlineDisplay(int height, int width, Backend backend, PrintWriter out) {
+        this(height, width, false, backend, out);
+    }
+
+    InlineDisplay(int height, int width, boolean autoWidth, Backend backend, PrintWriter out) {
         this.height = height;
         this.width = width;
+        this.autoWidth = autoWidth;
         this.backend = backend;
         this.out = out;
         this.buffer = Buffer.empty(Rect.of(width, height));
@@ -78,7 +84,8 @@ public final class InlineDisplay implements AutoCloseable {
 
     /**
      * Creates an InlineDisplay with the specified height.
-     * The width is automatically set to the terminal width.
+     * The width is automatically set to the terminal width and tracks terminal
+     * resizes on subsequent updates.
      *
      * @param height the number of lines to reserve for the display area
      * @return a new InlineDisplay
@@ -86,13 +93,30 @@ public final class InlineDisplay implements AutoCloseable {
      */
     public static InlineDisplay create(int height) throws IOException {
         Backend backend = BackendFactory.create();
-        Size size = backend.size();
-        PrintWriter out = createPrintWriter(backend);
-        return new InlineDisplay(height, size.width(), backend, out);
+        return withBackend(height, backend);
     }
 
     /**
-     * Creates an InlineDisplay with the specified height and width.
+     * Creates an InlineDisplay with the specified height using an existing backend.
+     * <p>
+     * The width is initialized from the backend and tracks terminal resizes on
+     * subsequent updates.
+     * The InlineDisplay will not take ownership of the backend; callers should
+     * avoid invoking {@link #close()} and instead call {@link #release()}.
+     *
+     * @param height the number of lines to reserve for the display area
+     * @param backend the backend to use for output
+     * @return a new InlineDisplay
+     * @throws IOException if initialization fails
+     */
+    public static InlineDisplay withBackend(int height, Backend backend) throws IOException {
+        Size size = backend.size();
+        PrintWriter out = createPrintWriter(backend);
+        return new InlineDisplay(height, size.width(), true, backend, out);
+    }
+
+    /**
+     * Creates an InlineDisplay with the specified height and fixed width.
      *
      * @param height the number of lines to reserve for the display area
      * @param width  the width of the display area in characters
@@ -106,7 +130,8 @@ public final class InlineDisplay implements AutoCloseable {
 
     /**
      * Creates an InlineDisplay using an existing backend. The InlineDisplay will not take ownership
-     * of the backend; callers should avoid invoking {@link #close()} and instead call {@link #release()}.
+     * of the backend; callers should avoid invoking {@link #close()} and instead call
+     * {@link #release()}. The width remains fixed at the provided value.
      *
      * @param height the number of lines to reserve for the display area
      * @param width  the width of the display area in characters
@@ -177,6 +202,7 @@ public final class InlineDisplay implements AutoCloseable {
      */
     public void render(BiConsumer<Rect, Buffer> renderer, int contentHeight, int cursorX, int cursorY) {
         ensureInitialized();
+        syncWidth();
 
         // Resize display if content height changed
         resizeDisplay(contentHeight);
@@ -201,6 +227,7 @@ public final class InlineDisplay implements AutoCloseable {
             return;
         }
         ensureInitialized();
+        syncWidth();
 
         // Ensure display is allocated to full height
         if (currentHeight != height) {
@@ -227,6 +254,7 @@ public final class InlineDisplay implements AutoCloseable {
             return;
         }
         ensureInitialized();
+        syncWidth();
 
         // Ensure display is allocated to full height
         if (currentHeight != height) {
@@ -255,6 +283,7 @@ public final class InlineDisplay implements AutoCloseable {
      */
     public void println(String message) {
         ensureInitialized();
+        syncWidth();
 
         if (currentHeight == 0) {
             // No display allocated yet, just print normally
@@ -302,6 +331,7 @@ public final class InlineDisplay implements AutoCloseable {
             return;
         }
 
+        syncWidth();
         Buffer tempBuffer = Buffer.empty(Rect.of(width, 1));
         tempBuffer.setLine(0, 0, text.lines().get(0));
         println(tempBuffer.toAnsiStringTrimmed());
@@ -350,10 +380,14 @@ public final class InlineDisplay implements AutoCloseable {
 
     /**
      * Returns the width of this display in characters.
+     * <p>
+     * For auto-width displays created with {@link #create(int)} or
+     * {@link #withBackend(int, Backend)}, this reflects the current terminal width.
      *
      * @return the display width
      */
     public int width() {
+        syncWidth();
         return width;
     }
 
@@ -382,6 +416,33 @@ public final class InlineDisplay implements AutoCloseable {
 
         initialized = true;
         // Note: Initial height allocation happens in first render() call via resizeDisplay()
+    }
+
+    private void syncWidth() {
+        if (!autoWidth) {
+            return;
+        }
+
+        try {
+            int newWidth = backend.size().width();
+            if (newWidth <= 0 || newWidth == width) {
+                return;
+            }
+
+            int currentBufferHeight = buffer.area().height();
+            Buffer resized = Buffer.empty(Rect.of(newWidth, currentBufferHeight));
+            int copyWidth = Math.min(width, newWidth);
+            for (int y = 0; y < currentBufferHeight; y++) {
+                for (int x = 0; x < copyWidth; x++) {
+                    resized.set(x, y, buffer.get(x, y));
+                }
+            }
+
+            width = newWidth;
+            buffer = resized;
+        } catch (IOException e) {
+            // Keep using the last known width if the terminal size cannot be queried.
+        }
     }
 
     private void redrawDisplayArea(int cursorX, int cursorY) {

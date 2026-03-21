@@ -5,6 +5,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 plugins {
     java
     id("com.diffplug.spotless")
+    id("com.adarshr.test-logger")
 }
 
 repositories {

@@ -93,4 +93,19 @@ class InlineViewportTest {
 
         assertThat(backend.rawOutput()).contains("Line10");
     }
+
+    @Test
+    @DisplayName("auto-width displays propagate resize to the viewport area")
+    void autoWidthDisplayResize_updatesViewportArea() throws Exception {
+        InlineDisplay display = InlineDisplay.withBackend(10, backend);
+        InlineViewport viewport = new InlineViewport(display);
+
+        backend.resize(40, 24);
+
+        final int[] renderedWidth = {-1};
+        viewport.draw(frame -> renderedWidth[0] = frame.area().width());
+
+        assertThat(renderedWidth[0]).isEqualTo(40);
+        assertThat(viewport.width()).isEqualTo(40);
+    }
 }

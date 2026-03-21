@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,11 +19,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import dev.tamboui.inline.InlineDisplay;
+import dev.tamboui.layout.Size;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
 import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.tui.event.UiRunnable;
 
@@ -35,6 +38,7 @@ import dev.tamboui.tui.event.UiRunnable;
  *   <li>Raw mode for key event reading (like TuiRunner)</li>
  *   <li>NO alternate screen (stays inline, like InlineDisplay)</li>
  *   <li>Tick events for animations (WaveText, etc.)</li>
+ *   <li>Automatic redraw on terminal resize</li>
  *   <li>Input reader thread for responsive keyboard handling</li>
  *   <li>Thread-safe operations for background task integration</li>
  * </ul>
@@ -75,6 +79,7 @@ public final class InlineTuiRunner implements AutoCloseable {
     private final Thread shutdownHook;
     private final AtomicReference<Instant> lastTick;
     private final AtomicReference<Instant> nextTickTime;
+    private final AtomicReference<Size> lastSize;
     private final TerminalInputReader inputReader;
 
     private InlineTuiRunner(Backend backend, InlineViewport viewport, InlineTuiConfig config) {
@@ -88,6 +93,19 @@ public final class InlineTuiRunner implements AutoCloseable {
         this.lastTick = new AtomicReference<>(Instant.now());
         this.nextTickTime = new AtomicReference<>(
                 config.tickRate() != null ? Instant.now().plus(config.tickRate()) : null);
+        this.lastSize = new AtomicReference<>(readCurrentSize(backend));
+
+        backend.onResize(() -> {
+            try {
+                Size newSize = backend.size();
+                Size previous = lastSize.getAndSet(newSize);
+                if (!newSize.equals(previous)) {
+                    eventQueue.offer(ResizeEvent.of(newSize.width(), newSize.height()));
+                }
+            } catch (IOException e) {
+                // Ignore resize errors
+            }
+        });
 
         // Set up scheduler - use provided scheduler or create one
         Schedulers.Scheduler scheduler = Schedulers.resolve(config.scheduler());
@@ -128,7 +146,10 @@ public final class InlineTuiRunner implements AutoCloseable {
      * @throws Exception if terminal initialization fails
      */
     public static InlineTuiRunner create(InlineTuiConfig config) throws Exception {
-        Backend backend = BackendFactory.create();
+        return create(BackendFactory.create(), config);
+    }
+
+    static InlineTuiRunner create(Backend backend, InlineTuiConfig config) throws Exception {
         InlineDisplay display;
 
         try {
@@ -136,8 +157,7 @@ public final class InlineTuiRunner implements AutoCloseable {
             backend.enableRawMode();
 
             // Create inline display using shared backend (no alternate screen)
-            int width = backend.size().width();
-            display = InlineDisplay.withBackend(config.height(), width, backend);
+            display = InlineDisplay.withBackend(config.height(), backend);
             if (config.clearOnClose()) {
                 display.clearOnClose();
             }
@@ -178,6 +198,14 @@ public final class InlineTuiRunner implements AutoCloseable {
                     // Handle UiRunnable events (scheduled work from other threads)
                     if (event instanceof UiRunnable) {
                         ((UiRunnable) event).run();
+                        continue;
+                    }
+
+                    if (event instanceof ResizeEvent) {
+                        handler.handle(event, this);
+                        if (running.get()) {
+                            viewport.draw(renderer::render);
+                        }
                         continue;
                     }
 
@@ -349,6 +377,14 @@ public final class InlineTuiRunner implements AutoCloseable {
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    private static Size readCurrentSize(Backend backend) {
+        try {
+            return backend.size();
+        } catch (IOException e) {
+            return new Size(80, 24);
+        }
     }
 
     /**

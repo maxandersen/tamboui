@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
 
@@ -28,15 +28,32 @@ import dev.tamboui.layout.Size;
  */
 public class TestBackend implements Backend {
 
-    private final int width;
-    private final int height;
+    private volatile int width;
+    private volatile int height;
     private final List<Op> ops = new ArrayList<>();
     private final StringBuilder rawOutput = new StringBuilder();
     private final List<Object> transcript = new ArrayList<>();
+    private volatile Runnable resizeHandler;
 
     public TestBackend(int width, int height) {
         this.width = width;
         this.height = height;
+    }
+
+    /**
+     * Simulates a terminal resize and invokes the registered resize handler.
+     *
+     * @param width the new terminal width
+     * @param height the new terminal height
+     */
+    public void resize(int width, int height) {
+        this.width = width;
+        this.height = height;
+
+        Runnable handler = resizeHandler;
+        if (handler != null) {
+            handler.run();
+        }
     }
 
     /**
@@ -150,7 +167,8 @@ public class TestBackend implements Backend {
     }
 
     @Override
-    public void draw(Iterable<CellUpdate> updates) throws IOException {
+    public void draw(DiffResult diff) throws IOException {
+        // No-op for test backend
     }
 
     @Override
@@ -203,6 +221,7 @@ public class TestBackend implements Backend {
 
     @Override
     public void onResize(Runnable handler) {
+        this.resizeHandler = handler;
     }
 
     @Override
