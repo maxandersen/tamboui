@@ -8,6 +8,9 @@
  */
 package dev.tamboui.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -25,10 +28,6 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Demonstrates all color modes supported by TamboUI:
@@ -55,11 +54,7 @@ public class ColorDemo {
             Terminal<Backend> terminal = new Terminal<>(backend);
 
             backend.onResize(() -> {
-                try {
                     terminal.draw(this::render);
-                } catch (IOException e) {
-                    // Ignore
-                }
             });
 
             while (running) {
