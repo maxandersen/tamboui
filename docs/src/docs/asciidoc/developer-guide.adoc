@@ -425,6 +425,10 @@ See `Paragraph.java` for a complete example of correct CharWidth usage in a widg
 * Provide methods for all state modifications
 * Consider immutable state for thread safety
 
+=== Native Image Support
+
+When building a native image, you need to make sure that JFR are enabled. This is done by passing `--enable-monitoring=jfr` to the native image builder.
+
 == Next Steps
 
 * Review the link:widgets.html[Widgets Reference] to see existing implementations
