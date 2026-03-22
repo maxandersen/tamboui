@@ -1,0 +1,39 @@
+/* ===================================================================
+ * Gruvbox Dark Theme
+ * A retro groove color scheme with warm, earthy tones
+ * https://github.com/morhetz/gruvbox
+ * =================================================================== */
+
+/* ===== Core Brand Colors ===== */
+$primary: #d3869b;      /* Purple - Primary brand color */
+$secondary: #83a598;    /* Blue - Secondary accent */
+$accent: #fe8019;       /* Orange - Highlight color */
+
+/* ===== Feedback Colors ===== */
+$error: #fb4934;        /* Red - Error states */
+$warning: #fabd2f;      /* Yellow - Warning states */
+$success: #b8bb26;      /* Green - Success states */
+$info: #8ec07c;         /* Aqua - Informational states */
+
+/* ===== Surface Colors ===== */
+$background: #282828;   /* bg - Main background */
+$surface: #3c3836;      /* bg1 - Elevated surface */
+$surface-variant: #504945;  /* bg2 - Alternative surface */
+$surface-dim: #1d2021;  /* bg0_h - Dimmed surface */
+
+/* ===== Text Colors ===== */
+$text: #ebdbb2;         /* fg - Primary text color */
+$text-muted: #a89984;   /* fg4 - Muted text */
+$text-disabled: #665c54;  /* bg4 - Disabled text */
+$text-on-primary: #282828;  /* bg - Text on primary color backgrounds */
+
+/* ===== Border Colors ===== */
+$border: #665c54;       /* bg4 - Default borders */
+$border-focus: #fe8019; /* Orange - Focused element borders */
+$border-muted: #504945; /* bg2 - Subtle borders */
+
+/* ===== Default Widget Styles ===== */
+* {
+    color: $text;
+    background: $background;
+}

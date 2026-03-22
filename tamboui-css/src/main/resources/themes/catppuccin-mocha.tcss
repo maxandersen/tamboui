@@ -1,0 +1,39 @@
+/* ===================================================================
+ * Catppuccin Mocha Theme
+ * A soothing pastel theme with warm, muted colors
+ * https://github.com/catppuccin/catppuccin
+ * =================================================================== */
+
+/* ===== Core Brand Colors ===== */
+$primary: #cba6f7;      /* Mauve - Primary brand color */
+$secondary: #89b4fa;    /* Blue - Secondary accent */
+$accent: #f5c2e7;       /* Pink - Highlight color */
+
+/* ===== Feedback Colors ===== */
+$error: #f38ba8;        /* Red - Error states */
+$warning: #f9e2af;      /* Yellow - Warning states */
+$success: #a6e3a1;      /* Green - Success states */
+$info: #89dceb;         /* Sky - Informational states */
+
+/* ===== Surface Colors ===== */
+$background: #1e1e2e;   /* Base - Main background */
+$surface: #313244;      /* Surface0 - Elevated surface */
+$surface-variant: #45475a;  /* Surface1 - Alternative surface */
+$surface-dim: #585b70;  /* Surface2 - Dimmed surface */
+
+/* ===== Text Colors ===== */
+$text: #cdd6f4;         /* Text - Primary text color */
+$text-muted: #a6adc8;   /* Subtext0 - Muted text */
+$text-disabled: #9399b2;  /* Overlay2 - Disabled text */
+$text-on-primary: #1e1e2e;  /* Base - Text on primary color backgrounds */
+
+/* ===== Border Colors ===== */
+$border: #6c7086;       /* Overlay0 - Default borders */
+$border-focus: #cba6f7; /* Mauve - Focused element borders */
+$border-muted: #585b70; /* Surface2 - Subtle borders */
+
+/* ===== Default Widget Styles ===== */
+* {
+    color: $text;
+    background: $background;
+}

@@ -1,0 +1,39 @@
+/* ===================================================================
+ * Nord Theme
+ * An arctic, north-bluish color palette
+ * https://www.nordtheme.com/
+ * =================================================================== */
+
+/* ===== Core Brand Colors ===== */
+$primary: #88c0d0;      /* Frost 2 - Primary brand color */
+$secondary: #81a1c1;    /* Frost 3 - Secondary accent */
+$accent: #b48ead;       /* Aurora Purple - Highlight color */
+
+/* ===== Feedback Colors ===== */
+$error: #bf616a;        /* Aurora Red - Error states */
+$warning: #ebcb8b;      /* Aurora Yellow - Warning states */
+$success: #a3be8c;      /* Aurora Green - Success states */
+$info: #8fbcbb;         /* Frost 1 - Informational states */
+
+/* ===== Surface Colors ===== */
+$background: #2e3440;   /* Polar Night 0 - Main background */
+$surface: #3b4252;      /* Polar Night 1 - Elevated surface */
+$surface-variant: #434c5e;  /* Polar Night 2 - Alternative surface */
+$surface-dim: #4c566a;  /* Polar Night 3 - Dimmed surface */
+
+/* ===== Text Colors ===== */
+$text: #eceff4;         /* Snow Storm 2 - Primary text color */
+$text-muted: #d8dee9;   /* Snow Storm 1 - Muted text */
+$text-disabled: #4c566a;  /* Polar Night 3 - Disabled text */
+$text-on-primary: #2e3440;  /* Polar Night 0 - Text on primary color backgrounds */
+
+/* ===== Border Colors ===== */
+$border: #4c566a;       /* Polar Night 3 - Default borders */
+$border-focus: #88c0d0; /* Frost 2 - Focused element borders */
+$border-muted: #434c5e; /* Polar Night 2 - Subtle borders */
+
+/* ===== Default Widget Styles ===== */
+* {
+    color: $text;
+    background: $background;
+}

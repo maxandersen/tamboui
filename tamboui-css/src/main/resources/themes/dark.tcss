@@ -1,0 +1,45 @@
+/* ===================================================================
+ * Dark Theme
+ * A classic dark theme with high contrast
+ * =================================================================== */
+
+/* ===== Core Brand Colors ===== */
+$primary: #00ffff;      /* Cyan - Primary brand color */
+$secondary: #0080ff;    /* Blue - Secondary accent */
+$accent: #00ffff;       /* Cyan - Highlight color */
+
+/* ===== Feedback Colors ===== */
+$error: #ff6b6b;        /* Light Red - Error states */
+$warning: #ffeb3b;      /* Light Yellow - Warning states */
+$success: #4caf50;      /* Light Green - Success states */
+$info: #00bcd4;         /* Light Cyan - Informational states */
+
+/* ===== Surface Colors ===== */
+$background: #000000;   /* Black - Main background */
+$surface: #1a1a1a;      /* Dark Gray - Elevated surface */
+$surface-variant: #333333;  /* Medium Gray - Alternative surface */
+$surface-dim: #0d0d0d;  /* Very Dark Gray - Dimmed surface */
+
+/* ===== Text Colors ===== */
+$text: #ffffff;         /* White - Primary text color */
+$text-muted: #999999;   /* Gray - Muted text */
+$text-disabled: #666666;  /* Dark Gray - Disabled text */
+$text-on-primary: #000000;  /* Black - Text on primary color backgrounds */
+
+/* ===== Border Colors ===== */
+$border: #555555;       /* Medium Gray - Default borders */
+$border-focus: #00ffff; /* Cyan - Focused element borders */
+$border-muted: #333333; /* Dark Gray - Subtle borders */
+
+/* ===== Legacy Variables (for backward compatibility) ===== */
+$bg-primary: $background;
+$fg-primary: $text;
+$border-color: $border;
+$focus-color: $border-focus;
+$highlight-bg: $surface-variant;
+
+/* ===== Default Widget Styles ===== */
+* {
+    color: $text;
+    background: $background;
+}

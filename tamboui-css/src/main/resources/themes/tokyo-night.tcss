@@ -1,0 +1,39 @@
+/* ===================================================================
+ * Tokyo Night Theme
+ * A clean, dark theme inspired by the lights of Tokyo at night
+ * https://github.com/tokyo-night/tokyo-night-vscode-theme
+ * =================================================================== */
+
+/* ===== Core Brand Colors ===== */
+$primary: #bb9af7;      /* Purple - Primary brand color */
+$secondary: #7aa2f7;    /* Blue - Secondary accent */
+$accent: #ff007c;       /* Magenta - Highlight color */
+
+/* ===== Feedback Colors ===== */
+$error: #f7768e;        /* Red - Error states */
+$warning: #e0af68;      /* Yellow - Warning states */
+$success: #9ece6a;      /* Green - Success states */
+$info: #7dcfff;         /* Cyan - Informational states */
+
+/* ===== Surface Colors ===== */
+$background: #1a1b26;   /* bg - Main background */
+$surface: #24283b;      /* bg_dark - Elevated surface */
+$surface-variant: #414868;  /* bg_highlight - Alternative surface */
+$surface-dim: #16161e;  /* bg_darker - Dimmed surface */
+
+/* ===== Text Colors ===== */
+$text: #c0caf5;         /* fg - Primary text color */
+$text-muted: #9aa5ce;   /* fg_dark - Muted text */
+$text-disabled: #565f89;  /* comment - Disabled text */
+$text-on-primary: #1a1b26;  /* bg - Text on primary color backgrounds */
+
+/* ===== Border Colors ===== */
+$border: #565f89;       /* comment - Default borders */
+$border-focus: #bb9af7; /* Purple - Focused element borders */
+$border-muted: #414868; /* bg_highlight - Subtle borders */
+
+/* ===== Default Widget Styles ===== */
+* {
+    color: $text;
+    background: $background;
+}

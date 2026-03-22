@@ -1,0 +1,39 @@
+/* ===================================================================
+ * Dracula Theme
+ * A dark theme with vibrant, high-contrast colors
+ * https://draculatheme.com/
+ * =================================================================== */
+
+/* ===== Core Brand Colors ===== */
+$primary: #bd93f9;      /* Purple - Primary brand color */
+$secondary: #8be9fd;    /* Cyan - Secondary accent */
+$accent: #ff79c6;       /* Pink - Highlight color */
+
+/* ===== Feedback Colors ===== */
+$error: #ff5555;        /* Red - Error states */
+$warning: #f1fa8c;      /* Yellow - Warning states */
+$success: #50fa7b;      /* Green - Success states */
+$info: #8be9fd;         /* Cyan - Informational states */
+
+/* ===== Surface Colors ===== */
+$background: #282a36;   /* Background - Main background */
+$surface: #44475a;      /* Current Line - Elevated surface */
+$surface-variant: #6272a4;  /* Comment - Alternative surface (lighter) */
+$surface-dim: #21222c;  /* Darker background - Dimmed surface */
+
+/* ===== Text Colors ===== */
+$text: #f8f8f2;         /* Foreground - Primary text color */
+$text-muted: #6272a4;   /* Comment - Muted text */
+$text-disabled: #44475a;  /* Current Line - Disabled text */
+$text-on-primary: #282a36;  /* Background - Text on primary color backgrounds */
+
+/* ===== Border Colors ===== */
+$border: #6272a4;       /* Comment - Default borders */
+$border-focus: #bd93f9; /* Purple - Focused element borders */
+$border-muted: #44475a; /* Current Line - Subtle borders */
+
+/* ===== Default Widget Styles ===== */
+* {
+    color: $text;
+    background: $background;
+}

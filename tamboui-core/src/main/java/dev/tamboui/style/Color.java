@@ -503,6 +503,86 @@ public interface Color {
     }
 
     /**
+     * Converts this color to a hex string.
+     *
+     * @return hex string in format {@code #rrggbb}
+     */
+    default String toHex() {
+        Rgb rgb = toRgb();
+        return String.format("#%02x%02x%02x", rgb.r(), rgb.g(), rgb.b());
+    }
+
+    /**
+     * Lightens this color by increasing lightness in HSL space.
+     *
+     * @param amount the amount to lighten (0.0 = no change, 1.0 = fully light)
+     * @return lightened color
+     */
+    default Color lighten(float amount) {
+        return ColorSpace.lighten(this, amount);
+    }
+
+    /**
+     * Darkens this color by decreasing lightness in HSL space.
+     *
+     * @param amount the amount to darken (0.0 = no change, 1.0 = fully dark)
+     * @return darkened color
+     */
+    default Color darken(float amount) {
+        return ColorSpace.darken(this, amount);
+    }
+
+    /**
+     * Adjusts saturation (color vibrancy).
+     *
+     * @param factor multiplication factor (&lt; 1.0 desaturates toward gray, &gt; 1.0 saturates)
+     * @return color with adjusted saturation
+     */
+    default Color adjustSaturation(float factor) {
+        return ColorSpace.adjustSaturation(this, factor);
+    }
+
+    /**
+     * Rotates hue on the color wheel.
+     * Useful for generating complementary (180°) or analogous (±30°) colors.
+     *
+     * @param degrees rotation in degrees (-360 to 360)
+     * @return color with rotated hue
+     */
+    default Color rotateHue(float degrees) {
+        return ColorSpace.rotateHue(this, degrees);
+    }
+
+    /**
+     * Mixes this color with another color.
+     *
+     * @param other the color to mix with
+     * @param ratio mixing ratio (0.0 = all this color, 1.0 = all other color)
+     * @return blended color
+     */
+    default Color mix(Color other, float ratio) {
+        return ColorSpace.mix(this, other, ratio);
+    }
+
+    /**
+     * Converts this color to HSL components.
+     *
+     * @return array [h, s, l] where h is 0-360 degrees, s and l are 0-100 percent
+     */
+    default float[] toHsl() {
+        return ColorSpace.toHsl(this);
+    }
+
+    /**
+     * Converts this color to HSV components.
+     *
+     * @return array [h, s, v] where h is 0-360 degrees, s and v are 0-100 percent
+     */
+    default float[] toHsv() {
+        return ColorSpace.toHsv(this);
+    }
+
+    /**
      * Converts an ANSI color to RGB using standard terminal colors.
      *
      * @param ansi the ANSI color
