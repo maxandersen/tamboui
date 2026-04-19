@@ -29,8 +29,40 @@ import dev.tamboui.util.SafeServiceLoader;
  */
 public final class BackendFactory {
 
+    private static final ThreadLocal<Backend> THREAD_LOCAL_BACKEND = new ThreadLocal<>();
+
     private BackendFactory() {
         // Utility class
+    }
+
+    /**
+     * Sets a thread-local backend override.
+     * <p>
+     * When set, {@link #create()} will return this backend instead of
+     * discovering one via ServiceLoader. This is useful for running
+     * applications over remote connections (e.g., SSH or WebSocket)
+     * where the backend must be provided externally.
+     * <p>
+     * The override only applies to the calling thread. Call
+     * {@link #clearThreadLocalBackend()} to remove it.
+     *
+     * @param backend the backend to use, or null to clear
+     */
+    public static void setThreadLocalBackend(Backend backend) {
+        if (backend == null) {
+            THREAD_LOCAL_BACKEND.remove();
+        } else {
+            THREAD_LOCAL_BACKEND.set(backend);
+        }
+    }
+
+    /**
+     * Clears the thread-local backend override.
+     *
+     * @see #setThreadLocalBackend(Backend)
+     */
+    public static void clearThreadLocalBackend() {
+        THREAD_LOCAL_BACKEND.remove();
     }
 
     /**
@@ -75,6 +107,12 @@ public final class BackendFactory {
      * @throws IllegalStateException if no provider is found or all providers fail
      */
     public static Backend create() throws IOException {
+        // Check thread-local override first
+        Backend threadLocalBackend = THREAD_LOCAL_BACKEND.get();
+        if (threadLocalBackend != null) {
+            return threadLocalBackend;
+        }
+
         // Check system property first, then environment variable
         String userSelectedProvider = System.getProperty("tamboui.backend");
         if (userSelectedProvider == null || userSelectedProvider.isEmpty()) {

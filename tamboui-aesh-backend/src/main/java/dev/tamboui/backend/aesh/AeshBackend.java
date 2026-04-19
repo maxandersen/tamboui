@@ -323,8 +323,14 @@ public class AeshBackend extends AbstractBackend {
             disableRawMode();
 
             flush();
+        } catch (Exception ignored) {
+            // Connection may not be fully initialized (e.g. WebSocket not yet connected)
         } finally {
-            connection.close();
+            try {
+                connection.close();
+            } catch (Exception ignored) {
+                // Connection may not be fully initialized (e.g. WebSocket not yet connected)
+            }
         }
     }
 

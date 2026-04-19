@@ -7,6 +7,9 @@
     "aesh-ssh-http-demo": {
       "script-ref": "demos/aesh-ssh-http-demo/src/main/java/dev/tamboui/demo/aesh/AeshSshHttpDemo.java"
     },
+    "aesh-web-chooser-demo": {
+      "script-ref": "demos/aesh-web-chooser-demo/src/main/java/dev/tamboui/demo/aesh/AeshWebChooserDemo.java"
+    },
     "error-handling-demo": {
       "script-ref": "demos/error-handling-demo/src/main/java/dev/tamboui/demo/errorhandling/ErrorHandlingDemo.java"
     },
