@@ -6,9 +6,10 @@ package dev.tamboui.tui.event;
 
 import java.io.IOException;
 
-import dev.tamboui.terminal.TestBackend;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.terminal.TestBackend;
 
 import static org.assertj.core.api.Assertions.*;
 
