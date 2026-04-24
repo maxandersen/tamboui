@@ -157,6 +157,31 @@ class ListWidgetTest {
     }
 
     @Test
+    @DisplayName("ListWidget scrolls to selected item by default when selection exceeds viewport")
+    void defaultScrollModeScrollsToSelected() {
+        ListWidget list = ListWidget.builder()
+            .items("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
+            .highlightSymbol("")
+            .build(); // no explicit scrollMode — default must scroll to selection
+        Rect area = new Rect(0, 0, 20, 2);
+        Buffer buffer = Buffer.empty(area);
+        ListState state = new ListState();
+        state.select(4); // Select last item, well beyond the 2-row viewport
+
+        list.render(area, buffer, state);
+
+        // offset adjusted so items 4 and 5 (indices 3 and 4) are visible
+        Style reversed = Style.EMPTY.reversed();
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "Item 4", Style.EMPTY);
+        expected.setString(0, 1, "Item 5", Style.EMPTY);
+        expected.setStyle(new Rect(0, 1, 20, 1), reversed);
+
+        assertThat(buffer).isEqualTo(expected);
+        assertThat(state.offset()).isEqualTo(3);
+    }
+
+    @Test
     @DisplayName("ListWidget renders arbitrary SizedWidget items")
     void withSizedWidgetItems() {
         SizedWidget item = SizedWidget.of(Paragraph.from("Custom widget"));
