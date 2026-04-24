@@ -252,7 +252,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         private Style highlightStyle = Style.EMPTY.reversed();
         private Line highlightSymbol = Line.from("> ");
         private Block block;
-        private ScrollMode scrollMode = ScrollMode.NONE;
+        private ScrollMode scrollMode = ScrollMode.AUTO_SCROLL;
         private ScrollBarPolicy scrollBarPolicy = ScrollBarPolicy.NONE;
         private Style scrollbarThumbStyle;
         private Style scrollbarTrackStyle;
