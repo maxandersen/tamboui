@@ -4,21 +4,22 @@
  */
 package dev.tamboui.toolkit.event;
 
-import dev.tamboui.layout.Rect;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.ElementRegistry;
-import dev.tamboui.toolkit.elements.FormFieldElement;
-import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.toolkit.AbstractElementTest;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.widgets.form.SelectFieldState;
-import dev.tamboui.widgets.input.TextInputState;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.ElementRegistry;
+import dev.tamboui.toolkit.elements.FormFieldElement;
+import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.widgets.form.SelectFieldState;
+import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.toolkit.Toolkit.formField;
 import static org.assertj.core.api.Assertions.assertThat;

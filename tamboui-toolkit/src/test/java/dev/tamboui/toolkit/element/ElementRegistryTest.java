@@ -4,12 +4,13 @@
  */
 package dev.tamboui.toolkit.element;
 
+import java.util.*;
+
+import org.junit.jupiter.api.*;
+
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.toolkit.AbstractElementTest;
-import org.junit.jupiter.api.*;
-
-import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

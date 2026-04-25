@@ -4,6 +4,12 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
@@ -16,11 +22,6 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 import static dev.tamboui.toolkit.Toolkit.columns;
 import static dev.tamboui.toolkit.Toolkit.text;

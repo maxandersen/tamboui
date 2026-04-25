@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.layout.Constraint;
-import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.elements.BarChartElement;
 import dev.tamboui.toolkit.elements.CalendarElement;

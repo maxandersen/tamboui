@@ -4,9 +4,10 @@
  */
 package dev.tamboui.toolkit;
 
-import dev.tamboui.tui.RenderThread;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+
+import dev.tamboui.tui.RenderThread;
 
 public abstract class AbstractElementTest {
 

@@ -4,7 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +13,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.Toolkit;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.tree.GuideStyle;

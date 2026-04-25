@@ -15,7 +15,6 @@ import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.TestBackend;
 import dev.tamboui.terminal.TestBackend.OpType;
-import dev.tamboui.toolkit.AbstractElementTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -4,15 +4,16 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.AbstractElementTest;
-import dev.tamboui.widgets.form.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.widgets.form.*;
 
 import static dev.tamboui.toolkit.Toolkit.form;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -4,7 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.*;
 
 import dev.tamboui.buffer.Buffer;
@@ -17,6 +16,7 @@ import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;

@@ -4,6 +4,13 @@
  */
 package dev.tamboui.tfx.toolkit;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -12,15 +19,9 @@ import dev.tamboui.style.Tags;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.TFxDuration;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.toolkit.AbstractElementTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
