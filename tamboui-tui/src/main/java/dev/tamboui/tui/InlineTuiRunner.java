@@ -186,7 +186,7 @@ public final class InlineTuiRunner implements AutoCloseable {
      */
     public void run(InlineEventHandler handler, Renderer renderer) throws Exception {
         // Mark this thread as the render thread
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
 
         try {
             // Initial draw

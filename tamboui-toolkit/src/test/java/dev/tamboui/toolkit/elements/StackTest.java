@@ -6,9 +6,7 @@ package dev.tamboui.toolkit.elements;
 
 import java.util.Arrays;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
@@ -17,16 +15,18 @@ import dev.tamboui.layout.ContentAlignment;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.stack;
+import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for StackElement.
  */
-class StackTest {
+class StackTest extends AbstractElementTest {
 
     @Test
     @DisplayName("last child renders on top")

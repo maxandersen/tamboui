@@ -13,9 +13,10 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.panel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * These tests verify end-to-end that attribute selectors like
  * {@code Panel[title="Test"]} match elements and apply styles.
  */
-class AttributeSelectorRenderingTest {
+class AttributeSelectorRenderingTest extends AbstractElementTest {
 
     private StyleEngine styleEngine;
     private DefaultRenderContext context;

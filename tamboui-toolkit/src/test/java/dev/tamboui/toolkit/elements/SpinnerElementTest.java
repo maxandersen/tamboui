@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.spinner.SpinnerState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Tests for {@link SpinnerElement}.
  */
-class SpinnerElementTest {
+class SpinnerElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("SpinnerElement fluent API chains correctly")

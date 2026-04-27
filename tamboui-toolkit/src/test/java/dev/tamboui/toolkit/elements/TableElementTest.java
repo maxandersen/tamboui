@@ -13,6 +13,7 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.table.TableState;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Tests for TableElement.
  */
-class TableElementTest {
+class TableElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("TableElement fluent API chains correctly")

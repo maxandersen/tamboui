@@ -4,9 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
@@ -14,6 +12,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widget.Widget;
 
@@ -24,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Tests for GenericWidgetElement.
  */
-class GenericWidgetElementTest {
+class GenericWidgetElementTest extends AbstractElementTest {
 
     @Nested
     @DisplayName("Factory methods")

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.layout.Rect;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.elements.FormFieldElement;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for EventRouter focus navigation.
  */
-class EventRouterTest {
+class EventRouterTest extends AbstractElementTest {
 
     private FocusManager focusManager;
     private ElementRegistry elementRegistry;

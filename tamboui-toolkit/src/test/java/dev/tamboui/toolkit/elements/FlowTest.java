@@ -16,16 +16,18 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.flow;
+import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for FlowElement.
  */
-class FlowTest {
+class FlowTest extends AbstractElementTest {
 
     @Test
     @DisplayName("children flow left-to-right")

@@ -15,6 +15,7 @@ import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for Column.
  */
-class ColumnTest {
+class ColumnTest extends AbstractElementTest {
 
     @Test
     @DisplayName("preferredWidth() returns 0 for empty column")

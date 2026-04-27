@@ -19,12 +19,13 @@ import dev.tamboui.style.Tags;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.TFxDuration;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.focus.FocusManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ElementEffectRegistryTest {
+class ElementEffectRegistryTest extends AbstractElementTest {
 
     private ElementEffectRegistry effectRegistry;
     private ElementRegistry elementRegistry;

@@ -11,14 +11,16 @@ import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Tests for ErrorPlaceholder element.
  */
-class ErrorPlaceholderTest {
+class ErrorPlaceholderTest extends AbstractElementTest {
 
     @Test
     @DisplayName("from(Throwable, String) creates placeholder with element ID")

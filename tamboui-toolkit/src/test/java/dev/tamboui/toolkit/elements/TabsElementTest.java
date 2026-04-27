@@ -15,6 +15,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.tabs.TabsState;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for TabsElement.
  */
-class TabsElementTest {
+class TabsElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("TabsElement fluent API chains correctly")

@@ -4,10 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
@@ -16,6 +13,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.component.Component;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
@@ -33,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * These tests verify the "explicit > CSS > default" priority pattern
  * implemented via {@link dev.tamboui.toolkit.element.StyledElement#resolveEffectiveStyle}.
  */
-class ElementChildStyleCssTest {
+class ElementChildStyleCssTest extends AbstractElementTest {
 
     /**
      * Minimal Component that mimics ProgressCard's structure:

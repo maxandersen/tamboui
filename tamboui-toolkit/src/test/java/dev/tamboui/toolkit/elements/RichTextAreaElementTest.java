@@ -18,16 +18,17 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.richTextArea;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for RichTextAreaElement.
  */
-class RichTextAreaElementTest {
+class RichTextAreaElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("RichTextAreaElement fluent API chains correctly")

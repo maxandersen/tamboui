@@ -11,6 +11,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.wavetext.WaveTextState;
 
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for WaveTextElement.
  */
-class WaveTextElementTest {
+class WaveTextElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("WaveTextElement fluent API chains correctly")

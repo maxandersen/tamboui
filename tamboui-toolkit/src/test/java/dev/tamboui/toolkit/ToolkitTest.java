@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Tests for the Dsl factory methods.
  */
-class ToolkitTest {
+class ToolkitTest extends AbstractElementTest {
 
     @Nested
     @DisplayName("Text factory methods")

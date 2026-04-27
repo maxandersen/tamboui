@@ -39,12 +39,7 @@ import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.error.ErrorContext;
 import dev.tamboui.tui.error.RenderError;
 import dev.tamboui.tui.error.RenderErrorHandler;
-import dev.tamboui.tui.event.Event;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.tui.event.ResizeEvent;
-import dev.tamboui.tui.event.TickEvent;
-import dev.tamboui.tui.event.UiRunnable;
+import dev.tamboui.tui.event.*;
 import dev.tamboui.tui.overlay.DebugOverlay;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -225,7 +220,7 @@ public final class TuiRunner implements AutoCloseable {
      */
     public void run(EventHandler handler, Renderer renderer) throws Exception {
         // Mark this thread as the render thread
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
 
         try {
             // Wrap renderer to add post-render processors and FPS overlay

@@ -13,6 +13,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.Toolkit;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.tree.GuideStyle;
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for {@link TreeElement}.
  */
-class TreeElementTest {
+class TreeElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("TreeElement fluent API chains correctly")

@@ -13,6 +13,7 @@ import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for Row.
  */
-class RowTest {
+class RowTest extends AbstractElementTest {
 
     @Test
     @DisplayName("preferredWidth() returns 0 for empty row")

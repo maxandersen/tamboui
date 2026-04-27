@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * When code uses {@code .red()} or {@code .fg(Color.RED)}, a CSS class "red" is added.
  * Theme stylesheets should be able to override the color via {@code .red { color: #FF5555; }}.
  */
-class NamedColorCssOverrideTest {
+class NamedColorCssOverrideTest extends AbstractElementTest {
 
     private static final Rect AREA = new Rect(0, 0, 10, 1);
 

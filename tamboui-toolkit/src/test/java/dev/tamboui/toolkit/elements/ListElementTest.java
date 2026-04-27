@@ -16,18 +16,21 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.tui.error.TuiException;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
-import static dev.tamboui.toolkit.Toolkit.*;
-import static org.assertj.core.api.Assertions.*;
+import static dev.tamboui.toolkit.Toolkit.list;
+import static dev.tamboui.toolkit.Toolkit.text;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for ListElement.
  */
-class ListElementTest {
+class ListElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("ListElement fluent API chains correctly")

@@ -12,16 +12,17 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.calendar;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for CalendarElement.
  */
-class CalendarElementTest {
+class CalendarElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("styleAttributes exposes title")

@@ -12,19 +12,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import dev.tamboui.widgets.form.FieldType;
-import dev.tamboui.widgets.form.FormState;
-import dev.tamboui.widgets.form.ValidationResult;
-import dev.tamboui.widgets.form.Validator;
-import dev.tamboui.widgets.form.Validators;
+import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.widgets.form.*;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.form;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for FormElement.
  */
-class FormElementTest {
+class FormElementTest extends AbstractElementTest {
 
     // ==================== Basic Form Building ====================
 

@@ -13,6 +13,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for MarkupTextElement.
  */
-class MarkupTextElementTest {
+class MarkupTextElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("MarkupTextElement renders plain text")

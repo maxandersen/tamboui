@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for InlineDisplay dynamic resizing behavior
  * when scopes collapse/expand.
  */
-class InlineScopeIntegrationTest {
+class InlineScopeIntegrationTest extends AbstractElementTest {
 
     private TestBackend backend;
 

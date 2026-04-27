@@ -12,6 +12,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.widgets.spinner.SpinnerFrameSet;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
@@ -22,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests CSS property resolution for SpinnerElement.
  */
-class SpinnerElementCssTest {
+class SpinnerElementCssTest extends AbstractElementTest {
 
     private DefaultRenderContext context;
     private StyleEngine styleEngine;

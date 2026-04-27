@@ -11,8 +11,6 @@
  */
 package dev.tamboui.demo.aesh;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.aesh.terminal.Connection;
@@ -60,10 +58,6 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
     private static final int SSH_PORT = 2222;
     private static final int HTTP_PORT = 8080;
 
-    // ==================== Shared State ====================
-
-    private final ExecutorService executor = Executors.newCachedThreadPool();
-
     // ==================== Main Entry Point ====================
 
     /**
@@ -85,8 +79,6 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             System.out.println("\nShutting down...");
-        } finally {
-            demo.stop();
         }
     }
 
@@ -147,7 +139,7 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
             // Connection closed
         });
 
-        executor.submit(() -> {
+        Thread.startVirtualThread(() -> {
             try {
                 runTuiApp(connection);
             } catch (Exception e) {
@@ -179,20 +171,6 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
         try (ToolkitRunner runner = ToolkitRunner.create(config)) {
             var app = new DemoApp();
             runner.run(() -> app.render());
-        }
-    }
-
-    // ==================== Shared Cleanup ====================
-
-    private void stop() {
-        // Shutdown executor - servers will be stopped when JVM exits
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
         }
     }
 
