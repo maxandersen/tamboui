@@ -18,6 +18,7 @@ apache-sshd = "2.17.1"
 netty = "4.2.10.Final"
 jfr-polyfill = "1.0.2"
 test-logger-plugin = "4.0.0"
+rewrite = "latest.release"
 
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }
@@ -45,6 +46,10 @@ apache-sshd-netty = { module = "org.apache.sshd:sshd-netty", version.ref = "apac
 netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
 jfr-polyfill = { module = "org.gradle.jfr.polyfill:jfr-polyfill", version.ref = "jfr-polyfill" }
 test-logger-gradle-plugin = { module = "com.adarshr.test-logger:com.adarshr.test-logger.gradle.plugin", version.ref = "test-logger-plugin" }
+rewrite-bom = { module = "org.openrewrite.recipe:rewrite-recipe-bom", version.ref = "rewrite" }
+rewrite-java = { module = "org.openrewrite:rewrite-java", version.ref = "rewrite" }
+rewrite-java-25 = { module = "org.openrewrite:rewrite-java-25", version.ref = "rewrite" }
+rewrite-test = { module = "org.openrewrite:rewrite-test", version.ref = "rewrite" }
 
 [bundles]
 testing = ["junit-jupiter", "junit-platform-launcher", "assertj-core"]

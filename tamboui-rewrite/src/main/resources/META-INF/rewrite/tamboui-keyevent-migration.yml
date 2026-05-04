@@ -1,0 +1,7 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: dev.tamboui.rewrite.TambouiKeyEventBreakingApiMigration
+displayName: TamboUI KeyEvent breaking API migration
+description: Finds and rewrites direct usages of KeyEvent.character() during the Unicode-safe API migration.
+recipeList:
+  - dev.tamboui.rewrite.keyevent.FindKeyEventCharacterUsages
+  - dev.tamboui.rewrite.keyevent.MigrateKeyEventCharacterComparison
