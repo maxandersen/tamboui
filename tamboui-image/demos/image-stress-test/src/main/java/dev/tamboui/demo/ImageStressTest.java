@@ -18,9 +18,11 @@ import dev.tamboui.image.Image;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
+import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
 import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
+import dev.tamboui.image.protocol.KittyUnicodePlaceholderProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
@@ -75,6 +77,7 @@ public class ImageStressTest {
     private Mode mode = Mode.SAME;
     private ImageScaling scaling = ImageScaling.FIT;
     private ImageProtocol protocol;
+    private final TerminalImageCapabilities capabilities;
     private final ImageData staticImage;
     private final AtomicLong frameCount = new AtomicLong();
     private long startTimeMs;
@@ -93,7 +96,8 @@ public class ImageStressTest {
     private ImageStressTest() {
         // Generate a 1024×768 test image — large enough to be meaningful for the leak
         this.staticImage = generateGradientImage(1024, 768);
-        this.protocol = TerminalImageCapabilities.detect().bestProtocol();
+        this.capabilities = TerminalImageCapabilities.detect();
+        this.protocol = capabilities.bestProtocol();
     }
 
     private void run() throws Exception {
@@ -141,13 +145,16 @@ public class ImageStressTest {
                 protocol = new KittyProtocol();
                 break;
             case '2':
-                protocol = new ITermProtocol();
+                protocol = new KittyUnicodePlaceholderProtocol();
                 break;
             case '3':
+                protocol = new ITermProtocol();
+                break;
+            case '4':
                 protocol = new SixelProtocol();
                 break;
             case 'a':
-                protocol = TerminalImageCapabilities.detect().bestProtocol();
+                protocol = capabilities.bestProtocol();
                 break;
             default:
                 break;
@@ -260,13 +267,26 @@ public class ImageStressTest {
         frame.renderWidget(image, area);
     }
 
+    /**
+     * Returns a styled label for a protocol: green if supported, dim if not.
+     */
+    private Span protocolLabel(String label, TerminalImageProtocol type) {
+        boolean supported = capabilities.supports(type);
+        return supported ? Span.raw(label).green() : Span.raw(label).dim();
+    }
+
     private void renderHelp(Frame frame, Rect area) {
         var help = Paragraph.builder()
             .text(Text.from(Line.from(
                 Span.raw(" c").bold().yellow(), Span.raw(" cycle mode  ").dim(),
-                Span.raw("1").bold().yellow(), Span.raw(" Kitty  ").dim(),
-                Span.raw("2").bold().yellow(), Span.raw(" iTerm2  ").dim(),
-                Span.raw("3").bold().yellow(), Span.raw(" Sixel  ").dim(),
+                Span.raw("1").bold().yellow(), Span.raw(" "),
+                protocolLabel("Kitty", TerminalImageProtocol.KITTY), Span.raw("  "),
+                Span.raw("2").bold().yellow(), Span.raw(" "),
+                protocolLabel("Kitty-UP", TerminalImageProtocol.KITTY), Span.raw("  "),
+                Span.raw("3").bold().yellow(), Span.raw(" "),
+                protocolLabel("iTerm2", TerminalImageProtocol.ITERM2), Span.raw("  "),
+                Span.raw("4").bold().yellow(), Span.raw(" "),
+                protocolLabel("Sixel", TerminalImageProtocol.SIXEL), Span.raw("  "),
                 Span.raw("a").bold().yellow(), Span.raw(" auto  ").dim(),
                 Span.raw("f").bold().yellow(), Span.raw("/").dim(),
                 Span.raw("i").bold().yellow(), Span.raw("/").dim(),

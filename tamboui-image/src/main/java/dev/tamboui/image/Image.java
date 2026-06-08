@@ -161,7 +161,9 @@ public final class Image implements Widget, RawOutputCapable {
             // the UI. Instead cap the transmitted resolution to the display size (with headroom
             // for high-DPI cells), which the terminal still downsamples crisply.
             Rect displayArea = computeNativeDisplayArea(data, imageArea);
-            ImageData transmit = capToDisplayResolution(data, displayArea);
+            ImageData transmit = (scaling == ImageScaling.STRETCH)
+                ? stretchToDisplayArea(data, displayArea)
+                : capToDisplayResolution(data, displayArea);
             try {
                 protocol.render(transmit, displayArea, buffer, rawOutput);
             } catch (IOException e) {
@@ -226,6 +228,22 @@ public final class Image implements Widget, RawOutputCapable {
                 return new Rect(area.x() + noneOffX, area.y() + noneOffY, noneW, noneH);
             }
         }
+    }
+
+    /**
+     * Pre-stretches the image for STRETCH mode on self-scaling protocols (Kitty, iTerm2).
+     * <p>
+     * These protocols always preserve the source image's aspect ratio when scaling to the
+     * display area ({@code c=/r=} for Kitty, {@code width=/height=} for iTerm2). To achieve
+     * true stretching, we resize the source to match the display area's pixel aspect ratio
+     * <em>before</em> transmission. The terminal's aspect-preserving scale then becomes a
+     * no-op, and the image fills the cells without letterboxing.
+     */
+    private ImageData stretchToDisplayArea(ImageData source, Rect displayArea) {
+        ImageProtocol.Resolution res = protocol.resolution();
+        int targetWidth = Math.max(1, displayArea.width() * res.widthMultiplier() * DISPLAY_SUPERSAMPLE);
+        int targetHeight = Math.max(1, displayArea.height() * res.heightMultiplier() * DISPLAY_SUPERSAMPLE);
+        return source.resize(targetWidth, targetHeight);
     }
 
     /**

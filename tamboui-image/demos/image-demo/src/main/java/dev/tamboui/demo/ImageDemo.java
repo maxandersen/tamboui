@@ -26,6 +26,7 @@ import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
 import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
+import dev.tamboui.image.protocol.KittyUnicodePlaceholderProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.internal.record.RecordingBackend;
 import dev.tamboui.layout.Constraint;
@@ -66,6 +67,7 @@ public class ImageDemo {
     private static final ImageProtocol BRAILLE = new BrailleProtocol();
     private static final ImageProtocol SIXEL = new SixelProtocol();
     private static final ImageProtocol KITTY = new KittyProtocol();
+    private static final ImageProtocol KITTY_UNICODE = new KittyUnicodePlaceholderProtocol();
     private static final ImageProtocol ITERM2 = new ITermProtocol();
 
     private boolean running = true;
@@ -161,6 +163,9 @@ public class ImageDemo {
                 currentProtocol = KITTY;
                 break;
             case '5':
+                currentProtocol = KITTY_UNICODE;
+                break;
+            case '6':
                 currentProtocol = ITERM2;
                 break;
             case 'f':
@@ -337,19 +342,28 @@ public class ImageDemo {
         frame.renderWidget(warning, area);
     }
 
+    /**
+     * Returns a styled label for a protocol: green if supported, dim if not.
+     */
+    private Span protocolLabel(String label, TerminalImageProtocol type) {
+        return capabilities.supports(type) ? Span.raw(label).green() : Span.raw(label).dim();
+    }
+
     private void renderFooter(Frame frame, Rect area) {
         var helpLine1 = Line.from(
             Span.raw(" Protocol: ").dim(),
-            Span.raw("1").bold().yellow(),
-            Span.raw(" Half-Block ").dim(),
-            Span.raw("2").bold().yellow(),
-            Span.raw(" Braille ").dim(),
-            Span.raw("3").bold().yellow(),
-            Span.raw(" Sixel ").dim(),
-            Span.raw("4").bold().yellow(),
-            Span.raw(" Kitty ").dim(),
-            Span.raw("5").bold().yellow(),
-            Span.raw(" iTerm2 ").dim(),
+            Span.raw("1").bold().yellow(), Span.raw(" "),
+            protocolLabel("Half-Block", TerminalImageProtocol.HALF_BLOCK), Span.raw(" "),
+            Span.raw("2").bold().yellow(), Span.raw(" "),
+            protocolLabel("Braille", TerminalImageProtocol.BRAILLE), Span.raw(" "),
+            Span.raw("3").bold().yellow(), Span.raw(" "),
+            protocolLabel("Sixel", TerminalImageProtocol.SIXEL), Span.raw(" "),
+            Span.raw("4").bold().yellow(), Span.raw(" "),
+            protocolLabel("Kitty", TerminalImageProtocol.KITTY), Span.raw(" "),
+            Span.raw("5").bold().yellow(), Span.raw(" "),
+            protocolLabel("Kitty-UP", TerminalImageProtocol.KITTY), Span.raw(" "),
+            Span.raw("6").bold().yellow(), Span.raw(" "),
+            protocolLabel("iTerm2", TerminalImageProtocol.ITERM2), Span.raw(" "),
             Span.raw("a").bold().yellow(),
             Span.raw(" Auto").dim()
         );

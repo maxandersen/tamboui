@@ -18,8 +18,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 import dev.tamboui.widget.RawOutputContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +47,8 @@ class NativeImageProtocolSkipTest {
     static Stream<Arguments> nativeProtocols() {
         return Stream.of(
             Arguments.of("Kitty", (Supplier<ImageProtocol>) KittyProtocol::new),
+            Arguments.of("Kitty (Unicode Placeholders)",
+                (Supplier<ImageProtocol>) KittyUnicodePlaceholderProtocol::new),
             Arguments.of("iTerm2", (Supplier<ImageProtocol>) ITermProtocol::new),
             Arguments.of("Sixel", (Supplier<ImageProtocol>) SixelProtocol::new)
         );
@@ -178,6 +182,67 @@ class NativeImageProtocolSkipTest {
         assertThat(out.size())
             .as("returning to a vacated non-overlapping position must retransmit")
             .isGreaterThan(0);
+    }
+
+    @Test
+    void kitty_unicode_placeholder_writes_cells_to_buffer() throws IOException {
+        KittyUnicodePlaceholderProtocol protocol = new KittyUnicodePlaceholderProtocol();
+        ImageData image = solidImage(0xFFFF0000);
+        GenerationOutput out = new GenerationOutput();
+        Rect area = new Rect(0, 0, 3, 2);
+        Buffer buffer = Buffer.empty(Rect.of(20, 20));
+
+        protocol.render(image, area, buffer, out);
+
+        // Verify that placeholder cells were written into the buffer
+        for (int y = 0; y < area.height(); y++) {
+            for (int x = 0; x < area.width(); x++) {
+                Cell cell = buffer.get(area.x() + x, area.y() + y);
+                assertThat(cell.symbol())
+                    .as("cell (%d,%d) should contain the placeholder character U+10EEEE", x, y)
+                    .contains(new String(Character.toChars(0x10EEEE)));
+                // Foreground color encodes the image id
+                assertThat(cell.style().fg()).isPresent()
+                    .hasValueSatisfying(c -> assertThat(c).isInstanceOf(Color.Rgb.class));
+            }
+        }
+    }
+
+    @Test
+    void kitty_unicode_placeholder_retransmits_on_content_change() throws IOException {
+        KittyUnicodePlaceholderProtocol protocol = new KittyUnicodePlaceholderProtocol();
+        ImageData first = solidImage(0xFFFF0000);
+        ImageData second = solidImage(0xFF00FF00);
+        GenerationOutput out = new GenerationOutput();
+
+        render(protocol, first, AREA_1, out);
+        String firstOutput = out.text();
+        assertThat(firstOutput).as("first render must transmit with U=1").contains("U=1");
+
+        out.reset();
+        render(protocol, first, AREA_1, out);
+        assertThat(out.text())
+            .as("same image must skip transmission (only buffer cells change)")
+            .doesNotContain("_G");
+
+        out.reset();
+        render(protocol, second, AREA_1, out);
+        assertThat(out.text())
+            .as("different image must retransmit")
+            .contains("U=1");
+    }
+
+    @Test
+    void kitty_unicode_placeholder_transmit_suppresses_reply() throws IOException {
+        KittyUnicodePlaceholderProtocol protocol = new KittyUnicodePlaceholderProtocol();
+        ImageData image = solidImage(0xFFFF0000);
+        GenerationOutput out = new GenerationOutput();
+
+        render(protocol, image, AREA_1, out);
+
+        assertThat(out.text())
+            .as("transmission must use q=2 to suppress terminal reply")
+            .contains("q=2");
     }
 
     @Test

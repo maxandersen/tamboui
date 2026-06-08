@@ -13,6 +13,7 @@ import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
 import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
+import dev.tamboui.image.protocol.KittyUnicodePlaceholderProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -123,11 +124,36 @@ class TerminalImageCapabilitiesTest {
 
     @Test
     void protocolFor_returns_native_protocols() {
-        TerminalImageCapabilities caps = TerminalImageCapabilities.detect();
+        TerminalImageCapabilities caps = TerminalImageCapabilities.withSupport(
+            EnumSet.of(TerminalImageProtocol.KITTY, TerminalImageProtocol.ITERM2,
+                TerminalImageProtocol.SIXEL, TerminalImageProtocol.HALF_BLOCK));
 
+        // Without unicode placeholder support, Kitty uses the direct protocol
         assertThat(caps.protocolFor(TerminalImageProtocol.KITTY)).isInstanceOf(KittyProtocol.class);
         assertThat(caps.protocolFor(TerminalImageProtocol.ITERM2)).isInstanceOf(ITermProtocol.class);
         assertThat(caps.protocolFor(TerminalImageProtocol.SIXEL)).isInstanceOf(SixelProtocol.class);
+    }
+
+    @Test
+    void kitty_with_unicode_placeholders_returns_placeholder_protocol() {
+        TerminalImageCapabilities caps = TerminalImageCapabilities.withSupport(
+            EnumSet.of(TerminalImageProtocol.KITTY, TerminalImageProtocol.HALF_BLOCK), true);
+
+        assertThat(caps.supportsKittyUnicodePlaceholders()).isTrue();
+        assertThat(caps.bestProtocol()).isInstanceOf(KittyUnicodePlaceholderProtocol.class);
+        assertThat(caps.protocolFor(TerminalImageProtocol.KITTY))
+            .isInstanceOf(KittyUnicodePlaceholderProtocol.class);
+    }
+
+    @Test
+    void kitty_without_unicode_placeholders_returns_direct_protocol() {
+        TerminalImageCapabilities caps = TerminalImageCapabilities.withSupport(
+            EnumSet.of(TerminalImageProtocol.KITTY, TerminalImageProtocol.HALF_BLOCK), false);
+
+        assertThat(caps.supportsKittyUnicodePlaceholders()).isFalse();
+        assertThat(caps.bestProtocol()).isInstanceOf(KittyProtocol.class);
+        assertThat(caps.protocolFor(TerminalImageProtocol.KITTY))
+            .isInstanceOf(KittyProtocol.class);
     }
 
     @Test
