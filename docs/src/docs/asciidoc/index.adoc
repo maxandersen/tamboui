@@ -154,3 +154,8 @@ public class HelloTamboUI extends ToolkitApp {
 == License
 
 {project-name} is released under the MIT License.
+
+[NOTE]
+====
+This page is a pull request documentation preview.
+====
