@@ -8,6 +8,8 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
@@ -74,6 +76,7 @@ public final class HtmlExporter {
 
         final Map<String, Integer> cssToClassNo = new LinkedHashMap<>();
         int nextClassNo = 1;
+        final Set<Integer> widthClasses = new TreeSet<>();
 
         StringBuilder code = new StringBuilder();
 
@@ -83,10 +86,13 @@ public final class HtmlExporter {
                 Cell cell = buffer.get(baseX + x, baseY + y);
                 Style style = cell.style();
 
+                int runStart = x;
                 StringBuilder runText = new StringBuilder();
                 while (x < widthCells) {
                     Cell c = buffer.get(baseX + x, baseY + y);
-                    if (!c.style().equals(style)) {
+                    // Continuation cells belong to the preceding wide grapheme, so keep them
+                    // in the same run even though they carry Style.EMPTY.
+                    if (!c.isContinuation() && !c.style().equals(style)) {
                         break;
                     }
                     String sym = c.symbol();
@@ -95,6 +101,7 @@ public final class HtmlExporter {
                     }
                     x++;
                 }
+                int runCols = x - runStart;
 
                 String text = runText.toString();
                 if (text.isEmpty()) {
@@ -105,18 +112,18 @@ public final class HtmlExporter {
                 String escaped = escapeHtml(text);
 
                 if (options.inlineStyles) {
-                    if (!htmlStyle.isEmpty()) {
-                        code.append("<span style=\"").append(htmlStyle).append("\">").append(escaped).append("</span>");
-                    } else {
-                        code.append(escaped);
-                    }
+                    String widthCss = widthCss(runCols);
+                    String combined = htmlStyle.isEmpty() ? widthCss : htmlStyle + ";" + widthCss;
+                    code.append("<span style=\"").append(combined).append("\">").append(escaped).append("</span>");
                 } else {
                     Integer classNo = cssToClassNo.get(htmlStyle);
                     if (classNo == null) {
                         classNo = nextClassNo++;
                         cssToClassNo.put(htmlStyle, classNo);
                     }
-                    code.append("<span class=\"r").append(classNo).append("\">").append(escaped).append("</span>");
+                    widthClasses.add(runCols);
+                    code.append("<span class=\"r").append(classNo).append(" w").append(runCols)
+                        .append("\">").append(escaped).append("</span>");
                 }
             }
             if (y < heightCells - 1) {
@@ -132,6 +139,9 @@ public final class HtmlExporter {
                     stylesheet.append(".r").append(e.getValue()).append(" { ").append(rule).append(" }\n");
                 }
             }
+            for (Integer cols : widthClasses) {
+                stylesheet.append(".w").append(cols).append(" { ").append(widthCss(cols)).append(" }\n");
+            }
         }
 
         String foreground = toHex(defaultForeground);
@@ -142,6 +152,19 @@ public final class HtmlExporter {
             .replace("{stylesheet}", stylesheet.toString())
             .replace("{foreground}", foreground)
             .replace("{background}", background);
+    }
+
+    /**
+     * CSS that pins an inline run to an exact number of monospace columns, so that wide
+     * (CJK) and emoji glyphs cannot drift borders and adjacent columns out of alignment
+     * regardless of the font the browser falls back to. {@code 1ch} equals the advance of
+     * the {@code 0} glyph, i.e. one column in a monospace font.
+     *
+     * @param cols the number of display columns the run must occupy
+     * @return the inline-block width declarations for the run
+     */
+    private static String widthCss(int cols) {
+        return "display:inline-block;width:" + cols + "ch;overflow:hidden;vertical-align:top";
     }
 
     private static String minimalHtml(Color.Rgb defaultFg, Color.Rgb defaultBg) {
