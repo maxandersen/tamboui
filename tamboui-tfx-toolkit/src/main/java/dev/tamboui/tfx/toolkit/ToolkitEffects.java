@@ -4,8 +4,6 @@
  */
 package dev.tamboui.tfx.toolkit;
 
-import java.time.Duration;
-
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.TFxDuration;
@@ -14,8 +12,8 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.EventHandler;
+import dev.tamboui.tui.RenderClock;
 import dev.tamboui.tui.Renderer;
-import dev.tamboui.tui.event.TickEvent;
 
 /**
  * High-level API for integrating TFX effects with the Toolkit DSL.
@@ -66,14 +64,23 @@ import dev.tamboui.tui.event.TickEvent;
 public final class ToolkitEffects {
 
     private final ElementEffectRegistry registry;
-    private Duration lastElapsed;
+    private final RenderClock clock;
 
     /**
      * Creates a new ToolkitEffects instance.
      */
     public ToolkitEffects() {
+        this(new RenderClock());
+    }
+
+    /**
+     * Creates a new ToolkitEffects instance reading the given render clock, for tests.
+     *
+     * @param clock the clock measuring the time between renders
+     */
+    ToolkitEffects(RenderClock clock) {
         this.registry = new ElementEffectRegistry();
-        this.lastElapsed = Duration.ZERO;
+        this.clock = clock;
     }
 
     /**
@@ -161,24 +168,21 @@ public final class ToolkitEffects {
     }
 
     /**
-     * Wraps an event handler to capture tick timing and force redraws.
+     * Wraps an event handler to force redraws while effects are running.
      * <p>
      * The wrapper:
      * <ul>
-     *   <li>Captures elapsed time from {@link TickEvent}s</li>
-     *   <li>Forces redraws when effects are active</li>
+     *   <li>Forces redraws when effects are active, so the animation keeps going</li>
      * </ul>
+     * <p>
+     * Effects advance by the time measured between renders, not by the time of a tick, so a
+     * redraw forced for an input event between two ticks does not make them run faster.
      *
      * @param handler the event handler to wrap
      * @return a wrapped event handler
      */
     public EventHandler wrapHandler(EventHandler handler) {
         return (event, runner) -> {
-            // Capture elapsed time from tick events
-            if (event instanceof TickEvent) {
-                lastElapsed = ((TickEvent) event).elapsed();
-            }
-
             // Delegate to wrapped handler
             boolean shouldRedraw = handler.handle(event, runner);
 
@@ -198,7 +202,8 @@ public final class ToolkitEffects {
      * <ul>
      *   <li>Calls the wrapped renderer first</li>
      *   <li>Expands pending selector effects to element and styled area instances</li>
-     *   <li>Processes all active effects on the buffer with dynamic area lookup</li>
+     *   <li>Processes all active effects on the buffer with dynamic area lookup, advancing them
+     *       by the real time since the last render</li>
      * </ul>
      * <p>
      * When a StyledAreaRegistry is provided, effects can target styled spans
@@ -223,10 +228,12 @@ public final class ToolkitEffects {
             // Expand pending selector effects
             registry.expandSelectors(elementRegistry, styledAreaRegistry);
 
-            // Process effects on the buffer with dynamic area lookup
+            // Process effects on the buffer, advancing them by the time since the last render
             if (registry.isRunning()) {
-                TFxDuration delta = TFxDuration.fromJavaDuration(lastElapsed);
+                TFxDuration delta = TFxDuration.fromJavaDuration(clock.tick());
                 registry.processEffects(delta, frame.buffer(), frame.area(), elementRegistry, styledAreaRegistry, focusManager);
+            } else {
+                clock.reset();
             }
         };
     }

@@ -22,6 +22,7 @@ import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.tui.RenderClock;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.bindings.ActionHandler;
@@ -78,7 +79,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private final DefaultRenderContext renderContext;
     private final boolean faultTolerant;
     private final List<ToolkitPostRenderProcessor> postRenderProcessors;
-    private volatile Duration lastElapsed = Duration.ZERO;
+    private final RenderClock renderClock = new RenderClock();
 
     private ToolkitRunner(TuiRunner tuiRunner,
                           Bindings bindings,
@@ -169,9 +170,12 @@ public final class ToolkitRunner implements AutoCloseable {
                     }
                 }
 
-                // Apply post-render processors (e.g., effects, overlays)
+                // Apply post-render processors (e.g., effects, overlays). Advance them by the
+                // real time since the last render, so an input-driven redraw between two ticks
+                // does not make an animation run faster
+                Duration elapsed = postRenderProcessors.isEmpty() ? Duration.ZERO : renderClock.tick();
                 for (ToolkitPostRenderProcessor processor : postRenderProcessors) {
-                    processor.process(frame, elementRegistry, styledAreaRegistry, focusManager, lastElapsed);
+                    processor.process(frame, elementRegistry, styledAreaRegistry, focusManager, elapsed);
                 }
             }
         );
@@ -187,9 +191,8 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     private boolean handleEvent(Event event) {
-        // Tick events trigger a redraw for animations
+        // Tick events trigger a redraw for animations; the render clock, not the tick, times them
         if (event instanceof TickEvent) {
-            lastElapsed = ((TickEvent) event).elapsed();
             return true;
         }
 

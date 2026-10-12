@@ -4,17 +4,14 @@
  */
 package dev.tamboui.tfx.tui;
 
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
-
 import dev.tamboui.layout.Rect;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
 import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tui.EventHandler;
+import dev.tamboui.tui.RenderClock;
 import dev.tamboui.tui.Renderer;
 import dev.tamboui.tui.TuiRunner;
-import dev.tamboui.tui.event.TickEvent;
 
 /**
  * Integrates TFX effects with the TuiRunner event loop.
@@ -47,17 +44,23 @@ import dev.tamboui.tui.event.TickEvent;
 public final class TfxIntegration {
 
     private final EffectManager effectManager;
-    /**
-     * Last elapsed duration from tick events. Uses AtomicReference for
-     * safe visibility between event handler and renderer.
-     */
-    private final AtomicReference<Duration> lastElapsed = new AtomicReference<>(Duration.ZERO);
+    private final RenderClock clock;
 
     /**
      * Creates a new TfxIntegration instance.
      */
     public TfxIntegration() {
+        this(new RenderClock());
+    }
+
+    /**
+     * Creates a new TfxIntegration instance reading the given render clock, for tests.
+     *
+     * @param clock the clock measuring the time between renders
+     */
+    TfxIntegration(RenderClock clock) {
         this.effectManager = new EffectManager();
+        this.clock = clock;
     }
 
     /**
@@ -112,25 +115,22 @@ public final class TfxIntegration {
     }
 
     /**
-     * Wraps an event handler to capture tick timing and force redraws when effects are running.
+     * Wraps an event handler to force redraws while effects are running.
      * <p>
      * The wrapper:
      * <ul>
-     *   <li>Captures elapsed time from {@link TickEvent}s for effect timing</li>
-     *   <li>Forces redraws (returns true) when effects are active</li>
+     *   <li>Forces redraws (returns true) when effects are active, so the animation keeps going</li>
      *   <li>Delegates all events to the wrapped handler</li>
      * </ul>
+     * <p>
+     * Effects advance by the time measured between renders, not by the time of a tick, so a
+     * redraw forced for an input event between two ticks does not make them run faster.
      *
      * @param handler the event handler to wrap
      * @return a wrapped event handler
      */
     public EventHandler wrapHandler(EventHandler handler) {
         return (event, runner) -> {
-            // Capture elapsed time from tick events
-            if (event instanceof TickEvent) {
-                lastElapsed.set(((TickEvent) event).elapsed());
-            }
-
             // Delegate to wrapped handler
             boolean shouldRedraw = handler.handle(event, runner);
 
@@ -149,7 +149,8 @@ public final class TfxIntegration {
      * The wrapper:
      * <ul>
      *   <li>Calls the wrapped renderer first</li>
-     *   <li>Processes all active effects on the buffer</li>
+     *   <li>Processes all active effects on the buffer, advancing them by the real time since
+     *       the last render</li>
      *   <li>Automatically removes completed effects</li>
      * </ul>
      *
@@ -161,10 +162,12 @@ public final class TfxIntegration {
             // Render the UI first
             renderer.render(frame);
 
-            // Process effects on the buffer
+            // Process effects on the buffer, advancing them by the time since the last render
             if (effectManager.isRunning()) {
-                TFxDuration delta = TFxDuration.fromJavaDuration(lastElapsed.get());
+                TFxDuration delta = TFxDuration.fromJavaDuration(clock.tick());
                 effectManager.processEffects(delta, frame.buffer(), frame.area());
+            } else {
+                clock.reset();
             }
         };
     }

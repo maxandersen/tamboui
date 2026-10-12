@@ -32,7 +32,10 @@ public interface ToolkitPostRenderProcessor {
      * @param elementRegistry the registry of rendered element areas
      * @param styledAreaRegistry the registry of styled areas (for CSS targeting)
      * @param focusManager the focus manager for pseudo-class state
-     * @param elapsed the time elapsed since the last frame (from TickEvent)
+     * @param elapsed the real time since the last render, measured by the runner's render clock,
+     *                or zero on the first render; animations advance by it rather than by the
+     *                time of a tick, so an input-driven redraw between two ticks does not make
+     *                them run faster
      */
     void process(Frame frame, ElementRegistry elementRegistry, StyledAreaRegistry styledAreaRegistry, FocusManager focusManager, Duration elapsed);
 }
