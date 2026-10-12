@@ -68,7 +68,6 @@ public final class InlineToolkitRunner implements AutoCloseable {
     private final EventRouter eventRouter;
     private final ElementRegistry elementRegistry;
     private final DefaultRenderContext renderContext;
-    private volatile Duration lastElapsed = Duration.ZERO;
 
     private InlineToolkitRunner(InlineTuiRunner tuiRunner, Bindings bindings) {
         this.tuiRunner = tuiRunner;
@@ -191,7 +190,6 @@ public final class InlineToolkitRunner implements AutoCloseable {
     private boolean handleEvent(Event event) {
         // Tick events trigger a redraw for animations
         if (event instanceof TickEvent) {
-            lastElapsed = ((TickEvent) event).elapsed();
             return true;
         }
 
