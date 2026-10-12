@@ -99,6 +99,7 @@ class MyApp extends ToolkitApp {
 
 - `TuiRunner` provides the main event loop with `EventHandler` callback
 - Event types: `KeyEvent`, `MouseEvent`, `TickEvent`, `ResizeEvent`, `UiRunnable`
+- `TickEvent` is a redraw pulse that carries no time; at most one waits in the queue (ticks do not pile up). To advance an animation by real time, measure it at the render with `RenderClock` (monotonic, sub-millisecond carry, clamps long gaps); to step once per tick, use `TickEvent.frameCount()`. tfx effects use `RenderClock`, mirroring ratatui's tachyonfx (the host measures elapsed at the draw, not from a tick).
 - `KeyEvent` provides semantic methods (`isQuit()`, `isUp()`, `isDown()`, `isSelect()`, etc.) that respect configured bindings
 - Bindings map physical inputs to semantic actions; use `BindingSets.standard()`, `BindingSets.vim()`, or custom bindings
 - `@OnAction` annotation on Component methods handles actions; use annotation processor for compile-time generation
@@ -121,7 +122,7 @@ class MyApp extends ToolkitApp {
 - `dev.tamboui.style` - Style, Color, Modifier
 - `dev.tamboui.text` - Text, Span, Line for styled text
 - `dev.tamboui.widgets.*` - Widget implementations (block, paragraph, list, table, chart, canvas, sparkline, etc.)
-- `dev.tamboui.tui` - TuiRunner, TuiConfig, RenderThread, event types
+- `dev.tamboui.tui` - TuiRunner, TuiConfig, RenderThread, RenderClock, event types
 - `dev.tamboui.tui.bindings` - Bindings, BindingSets, KeyTrigger, MouseTrigger, ActionHandler, @OnAction
 - `dev.tamboui.toolkit` - Toolkit DSL factory methods, Element interface, element implementations
 - `dev.tamboui.css` - StyleEngine, CssParser, selectors, cascade resolution

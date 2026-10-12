@@ -27,7 +27,7 @@ import dev.tamboui.tui.Renderer;
  * <ul>
  *   <li><b>Element-targeted:</b> Effects can target specific elements by ID</li>
  *   <li><b>Non-invasive:</b> Uses wrapper pattern like FpsOverlay</li>
- *   <li><b>Automatic timing:</b> Uses TickEvent elapsed time for consistency</li>
+ *   <li><b>Automatic timing:</b> Advances effects by the real time between renders, measured by a {@link dev.tamboui.tui.RenderClock}</li>
  *   <li><b>Resize-safe:</b> Effects follow elements automatically on resize</li>
  * </ul>
  * <p>

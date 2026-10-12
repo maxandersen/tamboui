@@ -23,7 +23,7 @@ import dev.tamboui.tui.TuiRunner;
  * <b>Design Philosophy:</b>
  * <ul>
  *   <li><b>Non-invasive:</b> Wraps existing handlers without requiring changes to application code</li>
- *   <li><b>Automatic timing:</b> Uses TickEvent elapsed time for consistent animation</li>
+ *   <li><b>Automatic timing:</b> Advances effects by the real time between renders, measured by a {@link dev.tamboui.tui.RenderClock}</li>
  *   <li><b>Forced redraws:</b> Automatically triggers redraws when effects are running</li>
  * </ul>
  * <p>

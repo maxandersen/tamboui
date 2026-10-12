@@ -42,13 +42,13 @@ class TfxIntegrationTest {
         });
 
         // First tick: the first render measures no time yet
-        handler.handle(TickEvent.of(1, Duration.ofMillis(16)), null);
+        handler.handle(TickEvent.of(1), null);
         renderer.render(frame);
         assertThat(timer.remaining().asMillis()).isEqualTo(1000);
 
         // One tick period of real time passes before the next render
         clock.advance(Duration.ofMillis(16));
-        handler.handle(TickEvent.of(2, Duration.ofMillis(16)), null);
+        handler.handle(TickEvent.of(2), null);
         renderer.render(frame);
         assertThat(timer.remaining().asMillis()).isEqualTo(984);
 
@@ -60,7 +60,7 @@ class TfxIntegrationTest {
         assertThat(timer.remaining().asMillis()).isEqualTo(984);
 
         clock.advance(Duration.ofMillis(16));
-        handler.handle(TickEvent.of(3, Duration.ofMillis(16)), null);
+        handler.handle(TickEvent.of(3), null);
         renderer.render(frame);
         assertThat(timer.remaining().asMillis()).isEqualTo(968);
     }

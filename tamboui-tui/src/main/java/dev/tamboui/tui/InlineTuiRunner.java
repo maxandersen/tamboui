@@ -81,7 +81,6 @@ public final class InlineTuiRunner implements AutoCloseable {
     private final ScheduledFuture<?> schedulerTask;
     private final AtomicLong frameCount;
     private final Thread shutdownHook;
-    private final AtomicReference<Instant> lastTick;
     private final AtomicReference<Instant> nextTickTime;
     private final AtomicReference<Size> lastSize;
     private final TerminalInputReader inputReader;
@@ -94,7 +93,6 @@ public final class InlineTuiRunner implements AutoCloseable {
         this.running = new AtomicBoolean(true);
         this.cleanedUp = new AtomicBoolean(false);
         this.frameCount = new AtomicLong(0);
-        this.lastTick = new AtomicReference<>(Instant.now());
         this.nextTickTime = new AtomicReference<>(
                 config.tickRate() != null ? Instant.now().plus(config.tickRate()) : null);
         this.lastSize = new AtomicReference<>(readCurrentSize(backend));
@@ -460,13 +458,10 @@ public final class InlineTuiRunner implements AutoCloseable {
             Instant targetTime = nextTickTime.get();
 
             if (targetTime != null && !now.isBefore(targetTime)) {
-                Instant previous = lastTick.getAndSet(now);
-                Duration elapsed = Duration.between(previous, now);
-
                 nextTickTime.set(targetTime.plus(config.tickRate()));
 
                 long frame = frameCount.incrementAndGet();
-                eventQueue.offer(TickEvent.of(frame, elapsed));
+                eventQueue.offer(TickEvent.of(frame));
             }
         }
     }

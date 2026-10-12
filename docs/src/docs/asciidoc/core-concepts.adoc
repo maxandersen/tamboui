@@ -273,11 +273,21 @@ include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=
 
 === TickEvent
 
-Tick events fire periodically for animations:
+Tick events fire periodically for animations. A tick is a pulse that asks for a redraw; it carries no time.
+At most one tick waits in the queue at a time, so ticks do not pile up when handling and rendering take longer than the tick rate.
 
 [source,java]
 ----
 include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=tick-event-basics,indent=0]
+----
+
+To advance an animation by real time, measure it at the render with a `RenderClock` rather than counting ticks.
+The clock is monotonic, carries sub-millisecond time so there is no drift, and clamps a long gap such as a laptop sleep or a debugger pause.
+To step once per tick, use `TickEvent.frameCount()`.
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=render-clock-basics,indent=0]
 ----
 
 === Exceptions

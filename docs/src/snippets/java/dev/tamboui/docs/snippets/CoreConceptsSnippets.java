@@ -18,6 +18,7 @@ import dev.tamboui.layout.Layout;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
+import dev.tamboui.tui.RenderClock;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
@@ -364,11 +365,26 @@ public class CoreConceptsSnippets {
             .tickRate(Duration.ofMillis(16))  // ~60fps
             .build();
 
-        // Handle tick
+        // A tick is a pulse that asks for a redraw; it carries no time
         if (event instanceof TickEvent) {
             updateAnimation();
             // return true to trigger redraw
         }
         // end::tick-event-basics[]
+    }
+
+    private final RenderClock clock = new RenderClock();
+
+    void renderClockBasics(Frame frame) {
+        // tag::render-clock-basics[]
+        // Advance an animation by the real time since the last render. RenderClock is
+        // monotonic, carries sub-millisecond time so there is no drift, and clamps a
+        // long gap (a sleep or a debugger pause) so the animation does not jump ahead.
+        Duration elapsed = clock.tick();
+        updateAnimation(elapsed);
+        // end::render-clock-basics[]
+    }
+
+    private void updateAnimation(Duration elapsed) {
     }
 }
