@@ -271,7 +271,12 @@ public final class ScrollableElement extends ContainerElement<ScrollableElement>
 
         frame.renderStatefulWidget(scrollbar, scrollbarArea, state);
 
-        Layout layout = Layout.vertical().constraints(constraints.toArray(new Constraint[0]));
+        // Lay out only the visible window, not every child: the visible slice fits
+        // innerArea by construction, so this stays cheap even with hundreds of
+        // children (otherwise Layout.split is O(N^3) in the child count). See #559.
+        List<Constraint> visibleConstraints =
+                constraints.subList(startingPosition, startingPosition + visibleChildren.size());
+        Layout layout = Layout.vertical().constraints(visibleConstraints.toArray(new Constraint[0]));
         List<Rect> areas = layout.split(innerArea);
 
         // Render children

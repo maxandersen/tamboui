@@ -4,12 +4,15 @@
  */
 package dev.tamboui.layout;
 
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class LayoutTest {
 
@@ -177,5 +180,22 @@ class LayoutTest {
             assertThat(rect.left()).as("rect[" + i + "] left").isGreaterThanOrEqualTo(area.left());
             assertThat(rect.right()).as("rect[" + i + "] right").isLessThanOrEqualTo(area.right());
         }
+    }
+
+    @Test
+    @DisplayName("Many fixed lengths that fit solve in linear time (issue #559)")
+    void manyFixedLengthsAreFast() {
+        Constraint[] constraints = new Constraint[1000];
+        Arrays.fill(constraints, Constraint.length(1));
+        Rect area = new Rect(0, 0, 100, 1000);
+
+        // Without the all-Length fast path this runs the exact-arithmetic simplex at
+        // roughly O(N^3) and takes minutes; the budget guards against regressing it.
+        List<Rect> rects = assertTimeoutPreemptively(Duration.ofSeconds(2),
+            () -> Layout.vertical().constraints(constraints).split(area));
+
+        assertThat(rects).hasSize(1000);
+        assertThat(rects).allSatisfy(rect -> assertThat(rect.height()).isEqualTo(1));
+        assertThat(rects.get(999).top()).isEqualTo(999);
     }
 }

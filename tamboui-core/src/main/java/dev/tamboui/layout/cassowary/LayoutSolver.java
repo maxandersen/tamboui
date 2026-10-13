@@ -64,6 +64,15 @@ public final class LayoutSolver {
             return new int[0];
         }
 
+        // Fast path: when every constraint is a fixed Length and they all fit, the
+        // sizes are exactly those values (any slack becomes flex gaps, handled by the
+        // caller). This is provably identical to the simplex result for this case and
+        // avoids the O(N^3) solver entirely. See issue #559.
+        int[] fixed = tryFixedLengthFastPath(constraints, available);
+        if (fixed != null) {
+            return fixed;
+        }
+
         solver.reset();
 
         Variable[] sizes = new Variable[n];
@@ -108,6 +117,32 @@ public final class LayoutSolver {
         }
 
         return roundWithConstraint(fractionSizes, available);
+    }
+
+    /**
+     * Returns the sizes directly when every constraint is a {@link Constraint.Length}
+     * whose total fits the available space, or {@code null} when the general solver is
+     * required. In the fitting all-length case each segment keeps its exact length, so
+     * no simplex pass is needed.
+     *
+     * @param constraints the layout constraints
+     * @param available   the distributable space (spacing already removed)
+     * @return exact sizes, or {@code null} if the solver must run
+     */
+    private static int[] tryFixedLengthFastPath(List<Constraint> constraints, int available) {
+        int n = constraints.size();
+        int[] sizes = new int[n];
+        long sum = 0;
+        for (int i = 0; i < n; i++) {
+            Constraint c = constraints.get(i);
+            if (!(c instanceof Constraint.Length)) {
+                return null;
+            }
+            int value = ((Constraint.Length) c).value();
+            sizes[i] = value;
+            sum += value;
+        }
+        return sum <= available ? sizes : null;
     }
 
     /**
